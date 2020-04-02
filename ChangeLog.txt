@@ -1,0 +1,4 @@
+02/04/2020
+- First major commit, via the correct methods
+- Removed old files that were no longer relevant
+- Committed Main and Run-AIP.sh, but not Eval and Total_Eval.sh because both still contain personal identifiers
