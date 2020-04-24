@@ -9,17 +9,11 @@ from get_functions import list_method_A_functions, list_method_B_functions, list
 
 startTime = datetime.now()
 
-# Put the options for modules in a dictionary, so user can pick which one they want
-functions_list = [o for o in getmembers(main_modulev3) if isfunction(o[1])]
-# print(functions_list)
+print('AIP started')
 
-dictionary_of_functions = {}
-for function in functions_list:
-    dictionary_of_functions[function[0]] = function[1]
-
-
+# Open the file that stored the selected modules, and store the selections in
+# a list.
 file_for_functions = os.environ['output_folder'] + '/Selected_modules.csv'
-# file_for_functions = '/home/thomas/Documents' + '/Selected_modules.csv'
 with open(file_for_functions, 'r') as file:
     list_of_functions_that_were_choosen = []
     for line in csv.reader(file):
@@ -28,7 +22,9 @@ with open(file_for_functions, 'r') as file:
         else:
             list_of_functions_that_were_choosen.extend(line)
 
-# >>>>>>>>> Needs to be here so it can be called immediately
+
+# >>>>>>>>> Needs to be here so it can be called immediately, fine what data
+# files have not been processed.
 def find_new_data_files(b, c):
     list_of_new_data_files = []
     list_of_data_files = os.listdir(b)
@@ -77,6 +73,7 @@ directory_path_historical_ratings = AIPP_direcory + '/Historical_Ratings'
 
 # >>>>>>>>>>>>>>> Call the find new file function and define the time reference point for the aging function
 new_data_files, date = find_new_data_files(folder_path_for_raw_Splunk_data, record_file_path_for_processed_Splunk_files)
+print('There are ', len(new_data_files), ' new data files to process')
 current_time = datetime(int(date[0:4]), int(date[5:7]), int(date[8:10]), 1).timestamp()
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Blacklist Files <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
