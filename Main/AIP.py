@@ -28,7 +28,6 @@ with open(file_for_functions, 'r') as file:
         else:
             list_of_functions_that_were_choosen.extend(line)
 
-
 # >>>>>>>>> Needs to be here so it can be called immediately
 def find_new_data_files(b, c):
     list_of_new_data_files = []
