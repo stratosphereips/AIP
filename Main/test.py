@@ -29,4 +29,7 @@ import main_modulev3
 
 functions_list = [o[0] for o in getmembers(main_modulev3) if isfunction(o[1])]
 
-print(functions_list)
+method_to_call = getattr(main_modulev3, functions_list[1])
+result = method_to_call()
+
+print(result)

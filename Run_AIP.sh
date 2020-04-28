@@ -1,60 +1,88 @@
 #!/bin/bash
-echo ............................
-echo Directory where you want results, no slash at end:
-read output_folder_directory
-echo ............................
+answer1="Yes"
+answer2="No"
+answer3="1"
+answer4="2"
 
-# Check to see if the directory is real.
-while [ ! -d $output_folder_directory ]
+echo "............................"
+echo "Please Select a option from the menu[1,2]:"
+echo "(1) New Instance, create ouput folder and folders"
+echo "(2) Running Instance, save output to an existing folder"
+read option
+echo "............................"
+
+echo "Location of input data files(Can contain one or more files):"
+read input_data_folder
+echo "............................"
+
+while [ ! -d $input_data_folder ]
 do
    echo Not a real directory, please input a real one:
-   read output_folder_directory
+   read input_data_folder
    echo ............................
 done
 
-# Input a name that you want for these results
-echo Pick a name that does not already exist for your results folder:
-read name_of_results_folder
-echo ............................
-
-# Check to see if directory already exists.
-while [ -d $output_folder_directory/$name_of_results_folder ]
-do
-   echo Directory alreay exists, please name it something else:
-   read name_of_results_folder
-   echo ...................
-done
-
-directory_of_AIP=$(pwd)
-
-output_folder=$output_folder_directory/$name_of_results_folder
-mkdir $output_folder/
-mkdir $output_folder/Historical_Ratings/
-mkdir $output_folder/Evaluations/
-touch $output_folder/Evaluations/averages.csv
-touch $output_folder/Evaluations/all_percentages.csv
-mkdir $output_folder/Historical_Ratings/Prioritize_Consistent/
-mkdir $output_folder/Historical_Ratings/Prioritize_New/
-mkdir $output_folder/Historical_Ratings/Seen_today_Only/
-mkdir $output_folder/Historical_Ratings/Traditional/
-touch $output_folder/Absolute_Data.csv
-touch $output_folder/Known_IPs.txt
-touch $output_folder/Processed_Splunk_Files.txt
-touch $output_folder/Times.csv
-touch $output_folder/Selected_modules.csv
+if [ "$option" = "$answer3" ]
+then
+		echo New Directory where you want results, no slash at end:
+		read output_folder
+		echo ............................
+		# Check to see if the directory is real.
+		while [ ! -d $output_folder ]
+		do
+			echo Not a real directory, do you wish to create it? [Yes,No]
+			read answer
+		  if [ "$answer" = "$answer1" ]
+		  then
+		  	mkdir $output_folder
+				mkdir $output_folder/Input_Data/
+				mkdir $output_folder/Historical_Ratings/
+				mkdir $output_folder/Historical_Ratings/Prioritize_Consistent/
+				mkdir $output_folder/Historical_Ratings/Prioritize_New/
+				mkdir $output_folder/Historical_Ratings/Seen_today_Only/
+				mkdir $output_folder/Historical_Ratings/Traditional/
+				touch $output_folder/Absolute_Data.csv
+				touch $output_folder/Known_IPs.txt
+				touch $output_folder/Processed_Splunk_Files.txt
+				touch $output_folder/Times.csv
+				touch $output_folder/Selected_modules.csv
+		  elif [ "$answer" = "$answer2" ]
+		  then
+		  	echo Input different location:
+		  	read output_folder
+				mkdir $output_folder/Historical_Ratings/
+				mkdir $output_folder/Input_Data/
+				mkdir $output_folder/Historical_Ratings/Prioritize_Consistent/
+				mkdir $output_folder/Historical_Ratings/Prioritize_New/
+				mkdir $output_folder/Historical_Ratings/Seen_today_Only/
+				mkdir $output_folder/Historical_Ratings/Traditional/
+				touch $output_folder/Absolute_Data.csv
+				touch $output_folder/Known_IPs.txt
+				touch $output_folder/Processed_Splunk_Files.txt
+				touch $output_folder/Times.csv
+				touch $output_folder/Selected_modules.csv
+		  else
+		  	continue
+			echo ............................
+		  fi
+		done
+elif [ "$option" = "$answer4" ]
+then
+	echo "Please Input location of current instance ouput files:"
+	read output_folder
+fi
 
 # Export all variables so they can be accessed by AIP.py
 export output_folder
 export input_data_folder
 
+directory_of_AIP=$(pwd)
+
 python3 $directory_of_AIP/Main/Select_Modules.py
-python3 $directory_of_AIP/Main/AIP.py
 
 for entry in $input_data_folder/*
 do
-   cp "$entry" $output_folder/
+   cp "$entry" $output_folder/Input_Data/
    echo "$entry"
-   python3 /home/thomas/Test/Gradual/B20-E20/AIP.py
+   python3 $directory_of_AIP/Main/AIP.py
 done
-#
-# python3 /home/thomas/Test/Gradual/B20-E20/Eval/Eval-Main1.1.py

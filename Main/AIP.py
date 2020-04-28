@@ -22,6 +22,8 @@ with open(file_for_functions, 'r') as file:
         else:
             list_of_functions_that_were_choosen.extend(line)
 
+functions_list = [o for o in getmembers(main_modulev3) if isfunction(o[1])]
+
 
 # >>>>>>>>> Needs to be here so it can be called immediately, fine what data
 # files have not been processed.
@@ -51,7 +53,7 @@ AIPP_direcory = os.environ['output_folder']
 # Full path to the  folder where the program will look for new data files. It will look in the file and only process the
 # files it has not precessed yet. It will process every file it does not recognize.
 # (b)
-folder_path_for_raw_Splunk_data = os.environ['input_data_folder']
+folder_path_for_raw_Splunk_data = AIPP_direcory + '/Input_Data'
 
 # Full path to the file where the program will record the data files it processes
 # (c)
@@ -232,9 +234,9 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
 
 # Pull the three functions that were choosen by the user from the dictionary of functions.
 print(list_of_functions_that_were_choosen)
-PCF = dictionary_of_functions[list_of_functions_that_were_choosen[0]]
-PNF = dictionary_of_functions[list_of_functions_that_were_choosen[1]]
-OTF = dictionary_of_functions[list_of_functions_that_were_choosen[2]]
+PCF = getattr(main_modulev3, list_of_functions_that_were_choosen[0])
+PNF = getattr(main_modulev3, list_of_functions_that_were_choosen[1])
+OTF = getattr(main_modulev3, list_of_functions_that_were_choosen[2])
 
 # Call the create blacklist function for each of the three user input functions
 create_final_blacklist(top_IPs_for_all_time, new_absolute_file_data, PCF)
