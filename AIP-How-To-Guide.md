@@ -10,11 +10,12 @@ In this document, I will describe how to use the AIP algorithm tool. Since it is
 ## Steps
 1. Download or clone the repo to a directory of your choosing. It contains all necessary files and folders
 2. cd /the/location/of/the/AIP_repo
-3. To run AIP, execute ./Run_AIP.sh
-4. Follow the onscreen instructions. Depending on whether this is the first time you have run it or not, it will ask you for the location of your input data files, and then the location that you want the output to be saved to.
-5. cd /the/location/you/specified/for/the/output/Files
-6. There you will see a number of folders and files. These are the files AIP uses to remember past runs. 
-7. Go to the directory /Historical_Ratings/ to see the output blacklists.
+3. chmod u+x Run_AIP.sh
+4. To run AIP, execute ./Run_AIP.sh
+5. Follow the onscreen instructions. Depending on whether this is the first time you have run it or not, it will ask you for the location of your input data files, and then the location that you want the output to be saved to.
+6. cd /the/location/you/specified/for/the/output/Files
+7. There you will see a number of folders and files. These are the files AIP uses to remember past runs. 
+8. Go to the directory /Historical_Ratings/ to see the output blacklists.
 ## The Input Data
 In terms of file format for the input data, the program accepts a .csv file that has one IP per line, with each of the following data inputs for each IP on that line, separated by commas:
 1. The IP address
