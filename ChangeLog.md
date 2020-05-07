@@ -18,3 +18,9 @@
 - If directoy exist, creates needed folders in it, if it does not, asks if we wisd to continue, and creates it all
 - If not a new instance, simple asks where the old instance is.
 - IMPORTANT - There is a bug with updating an old instance!
+
+07/05/2020
+- Updated README.md files
+- Updated AIP-How-To-Guide.md
+
+-
