@@ -5,6 +5,7 @@
 # the first time seen, it uses the last time the IP is seen. That way, if an IP is consistent every day, its score will
 # not decrease, while IPs that are active for only a day will decrease faster.
 import math
+import csv
 
 
 def prioritize_consistent_original(list_of_flows, time_of_newest_data_file):
@@ -155,7 +156,9 @@ def prioritize_new_original(list_of_flows, time_of_newest_data_file):
         return list_of_raw_ratings
 
 
-def prioritize_consistent_normalized(list_of_flows, time_of_newest_data_file):
+def prioritize_consistent_normalized(list_of_flows, time_of_newest_data_file, path_to_aging_file):
+    counter = 0
+    aging_file_data = open_and_read_aging_file(path_to_aging_file)
     # These values will define which of the four metrics are the most important
     total_event_weight = 0.05
     average_event_weight = 0.20
@@ -248,21 +251,35 @@ def prioritize_consistent_normalized(list_of_flows, time_of_newest_data_file):
         # This is the time modifier section. The longer an IP does not have any events, the lower its score will
         # be. An IP will lose .01 of its score per day that it is not active, thus taking 100 days to be reduced
         # to a score of zero.
+        calculated_score = (event_score + average_events_score + duration_score + average_duration_score
+                                      + bytes_score + average_bytes_score + packets_score + average_packets_score)
         if (time_of_newest_data_file - last_event) < 86400:
-            time_modifier = 1
+            if flow[0] in aging_file_data:
+                time_modifier = float(aging_file_data[flow[0]])
+            else:
+                time_modifier = 0
         else:
             time_modifier_factor = (time_of_newest_data_file - last_event) // 86400
             # I am using the general function y = x/(x + 10), where x is the number of days an IP is not seen.
             # In this way, the amount by which a score will decrease will increase to about 50% in about 30 days,
             # and will infinities approach 100% after that.
-            time_modifier = 6 / (time_modifier_factor + 6)
-        total_score = math.sqrt((event_score + average_events_score + duration_score + average_duration_score
-                                 + bytes_score + average_bytes_score + packets_score + average_packets_score) * time_modifier)
+            time_modifier = calculated_score - (calculated_score * (2 / (time_modifier_factor + 2)))
+            if flow[0] in aging_file_data:
+                updated_entry = {flow[0]: time_modifier}
+                aging_file_data.update(updated_entry)
+            else:
+                aging_file_data[flow[0]] = time_modifier
+        total_score = calculated_score - time_modifier
         list_of_raw_ratings.append([flow[0], total_score])
+        counter += 1
+    write_to_aging_file(path_to_aging_file, aging_file_data)
+    print(counter)
     return list_of_raw_ratings
 
 
-def prioritize_new_normalized(list_of_flows, time_of_newest_data_file):
+def prioritize_new_normalized(list_of_flows, time_of_newest_data_file, path_to_aging_file):
+    counter = 0
+    aging_file_data = open_and_read_aging_file(path_to_aging_file)
     # These values will define which of the four metrics are the most important
     total_event_weight = 0.20
     average_event_weight = 0.05
@@ -352,23 +369,37 @@ def prioritize_new_normalized(list_of_flows, time_of_newest_data_file):
         average_packets_score = (
                     ((average_packets - min_av_packet) / (max_av_packet - min_av_packet)) * average_packet_weight)
 
-        # This is the time modifier section. The longer an IP does not have any events, the lower its score will
-        # be. An IP will lose .01 of its score per day that it is not active, thus taking 100 days to be reduced
-        # to a score of zero.
+        calculated_score = (event_score + average_events_score + duration_score + average_duration_score
+                            + bytes_score + average_bytes_score + packets_score + average_packets_score)
         if (time_of_newest_data_file - last_event) < 86400:
-            time_modifier = 1
+            if flow[0] in aging_file_data:
+                time_modifier = float(aging_file_data[flow[0]])
+            else:
+                time_modifier = 0
         else:
             time_modifier_factor = (time_of_newest_data_file - last_event) // 86400
             # I am using the general function y = x/(x + 10), where x is the number of days an IP is not seen.
             # In this way, the amount by which a score will decrease will increase to about 50% in about 30 days,
             # and will infinities approach 100% after that.
-            time_modifier = 6 / (time_modifier_factor + 6)
-        total_score = math.sqrt((event_score + average_events_score + duration_score + average_duration_score
-                                 + bytes_score + average_bytes_score + packets_score + average_packets_score) * time_modifier)
+            time_modifier = calculated_score - (calculated_score * (2 / (time_modifier_factor + 2)))
+            if flow[0] in aging_file_data:
+                updated_entry = {flow[0]: time_modifier}
+                aging_file_data.update(updated_entry)
+            else:
+                aging_file_data[flow[0]] = time_modifier
+        write_to_aging_file(path_to_aging_file, aging_file_data)
+        total_score = calculated_score - time_modifier
         list_of_raw_ratings.append([flow[0], total_score])
+        counter += 1
+        if flow not in list_of_flows:
+            print(counter)
+            write_to_aging_file(path_to_aging_file, aging_file_data)
+            return list_of_raw_ratings
+    write_to_aging_file(path_to_aging_file, aging_file_data)
+    print(counter)
     return list_of_raw_ratings
 
-def todays_ips_only_normalized(list_of_flows, time_of_newest_data_file):
+def todays_ips_only_normalized(list_of_flows, time_of_newest_data_file, path_to_aging_file):
     # These values will define which of the four metrics are the most important
     total_event_weight = 0.05
     average_event_weight = 0.20
@@ -463,3 +494,20 @@ def todays_ips_only_normalized(list_of_flows, time_of_newest_data_file):
                                  + bytes_score + average_bytes_score + packets_score + average_packets_score))
         list_of_raw_ratings.append([flow[0], total_score])
     return list_of_raw_ratings
+
+def open_and_read_aging_file(path_to_aging_file):
+    dictionary = {}
+    with open(path_to_aging_file, 'r') as file:
+        for line in csv.reader(file):
+            dictionary[line[0]]=line[1]
+    return dictionary
+
+def write_to_aging_file(path_to_aging_file, data):
+    with open(path_to_aging_file, 'w') as file:
+        wr2 = csv.writer(file, quoting=csv.QUOTE_ALL)
+        for ip, age in data.items():
+            list = []
+            list.append(ip)
+            list.append(age)
+            wr2.writerow(list)
+        

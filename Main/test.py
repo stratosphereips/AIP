@@ -21,15 +21,20 @@
 # print(os.environ['prioritize_new'])
 # print(os.environ['only_todays_ips'])
 # print(os.environ['eval_data_folder'])
-from inspect import getmembers, isfunction
-import main_modulev3
+# from inspect import getmembers, isfunction
+# import main_modulev3
+#
+# # This is a test
+#
+#
+# functions_list = [o[0] for o in getmembers(main_modulev3) if isfunction(o[1])]
+#
+# method_to_call = getattr(main_modulev3, functions_list[1])
+# result = method_to_call()
+#
+updated_entry = {'2': 2}
+dictionary = {'2': 1, '3': 3 }
 
-# This is a test
+dictionary.update(updated_entry)
 
-
-functions_list = [o[0] for o in getmembers(main_modulev3) if isfunction(o[1])]
-
-method_to_call = getattr(main_modulev3, functions_list[1])
-result = method_to_call()
-
-print(result)
+print(dictionary)

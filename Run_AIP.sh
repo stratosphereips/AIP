@@ -46,6 +46,8 @@ then
 				touch $output_folder/Processed_Splunk_Files.txt
 				touch $output_folder/Times.csv
 				touch $output_folder/Selected_modules.csv
+        touch $output_folder/Aging-modifiers-pc.csv
+        touch $output_folder/Aging-modifiers-pn.csv
 		  elif [ "$answer" = "$answer2" ]
 		  then
 		  	echo Input different location:

@@ -41,10 +41,9 @@ def find_new_data_files(b, c):
         with open(c, 'a') as records_file1:
             records_file1.write(file12 + '\n')
     sorted_dates = sorted(dictionary_of_dates_on_files, key=lambda date: datetime.strptime(date, '%Y-%m-%d'))
-    if len(sorted_dates) == 1:
-        return list_of_new_data_files, sorted_dates[0]
-    else:
-        return list_of_new_data_files, sorted_dates[-1]
+    sorted_dates.reverse()
+    print(sorted_dates)
+    return list_of_new_data_files, sorted_dates[0]
 
 # Full path to directory where all the files will be stored
 # (a)
@@ -96,6 +95,10 @@ traditional_blacklist = directory_path_historical_ratings + '/Traditional/' + da
 
 # File that will be storing the run times for this script
 time_file = AIPP_direcory + '/Times.csv'
+
+# Files for keeping track of aging modifiers
+path_aging_modifier_pc = AIPP_direcory + '/Aging-modifiers-pc.csv'
+path_aging_modifier_pn = AIPP_direcory + '/Aging-modifiers-pn.csv'
 
 def open_sort_new_file(b, list_of_new_files):
     list_of_new_data_flows = []
@@ -221,19 +224,44 @@ new_absolute_file_data, new_IPs = open_sort_abs_file(record_file_path_for_absolu
 def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_use):
     with open(path_to_file, 'w') as new_file2:
         write2 = csv.writer(new_file2, quoting=csv.QUOTE_ALL)
-        # write2.writerow(('Top IPs from data gathered in last 24 hours only', date))
-        # write2.writerow(('Number', 'IP address', 'Rating'))
-        for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time))):
-            if x2 <= 24999.0:
+        write2.writerow(('Top IPs from data gathered in last 24 hours only', date))
+        write2.writerow(('Number', 'IP address', 'Rating'))
+        if function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[1]):
+            print('using pn')
+            for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pn))):
+                if float(interesting_rating2[1]) >= 0.003:
+                    new_list2 = []
+                    new_list2.append(x2)
+                    new_list2.append(list(interesting_rating2)[0])
+                    new_list2.append(interesting_rating2[1])
+                    write2.writerow(new_list2)
+                else:
+                    break
+        elif function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[0]):
+            print('using pc')
+            for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pc))):
+                if float(interesting_rating2[1]) >= 0.003:
+                    new_list2 = []
+                    new_list2.append(x2)
+                    new_list2.append(list(interesting_rating2)[0])
+                    new_list2.append(interesting_rating2[1])
+                    write2.writerow(new_list2)
+                else:
+                    break
+        else:
+            print('using to')
+            for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pc))):
                 new_list2 = []
+                new_list2.append(x2)
                 new_list2.append(list(interesting_rating2)[0])
+                new_list2.append(interesting_rating2[1])
                 write2.writerow(new_list2)
-            else:
-                break
+
 
 
 # Pull the three functions that were choosen by the user from the dictionary of functions.
-print(list_of_functions_that_were_choosen)
+# print(list_of_functions_that_were_choosen)
+
 PCF = getattr(main_modulev3, list_of_functions_that_were_choosen[0])
 PNF = getattr(main_modulev3, list_of_functions_that_were_choosen[1])
 OTF = getattr(main_modulev3, list_of_functions_that_were_choosen[2])
@@ -241,7 +269,7 @@ OTF = getattr(main_modulev3, list_of_functions_that_were_choosen[2])
 # Call the create blacklist function for each of the three user input functions
 create_final_blacklist(top_IPs_for_all_time, new_absolute_file_data, PCF)
 create_final_blacklist(top_IPs_all_time_newer_prioritized, new_absolute_file_data, PNF)
-create_final_blacklist(top_IPs_seen_today, new_absolute_file_data, OTF)
+create_final_blacklist(top_IPs_seen_today, unknown_IP_flows_from_new_data, OTF)
 
 
 shutil.copy2(record_file_path_to_known_IPs, traditional_blacklist)
