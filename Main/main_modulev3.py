@@ -387,14 +387,9 @@ def prioritize_new_normalized(list_of_flows, time_of_newest_data_file, path_to_a
                 aging_file_data.update(updated_entry)
             else:
                 aging_file_data[flow[0]] = time_modifier
-        write_to_aging_file(path_to_aging_file, aging_file_data)
         total_score = calculated_score - time_modifier
         list_of_raw_ratings.append([flow[0], total_score])
         counter += 1
-        if flow not in list_of_flows:
-            print(counter)
-            write_to_aging_file(path_to_aging_file, aging_file_data)
-            return list_of_raw_ratings
     write_to_aging_file(path_to_aging_file, aging_file_data)
     print(counter)
     return list_of_raw_ratings

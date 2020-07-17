@@ -4,8 +4,8 @@ import operator
 from datetime import datetime
 import shutil
 import os
+import White-List-Module.py
 import main_modulev3
-from get_functions import list_method_A_functions, list_method_B_functions, list_method_C_functions
 
 startTime = datetime.now()
 
@@ -126,6 +126,15 @@ def open_sort_abs_file(e):
                 IPs_in_absolute_file.append(line[0])
     return IP_flows, IPs_in_absolute_file
 
+def get_updated_flows(location_of_absolute_data_file):
+    IP_flows = []
+    with open(location_of_absolute_data_file, 'r') as csvfile:
+        for line in csv.reader(csvfile):
+            if not line:
+                break
+            else:
+                IP_flows.append([line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10]])
+    return IP_flows
 
 def sort_IPs_from_data(IPs_from_absolute_data, IP_flows_from_todays_data):
     unknown_IP_flows = []
@@ -218,8 +227,10 @@ write_unkown_IPs_to_data_file(unknown_IPs_from_new_data, record_file_path_to_kno
 
 update_records_files(record_file_path_for_absolute_data, known_IP_data_flows_from_new_data, unknown_IP_flows_from_new_data)
 
-new_absolute_file_data, new_IPs = open_sort_abs_file(record_file_path_for_absolute_data)
+# new_absolute_file_data = get_updated_flows(record_file_path_for_absolute_data)
 
+number_of_lines = len(open(record_file_path_for_absolute_data).readlines())
+print(number_of_lines)
 
 def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_use):
     with open(path_to_file, 'w') as new_file2:
@@ -229,7 +240,7 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
         if function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[1]):
             print('using pn')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pn))):
-                if float(interesting_rating2[1]) >= 0.003:
+                if float(interesting_rating2[1]) >= 0.0004:
                     new_list2 = []
                     new_list2.append(x2)
                     new_list2.append(list(interesting_rating2)[0])
@@ -240,7 +251,7 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
         elif function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[0]):
             print('using pc')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pc))):
-                if float(interesting_rating2[1]) >= 0.003:
+                if float(interesting_rating2[1]) >= 0.0004:
                     new_list2 = []
                     new_list2.append(x2)
                     new_list2.append(list(interesting_rating2)[0])
@@ -267,8 +278,8 @@ PNF = getattr(main_modulev3, list_of_functions_that_were_choosen[1])
 OTF = getattr(main_modulev3, list_of_functions_that_were_choosen[2])
 
 # Call the create blacklist function for each of the three user input functions
-create_final_blacklist(top_IPs_for_all_time, new_absolute_file_data, PCF)
-create_final_blacklist(top_IPs_all_time_newer_prioritized, new_absolute_file_data, PNF)
+create_final_blacklist(top_IPs_for_all_time, get_updated_flows(record_file_path_for_absolute_data), PCF)
+create_final_blacklist(top_IPs_all_time_newer_prioritized, get_updated_flows(record_file_path_for_absolute_data), PNF)
 create_final_blacklist(top_IPs_seen_today, unknown_IP_flows_from_new_data, OTF)
 
 
