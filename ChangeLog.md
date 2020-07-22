@@ -23,4 +23,11 @@
 - Updated README.md files
 - Updated AIP-How-To-Guide.md
 
--
+22/07/2020
+- Added a whitlist module, namely before using the main data file, program will check for IPs that should not be blacklisted
+- Added an auto-run script. 
+- Changed the aging function so it keeps track og how much an IP needs to be reduced over time
+- Changed the threshold so that it is dynamic again
+- Fixed the cannot check whitelist bug
+- Fixed the infinite loop bug for the prioritize new normalized rating function
+- Fixed other small bugs and improved code
