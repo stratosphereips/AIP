@@ -32,7 +32,10 @@
 # method_to_call = getattr(main_modulev3, functions_list[1])
 # result = method_to_call()
 #
-from netaddr import IPAddress, IPNetwork
-if IPAddress("192.168.0.3") in IPNetwork("192.168.0.0/24"):
-    print("Yay!")
+# from netaddr import IPAddress, IPNetwork
+# if IPAddress("192.168.0.3") in IPNetwork("192.168.0.0/24"):
+#     print("Yay!")
 
+flow = [2,3,4,[3,4]]
+flow.append([3])
+print(flow)

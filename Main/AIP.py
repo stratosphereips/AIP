@@ -1,10 +1,11 @@
 from inspect import getmembers, isfunction
+from netaddr import IPAddress, IPNetwork
 import csv
 import operator
 from datetime import datetime
 import shutil
 import os
-import White-List-Module.py
+from whitelist_module import load_whitelist, check_if_ip_is_in_whitelisted_nets, check_if_ip_is_in_whitelisted_ips
 import main_modulev3
 
 startTime = datetime.now()
@@ -200,6 +201,16 @@ def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
                     break
                 else:
                     continue
+
+    whitelisted_nets, whitelisted_ips = load_whitelist()
+    for index, flow in enumerate(new_absolute_file_flows):
+        judgement1 = check_if_ip_is_in_whitelisted_nets(flow[0], whitelisted_nets)
+        judgement2 = check_if_ip_is_in_whitelisted_ips(flow[0], whitelisted_ips)
+        if (judgement1==True) or (judgement2==True) is True:
+            del new_absolute_file_flows[index]
+            print('Found ', flow[0], ' in Whitelisted IPs. Deleting entry...')
+        else:
+            continue
 
     with open(e, 'w') as new_file_another:
         wr2 = csv.writer(new_file_another, quoting=csv.QUOTE_ALL)
