@@ -246,7 +246,7 @@ print(number_of_lines)
 def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_use):
     with open(path_to_file, 'w') as new_file2:
         write2 = csv.writer(new_file2, quoting=csv.QUOTE_ALL)
-        write2.writerow(('Top IPs from data gathered in last 24 hours only', date))
+        write2.writerow(('# Top IPs from data gathered in last 24 hours only', date))
         write2.writerow(('Number', 'IP address', 'Rating'))
         if function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[1]):
             print('using pn')
