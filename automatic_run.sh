@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Please Input location of current instance
-output_folder='/home/aposematworker/AIP/Out-Put'
+output_folder=
 
 # Please Input location of input data files
-input_data_folder='/home/aposematworker/AIP/AIP-Splunk-Data'
+input_data_folder=
 
 # Export all variables so they can be accessed by AIP.py
 export output_folder
