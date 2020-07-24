@@ -81,18 +81,18 @@ current_time = datetime(int(date[0:4]), int(date[5:7]), int(date[8:10]), 1).time
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Blacklist Files <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # Path to the file that will contain top IPs from today's data only. Program will overwrite the previous days data.
 # (g)
-top_IPs_seen_today = directory_path_historical_ratings + '/Seen_today_Only/' + date + '_blacklist.csv'
+top_IPs_seen_today = directory_path_historical_ratings + '/Seen_today_Only/' + date + '_new_blacklist.csv'
 
 # Path to file that will contain the top IPs from the data from all time. Program will overwrite the previous days data.
 # (h)
-top_IPs_for_all_time = directory_path_historical_ratings + '/Prioritize_Consistent/' + date + '_blacklist.csv'
+top_IPs_for_all_time = directory_path_historical_ratings + '/Prioritize_Consistent/' + date + '_pc_blacklist.csv'
 
 # Path to file that will have the ratings that will prioritize the IPs that are newer over older ones based on
 # all the data.
-top_IPs_all_time_newer_prioritized = directory_path_historical_ratings + '/Prioritize_New/' + date + '_blacklist.csv'
+top_IPs_all_time_newer_prioritized = directory_path_historical_ratings + '/Prioritize_New/' + date + '_pn_blacklist.csv'
 
 # Path to file that will save the traditional blacklist
-traditional_blacklist = directory_path_historical_ratings + '/Traditional/' + date + '_blacklist.csv'
+traditional_blacklist = directory_path_historical_ratings + '/Traditional/' + date + '_trad_blacklist.csv'
 
 # File that will be storing the run times for this script
 time_file = AIPP_direcory + '/Times.csv'
