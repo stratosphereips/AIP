@@ -251,7 +251,7 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
         if function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[1]):
             print('using pn')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pn))):
-                if float(interesting_rating2[1]) >= 0.0004:
+                if float(interesting_rating2[1]) >= 0.00008:
                     new_list2 = []
                     new_list2.append(x2)
                     new_list2.append(list(interesting_rating2)[0])
