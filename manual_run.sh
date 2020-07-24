@@ -78,7 +78,10 @@ fi
 export output_folder
 export input_data_folder
 
-directory_of_AIP=$(pwd)
+directory_of_AIP=$(dirname $(readlink -f "manual_run.sh"))
+
+echo $directory_of_AIP
+echo $directory_of_AIP/Main/Select_Modules.py
 
 python3 $directory_of_AIP/Main/Select_Modules.py
 
