@@ -46,6 +46,8 @@ then
 				touch $output_folder/Processed_Splunk_Files.txt
 				touch $output_folder/Times.csv
 				touch $output_folder/Selected_modules.csv
+        			touch $output_folder/Aging-modifiers-pc.csv
+        			touch $output_folder/Aging-modifiers-pn.csv
 		  elif [ "$answer" = "$answer2" ]
 		  then
 		  	echo Input different location:
@@ -76,7 +78,10 @@ fi
 export output_folder
 export input_data_folder
 
-directory_of_AIP=$(pwd)
+directory_of_AIP=$(dirname $(readlink -f "manual_run.sh"))
+
+echo $directory_of_AIP
+echo $directory_of_AIP/Main/Select_Modules.py
 
 python3 $directory_of_AIP/Main/Select_Modules.py
 
