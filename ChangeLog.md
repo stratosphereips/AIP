@@ -1,3 +1,6 @@
+17/09/2020
+- Moved the daily blacklists to a separte repository
+
 15/09/2020
 - Created branch V3.0.0 for next major update
 
