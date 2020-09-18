@@ -1,3 +1,6 @@
+18/09/2020
+- Modified thresholds to shrink lists
+
 17/09/2020
 - Moved the daily blacklists to a separte repository
 
