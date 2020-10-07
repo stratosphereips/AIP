@@ -1,3 +1,8 @@
+07/10/2020
+V2.0.2
+- Created branch V2.0.2 for testing
+- Fixed problem with parenthsis in the blacklist headers
+
 18/09/2020
 - Modified thresholds to shrink lists
 

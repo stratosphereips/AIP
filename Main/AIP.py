@@ -244,40 +244,37 @@ number_of_lines = len(open(record_file_path_for_absolute_data).readlines())
 print(number_of_lines)
 
 def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_use):
-    with open(path_to_file, 'w') as new_file2:
-        write2 = csv.writer(new_file2, quoting=csv.QUOTE_ALL)
-        write2.writerow(('# Top IPs from data gathered in last 24 hours only', date))
-        write2.writerow(('# Number', 'IP address', 'Rating'))
+    with open(path_to_file, 'wt', newline ='') as new_file2:
+        writer = csv.DictWriter(new_file2, fieldnames=['# Top IPs from data gathered in last 24 hours only', date])
+        writer.writeheader()
+        writer1 = csv.DictWriter(new_file2, fieldnames=['# Number', 'IP address', 'Rating'])
+        writer1.writeheader()
+        # write2 = csv.writer(new_file2, delimiter= ',')
+        # write2.writerow(('# Top IPs from data gathered in last 24 hours only', date))
+        # write2.writerow(('# Number', 'IP address', 'Rating'))
         if function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[1]):
             print('using pn')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pn))):
                 if float(interesting_rating2[1]) >= 0.00021:
-                    new_list2 = []
-                    new_list2.append(x2)
-                    new_list2.append(list(interesting_rating2)[0])
-                    new_list2.append(interesting_rating2[1])
-                    write2.writerow(new_list2)
+                    new_entry = {'# Number': x2, 'IP address': list(interesting_rating2)[0], 'Rating': interesting_rating2[1]}
+                    writer1.writerows([new_entry])
                 else:
                     break
         elif function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[0]):
             print('using pc')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pc))):
                 if float(interesting_rating2[1]) >= 0.0009:
-                    new_list2 = []
-                    new_list2.append(x2)
-                    new_list2.append(list(interesting_rating2)[0])
-                    new_list2.append(interesting_rating2[1])
-                    write2.writerow(new_list2)
+                    new_entry = {'# Number': x2, 'IP address': list(interesting_rating2)[0],
+                                 'Rating': interesting_rating2[1]}
+                    writer1.writerows([new_entry])
                 else:
                     break
         else:
             print('using to')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pc))):
-                new_list2 = []
-                new_list2.append(x2)
-                new_list2.append(list(interesting_rating2)[0])
-                new_list2.append(interesting_rating2[1])
-                write2.writerow(new_list2)
+                new_entry = {'# Number': x2, 'IP address': list(interesting_rating2)[0],
+                             'Rating': interesting_rating2[1]}
+                writer1.writerows([new_entry])
 
 
 
