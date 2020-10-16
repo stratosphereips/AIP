@@ -1,3 +1,7 @@
+16/10/2020
+V2.0.3
+- Updated Whitelist
+
 07/10/2020
 V2.0.2
 - Created branch V2.0.2 for testing
