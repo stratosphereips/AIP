@@ -1,17 +1,18 @@
 16/10/2020
 V2.0.3
-- Updated Whitelist
+- Updated Whitelist for master branch
 
 07/10/2020
 V2.0.2
 - Created branch V2.0.2 for testing
-- Fixed problem with parenthsis in the blacklist headers
+- Fixed problem with parenthesis in the blacklist headers
+- Merged V2.0.2 with master
 
 18/09/2020
 - Modified thresholds to shrink lists
 
 17/09/2020
-- Moved the daily blacklists to a separte repository
+- Moved the daily blacklists to a separate repository
 
 15/09/2020
 - Created branch V3.0.0 for next major update
