@@ -52,6 +52,8 @@ current_directory = os.getcwd()
 # (a)
 AIPP_direcory = os.environ['output_folder']
 
+FP_log_file = AIPP_direcory + '/FP_log_file.csv'
+
 # Full path to the  folder where the program will look for new data files. It will look in the file and only process the
 # files it has not precessed yet. It will process every file it does not recognize.
 # (b)
@@ -210,26 +212,34 @@ def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
 
     asn_info = get_ASN_data(current_directory + '/Main/ASN/GeoLite2-ASN.mmdb', new_absolute_file_flows)
     whitelisted_nets, whitelisted_ips = load_whitelist()
+    list_of_FPs = []
     for index, flow in enumerate(new_absolute_file_flows):
         judgement1 = check_if_ip_is_in_whitelisted_nets(flow[0], whitelisted_nets)
         judgement2 = check_if_ip_is_in_whitelisted_ips(flow[0], whitelisted_ips)
         judgement3, entry = check_organization_strings(asn_info[flow[0]], list_of_good_organiations)
         if judgement1 == True:
+            list_of_FPs.append(flow)
             del new_absolute_file_flows[index]
             print('Found ', flow[0], ' in Whitelisted Nets. Deleting entry...')
         elif judgement2 == True:
+            list_of_FPs.append(flow)
             del new_absolute_file_flows[index]
             print('Found ', flow[0], ' in Whitelisted IPs. Deleting entry...')
         elif judgement3 == True:
+            list_of_FPs.append(flow)
             del new_absolute_file_flows[index]
             print('Found ', flow[0], ' ASN matches organization ', entry, ' Deleting entry...')
         else:
             continue
 
+    with open(FP_log_file, 'a') as FP_file:
+        csvwriter = csv.writer(FP_file)
+        csvwriter.writerows(list_of_FPs)
+
     with open(e, 'w') as new_file_another:
-        wr2 = csv.writer(new_file_another, quoting=csv.QUOTE_ALL)
-        for y in new_absolute_file_flows:
-            wr2.writerow(y)
+            wr2 = csv.writer(new_file_another, quoting=csv.QUOTE_ALL)
+            for y in new_absolute_file_flows:
+                wr2.writerow(y)
 
 
 def sort_data_decending(data):

@@ -46,6 +46,7 @@ then
 				touch $output_folder/Processed_Splunk_Files.txt
 				touch $output_folder/Times.csv
 				touch $output_folder/Selected_modules.csv
+				touch $output_folder/FP_log_file.csv
         			touch $output_folder/Aging-modifiers-pc.csv
         			touch $output_folder/Aging-modifiers-pn.csv
 		  elif [ "$answer" = "$answer2" ]
@@ -59,6 +60,7 @@ then
 				mkdir $output_folder/Historical_Ratings/Seen_today_Only/
 				mkdir $output_folder/Historical_Ratings/Traditional/
 				touch $output_folder/Absolute_Data.csv
+				touch $output_folder/FP_log_file.csv
 				touch $output_folder/Known_IPs.txt
 				touch $output_folder/Processed_Splunk_Files.txt
 				touch $output_folder/Times.csv
