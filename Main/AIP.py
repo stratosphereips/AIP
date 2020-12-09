@@ -204,11 +204,11 @@ def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
                 else:
                     continue
 
-    with open(current_directory + '/ASN/strings_to_check.csv', 'r') as read_obj:
+    with open(current_directory + '/Main/ASN/strings_to_check.csv', 'r') as read_obj:
         csv_reader = csv.reader(read_obj)
         list_of_good_organiations = list(csv_reader)
 
-    asn_info = get_ASN_data(current_directory + '/ASN/GeoLite2-ASN.mmdb', new_absolute_file_flows)
+    asn_info = get_ASN_data(current_directory + '/Main/ASN/GeoLite2-ASN.mmdb', new_absolute_file_flows)
     whitelisted_nets, whitelisted_ips = load_whitelist()
     for index, flow in enumerate(new_absolute_file_flows):
         judgement1 = check_if_ip_is_in_whitelisted_nets(flow[0], whitelisted_nets)

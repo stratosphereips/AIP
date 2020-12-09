@@ -44,10 +44,17 @@ def get_ASN_data(asn_database, list_of_ips):
     reader = maxminddb.open_database(asn_database)
     dictionary = {}
     for ip in list_of_ips:
-        data = reader.get(ip)
-        organization = data['autonomous_system_organization']
-        dictionary[ip] = organization
+        data = reader.get(ip[0])
+        if data is None:
+            organization = ' '
+        else:
+            try:
+                organization = data['autonomous_system_organization']
+            except KeyError:
+                organization = ' '
+        dictionary[ip[0]] = organization
     return dictionary
+
 
 def check_organization_strings(organization, list_of_good_organizations):
     is_a_good_organization = False
