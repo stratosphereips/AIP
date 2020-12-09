@@ -59,11 +59,11 @@ def get_ASN_data(asn_database, list_of_ips):
 def check_organization_strings(organization, list_of_good_organizations):
     is_a_good_organization = False
     filler = None
-    for entry in list_of_good_organizations:
-        expression = re.compile(entry, re.IGNORECASE)
+    for ENTRY in list_of_good_organizations:
+        expression = re.compile(ENTRY[0], re.IGNORECASE)
         if expression.search(organization):
             is_a_good_organization = True
-            return is_a_good_organization, entry
+            return is_a_good_organization, ENTRY[0]
         else:
             continue
     return is_a_good_organization, filler

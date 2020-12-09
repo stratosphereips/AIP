@@ -222,7 +222,7 @@ def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
             print('Found ', flow[0], ' in Whitelisted IPs. Deleting entry...')
         elif judgement3 == True:
             del new_absolute_file_flows[index]
-            print('Found ', flow[0], ' ASN matches organization ', entry, '. Deleting entry...')
+            print('Found ', flow[0], ' ASN matches organization ', entry, ' Deleting entry...')
         else:
             continue
 
