@@ -1,6 +1,8 @@
 from netaddr import IPAddress, IPNetwork
 import os
 import csv
+import maxminddb
+import re
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -38,9 +40,33 @@ def check_if_ip_is_in_whitelisted_ips(ip, list_of_whitelist_ips):
             continue
 
 
+def get_ASN_data(asn_database, list_of_ips):
+    reader = maxminddb.open_database(asn_database)
+    dictionary = {}
+    for ip in list_of_ips:
+        data = reader.get(ip)
+        organization = data['autonomous_system_organization']
+        dictionary[ip] = organization
+    return dictionary
+
+def check_organization_strings(organization, list_of_good_organizations):
+    is_a_good_organization = False
+    filler = None
+    for entry in list_of_good_organizations:
+        expression = re.compile(entry, re.IGNORECASE)
+        if expression.search(organization):
+            is_a_good_organization = True
+            return is_a_good_organization, entry
+        else:
+            continue
+    return is_a_good_organization, filler
 
 #----------------Debugging--------------------
 
+# print(os.getcwd())
+# get_ASN_data('/home/parthurnax/Documents/Programming/Git-Repos/AIP-Blacklist-Algorithm/Main/ASN/GeoLite2-ASN.mmdb', ['8.8.8.8'])
+#
+# print(check_organization_strings('25.224.186.35.bc.googleusercontent.com', ['google', 'facebook', 'spotify']))
 
 # def open_sort_abs_file(e):
 #     IP_flows = []

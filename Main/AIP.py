@@ -5,7 +5,7 @@ import operator
 from datetime import datetime
 import shutil
 import os
-from whitelist_module import load_whitelist, check_if_ip_is_in_whitelisted_nets, check_if_ip_is_in_whitelisted_ips
+from whitelist_module import *
 import main_modulev3
 
 startTime = datetime.now()
@@ -45,6 +45,8 @@ def find_new_data_files(b, c):
     sorted_dates.reverse()
     print(sorted_dates)
     return list_of_new_data_files, sorted_dates[0]
+
+current_directory = os.getcwd()
 
 # Full path to directory where all the files will be stored
 # (a)
@@ -202,13 +204,25 @@ def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
                 else:
                     continue
 
+    with open(current_directory + '/ASN/strings_to_check.csv', 'r') as read_obj:
+        csv_reader = csv.reader(read_obj)
+        list_of_good_organiations = list(csv_reader)
+
+    asn_info = get_ASN_data(current_directory + '/ASN/GeoLite2-ASN.mmdb', new_absolute_file_flows)
     whitelisted_nets, whitelisted_ips = load_whitelist()
     for index, flow in enumerate(new_absolute_file_flows):
         judgement1 = check_if_ip_is_in_whitelisted_nets(flow[0], whitelisted_nets)
         judgement2 = check_if_ip_is_in_whitelisted_ips(flow[0], whitelisted_ips)
-        if (judgement1==True) or (judgement2==True) is True:
+        judgement3, entry = check_organization_strings(asn_info[flow[0]], list_of_good_organiations)
+        if judgement1 == True:
+            del new_absolute_file_flows[index]
+            print('Found ', flow[0], ' in Whitelisted Nets. Deleting entry...')
+        elif judgement2 == True:
             del new_absolute_file_flows[index]
             print('Found ', flow[0], ' in Whitelisted IPs. Deleting entry...')
+        elif judgement3 == True:
+            del new_absolute_file_flows[index]
+            print('Found ', flow[0], ' ASN matches organization ', entry, '. Deleting entry...')
         else:
             continue
 
