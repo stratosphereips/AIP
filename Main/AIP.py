@@ -85,6 +85,7 @@ directory_path_historical_ratings = AIPP_direcory + '/Historical_Ratings'
 new_data_files, date = find_new_data_files(folder_path_for_raw_Splunk_data, record_file_path_for_processed_Splunk_files)
 with open(AIPP_direcory + "/log.txt", "a") as myfile:
     myfile.write('There are ' + str(len(new_data_files)) + ' new data files to process' + "\n")
+    myfile.write('Files are ' + str(new_data_files) + "\n")
 current_time = datetime(int(date[0:4]), int(date[5:7]), int(date[8:10]), 1).timestamp()
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Blacklist Files <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
