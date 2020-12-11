@@ -1,3 +1,10 @@
+11/12/2020
+V2.0.4
+- Added ASN checker for major organizations
+- Added tcp flag checker for import data
+- Create ASN branch for testing
+- Merged ASN branch with Master
+
 16/10/2020
 V2.0.3
 - Updated Whitelist for master branch
