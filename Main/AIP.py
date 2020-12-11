@@ -14,13 +14,14 @@ AIPP_direcory = os.environ['output_folder']
 
 startTime = datetime.now()
 
-with open(AIPP_direcory + "log.txt", "a") as myfile:
-    myfile.write(startTime)
-    myfile.write("AIP started")
+with open(AIPP_direcory + "/log.txt", "a") as myfile:
+    myfile.write(str(startTime) + "\n")
+    myfile.write("AIP started" + "\n")
 
 # Open the file that stored the selected modules, and store the selections in
 # a list.
 file_for_functions = os.environ['output_folder'] + '/Selected_modules.csv'
+
 with open(file_for_functions, 'r') as file:
     list_of_functions_that_were_choosen = []
     for line in csv.reader(file):
@@ -50,7 +51,7 @@ def find_new_data_files(b, c):
     sorted_dates = sorted(dictionary_of_dates_on_files, key=lambda date: datetime.strptime(date, '%Y-%m-%d'))
     sorted_dates.reverse()
     with open(AIPP_direcory + "log.txt", "a") as myfile:
-        myfile.write(sorted_dates)
+        myfile.write(str(sorted_dates) + "\n")
     return list_of_new_data_files, sorted_dates[0]
 
 current_directory = os.getcwd()
@@ -82,8 +83,8 @@ directory_path_historical_ratings = AIPP_direcory + '/Historical_Ratings'
 
 # >>>>>>>>>>>>>>> Call the find new file function and define the time reference point for the aging function
 new_data_files, date = find_new_data_files(folder_path_for_raw_Splunk_data, record_file_path_for_processed_Splunk_files)
-with open(AIPP_direcory + "log.txt", "a") as myfile:
-    myfile.write(('There are ', len(new_data_files), ' new data files to process'))
+with open(AIPP_direcory + "/log.txt", "a") as myfile:
+    myfile.write('There are ' + str(len(new_data_files)) + ' new data files to process' + "\n")
 current_time = datetime(int(date[0:4]), int(date[5:7]), int(date[8:10]), 1).timestamp()
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Blacklist Files <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -224,18 +225,18 @@ def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
         if judgement1 == True:
             list_of_FPs.append(flow)
             del new_absolute_file_flows[index]
-            with open(AIPP_direcory + "log.txt", "a") as myfile:
-                myfile.write(('Found ', flow[0], ' in Whitelisted Nets. Deleting entry...'))
+            with open(AIPP_direcory + "/log.txt", "a") as myfile:
+                myfile.write('Found ' + str(flow[0]) + ' in Whitelisted Nets. Deleting entry...' + "\n")
         elif judgement2 == True:
             list_of_FPs.append(flow)
             del new_absolute_file_flows[index]
-            with open(AIPP_direcory + "log.txt", "a") as myfile:
-                myfile.write(('Found ', flow[0], ' in Whitelisted IPs. Deleting entry...'))
+            with open(AIPP_direcory + "/log.txt", "a") as myfile:
+                myfile.write('Found ' + str(flow[0]) + ' in Whitelisted IPs. Deleting entry...' + "\n")
         elif judgement3 == True:
             list_of_FPs.append(flow)
             del new_absolute_file_flows[index]
-            with open(AIPP_direcory + "log.txt", "a") as myfile:
-                myfile.write(('Found ', flow[0], ' ASN matches organization ', entry, ' Deleting entry...'))
+            with open(AIPP_direcory + "/log.txt", "a") as myfile:
+                myfile.write('Found ' + str(flow[0]) + ' ASN matches organization ' + str(entry) + ' Deleting entry...' + "\n")
         else:
             continue
 
@@ -272,8 +273,8 @@ update_records_files(record_file_path_for_absolute_data, known_IP_data_flows_fro
 # new_absolute_file_data = get_updated_flows(record_file_path_for_absolute_data)
 
 number_of_lines = len(open(record_file_path_for_absolute_data).readlines())
-with open(AIPP_direcory + "log.txt", "a") as myfile:
-    myfile.write(('Number of lines in absolute data', number_of_lines))
+with open(AIPP_direcory + "/log.txt", "a") as myfile:
+    myfile.write('Number of lines in absolute data' + str(number_of_lines) + "\n")
 
 def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_use):
     with open(path_to_file, 'wt', newline ='') as new_file2:
@@ -328,8 +329,9 @@ create_final_blacklist(top_IPs_seen_today, unknown_IP_flows_from_new_data, OTF)
 
 shutil.copy2(record_file_path_to_known_IPs, traditional_blacklist)
 
-with open(AIPP_direcory + "log.txt", "a") as myfile:
-    myfile.write(('Total Runtime', datetime.now() - startTime))
+with open(AIPP_direcory + "/log.txt", "a") as myfile:
+    myfile.write('Total Runtime' + str(datetime.now() - startTime) + "\n")
+    myfile.write('---------------- AIP run complete ----------------' + "\n")
 
 # Append the time that it took to a file
 with open(time_file, 'a') as new_file_another:

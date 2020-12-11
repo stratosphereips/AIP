@@ -17,6 +17,6 @@ python3 $directory_of_AIP/Main/Select_Modules.py
 for entry in $input_data_folder/*
 do
    cp "$entry" $output_folder/Input_Data/
-   echo "$entry"
+   echo "$entry" >> $output_folder/log.txt
    python3 $directory_of_AIP/Main/AIP.py
 done

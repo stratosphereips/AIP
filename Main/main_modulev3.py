@@ -273,7 +273,6 @@ def prioritize_consistent_normalized(list_of_flows, time_of_newest_data_file, pa
         list_of_raw_ratings.append([flow[0], total_score])
         counter += 1
     write_to_aging_file(path_to_aging_file, aging_file_data)
-    print(counter)
     return list_of_raw_ratings
 
 
@@ -391,7 +390,6 @@ def prioritize_new_normalized(list_of_flows, time_of_newest_data_file, path_to_a
         list_of_raw_ratings.append([flow[0], total_score])
         counter += 1
     write_to_aging_file(path_to_aging_file, aging_file_data)
-    print(counter)
     return list_of_raw_ratings
 
 def todays_ips_only_normalized(list_of_flows, time_of_newest_data_file, path_to_aging_file):

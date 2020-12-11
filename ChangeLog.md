@@ -1,4 +1,8 @@
 11/12/2020
+V2.0.5
+- Added complete runtime logging system to Master branch
+
+09/12/2020
 V2.0.4
 - Added ASN checker for major organizations
 - Added tcp flag checker for import data
