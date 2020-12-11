@@ -8,9 +8,15 @@ import os
 from whitelist_module import *
 import main_modulev3
 
+# Full path to directory where all the files will be stored
+# (a)
+AIPP_direcory = os.environ['output_folder']
+
 startTime = datetime.now()
 
-print('AIP started')
+with open(AIPP_direcory + "log.txt", "a") as myfile:
+    myfile.write(startTime)
+    myfile.write("AIP started")
 
 # Open the file that stored the selected modules, and store the selections in
 # a list.
@@ -43,14 +49,11 @@ def find_new_data_files(b, c):
             records_file1.write(file12 + '\n')
     sorted_dates = sorted(dictionary_of_dates_on_files, key=lambda date: datetime.strptime(date, '%Y-%m-%d'))
     sorted_dates.reverse()
-    print(sorted_dates)
+    with open(AIPP_direcory + "log.txt", "a") as myfile:
+        myfile.write(sorted_dates)
     return list_of_new_data_files, sorted_dates[0]
 
 current_directory = os.getcwd()
-
-# Full path to directory where all the files will be stored
-# (a)
-AIPP_direcory = os.environ['output_folder']
 
 FP_log_file = AIPP_direcory + '/FP_log_file.csv'
 
@@ -79,7 +82,8 @@ directory_path_historical_ratings = AIPP_direcory + '/Historical_Ratings'
 
 # >>>>>>>>>>>>>>> Call the find new file function and define the time reference point for the aging function
 new_data_files, date = find_new_data_files(folder_path_for_raw_Splunk_data, record_file_path_for_processed_Splunk_files)
-print('There are ', len(new_data_files), ' new data files to process')
+with open(AIPP_direcory + "log.txt", "a") as myfile:
+    myfile.write(('There are ', len(new_data_files), ' new data files to process'))
 current_time = datetime(int(date[0:4]), int(date[5:7]), int(date[8:10]), 1).timestamp()
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Blacklist Files <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -220,15 +224,18 @@ def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
         if judgement1 == True:
             list_of_FPs.append(flow)
             del new_absolute_file_flows[index]
-            print('Found ', flow[0], ' in Whitelisted Nets. Deleting entry...')
+            with open(AIPP_direcory + "log.txt", "a") as myfile:
+                myfile.write(('Found ', flow[0], ' in Whitelisted Nets. Deleting entry...'))
         elif judgement2 == True:
             list_of_FPs.append(flow)
             del new_absolute_file_flows[index]
-            print('Found ', flow[0], ' in Whitelisted IPs. Deleting entry...')
+            with open(AIPP_direcory + "log.txt", "a") as myfile:
+                myfile.write(('Found ', flow[0], ' in Whitelisted IPs. Deleting entry...'))
         elif judgement3 == True:
             list_of_FPs.append(flow)
             del new_absolute_file_flows[index]
-            print('Found ', flow[0], ' ASN matches organization ', entry, ' Deleting entry...')
+            with open(AIPP_direcory + "log.txt", "a") as myfile:
+                myfile.write(('Found ', flow[0], ' ASN matches organization ', entry, ' Deleting entry...'))
         else:
             continue
 
@@ -265,7 +272,8 @@ update_records_files(record_file_path_for_absolute_data, known_IP_data_flows_fro
 # new_absolute_file_data = get_updated_flows(record_file_path_for_absolute_data)
 
 number_of_lines = len(open(record_file_path_for_absolute_data).readlines())
-print(number_of_lines)
+with open(AIPP_direcory + "log.txt", "a") as myfile:
+    myfile.write(('Number of lines in absolute data', number_of_lines))
 
 def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_use):
     with open(path_to_file, 'wt', newline ='') as new_file2:
@@ -277,7 +285,8 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
         # write2.writerow(('# Top IPs from data gathered in last 24 hours only', date))
         # write2.writerow(('# Number', 'IP address', 'Rating'))
         if function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[1]):
-            print('using pn')
+            with open(AIPP_direcory + "log.txt", "a") as myfile:
+                myfile.write('Using Prioritize New Function')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pn))):
                 if float(interesting_rating2[1]) >= 0.00021:
                     new_entry = {'# Number': x2, 'IP address': list(interesting_rating2)[0], 'Rating': interesting_rating2[1]}
@@ -285,7 +294,8 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
                 else:
                     break
         elif function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[0]):
-            print('using pc')
+            with open(AIPP_direcory + "log.txt", "a") as myfile:
+                myfile.write('Using Prioritize Consistent Function')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pc))):
                 if float(interesting_rating2[1]) >= 0.0009:
                     new_entry = {'# Number': x2, 'IP address': list(interesting_rating2)[0],
@@ -294,7 +304,8 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
                 else:
                     break
         else:
-            print('using to')
+            with open(AIPP_direcory + "log.txt", "a") as myfile:
+                myfile.write('Using Only New IPs Function')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pc))):
                 new_entry = {'# Number': x2, 'IP address': list(interesting_rating2)[0],
                              'Rating': interesting_rating2[1]}
@@ -316,6 +327,9 @@ create_final_blacklist(top_IPs_seen_today, unknown_IP_flows_from_new_data, OTF)
 
 
 shutil.copy2(record_file_path_to_known_IPs, traditional_blacklist)
+
+with open(AIPP_direcory + "log.txt", "a") as myfile:
+    myfile.write(('Total Runtime', datetime.now() - startTime))
 
 # Append the time that it took to a file
 with open(time_file, 'a') as new_file_another:
