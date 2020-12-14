@@ -14,10 +14,6 @@ AIPP_direcory = os.environ['output_folder']
 
 startTime = datetime.now()
 
-with open(AIPP_direcory + "/log.txt", "a") as myfile:
-    myfile.write(str(startTime) + "\n")
-    myfile.write("AIP started" + "\n")
-
 # Open the file that stored the selected modules, and store the selections in
 # a list.
 file_for_functions = os.environ['output_folder'] + '/Selected_modules.csv'
@@ -87,6 +83,10 @@ with open(AIPP_direcory + "/log.txt", "a") as myfile:
     myfile.write('There are ' + str(len(new_data_files)) + ' new data files to process' + "\n")
     myfile.write('Files are ' + str(new_data_files) + "\n")
 current_time = datetime(int(date[0:4]), int(date[5:7]), int(date[8:10]), 1).timestamp()
+
+with open(AIPP_direcory + "/log.txt", "a") as myfile:
+    myfile.write(str(startTime) + "\n")
+    myfile.write("AIP started" + "\n")
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Blacklist Files <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # Path to the file that will contain top IPs from today's data only. Program will overwrite the previous days data.
