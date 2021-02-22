@@ -290,7 +290,7 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
             with open(AIPP_direcory + "log.txt", "a") as myfile:
                 myfile.write('Using Prioritize New Function')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pn))):
-                if float(interesting_rating2[1]) >= 0.00021:
+                if float(interesting_rating2[1]) >= 0.0003:
                     new_entry = {'# Number': x2, 'IP address': list(interesting_rating2)[0], 'Rating': interesting_rating2[1]}
                     writer1.writerows([new_entry])
                 else:
