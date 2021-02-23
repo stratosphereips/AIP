@@ -232,6 +232,7 @@ def prioritize_consistent_normalized(list_of_flows, time_of_newest_data_file, pa
         average_bytes = float(flow[5])
         packets = float(flow[6])
         average_packets = float(flow[7])
+        first_event = float(flow[8])
         last_event = float(flow[9])
         average_events = float(flow[10])
 
@@ -259,11 +260,10 @@ def prioritize_consistent_normalized(list_of_flows, time_of_newest_data_file, pa
             else:
                 time_modifier = 0
         else:
-            time_modifier_factor = (time_of_newest_data_file - last_event) // 86400
-            # I am using the general function y = x/(x + 10), where x is the number of days an IP is not seen.
-            # In this way, the amount by which a score will decrease will increase to about 50% in about 30 days,
-            # and will infinities approach 100% after that.
-            time_modifier = calculated_score - (calculated_score * (2 / (time_modifier_factor + 2)))
+            total_time_attacking = last_event - first_event
+            time_since_last_attack = time_of_newest_data_file - last_event
+            percentage_drop = time_since_last_attack/(time_since_last_attack + total_time_attacking)
+            time_modifier = calculated_score - (calculated_score * percentage_drop)
             if flow[0] in aging_file_data:
                 updated_entry = {flow[0]: time_modifier}
                 aging_file_data.update(updated_entry)
@@ -377,9 +377,6 @@ def prioritize_new_normalized(list_of_flows, time_of_newest_data_file, path_to_a
                 time_modifier = 0
         else:
             time_modifier_factor = (time_of_newest_data_file - last_event) // 86400
-            # I am using the general function y = x/(x + 10), where x is the number of days an IP is not seen.
-            # In this way, the amount by which a score will decrease will increase to about 50% in about 30 days,
-            # and will infinities approach 100% after that.
             time_modifier = calculated_score - (calculated_score * (2 / (time_modifier_factor + 2)))
             if flow[0] in aging_file_data:
                 updated_entry = {flow[0]: time_modifier}

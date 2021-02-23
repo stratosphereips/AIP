@@ -271,8 +271,6 @@ write_unkown_IPs_to_data_file(unknown_IPs_from_new_data, record_file_path_to_kno
 
 update_records_files(record_file_path_for_absolute_data, known_IP_data_flows_from_new_data, unknown_IP_flows_from_new_data)
 
-# new_absolute_file_data = get_updated_flows(record_file_path_for_absolute_data)
-
 number_of_lines = len(open(record_file_path_for_absolute_data).readlines())
 with open(AIPP_direcory + "/log.txt", "a") as myfile:
     myfile.write('Number of lines in absolute data' + str(number_of_lines) + "\n")
@@ -283,14 +281,11 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
         writer.writeheader()
         writer1 = csv.DictWriter(new_file2, fieldnames=['# Number', 'IP address', 'Rating'])
         writer1.writeheader()
-        # write2 = csv.writer(new_file2, delimiter= ',')
-        # write2.writerow(('# Top IPs from data gathered in last 24 hours only', date))
-        # write2.writerow(('# Number', 'IP address', 'Rating'))
         if function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[1]):
             with open(AIPP_direcory + "log.txt", "a") as myfile:
                 myfile.write('Using Prioritize New Function')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pn))):
-                if float(interesting_rating2[1]) >= 0.00021:
+                if float(interesting_rating2[1]) >= 0.0003:
                     new_entry = {'# Number': x2, 'IP address': list(interesting_rating2)[0], 'Rating': interesting_rating2[1]}
                     writer1.writerows([new_entry])
                 else:
@@ -299,7 +294,7 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
             with open(AIPP_direcory + "log.txt", "a") as myfile:
                 myfile.write('Using Prioritize Consistent Function')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pc))):
-                if float(interesting_rating2[1]) >= 0.0009:
+                if float(interesting_rating2[1]) >= 0.003:
                     new_entry = {'# Number': x2, 'IP address': list(interesting_rating2)[0],
                                  'Rating': interesting_rating2[1]}
                     writer1.writerows([new_entry])
