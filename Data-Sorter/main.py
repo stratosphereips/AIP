@@ -6,6 +6,8 @@ print("Hello World")
 
 data_directory = os.environ['output_data_folder']
 
+output = os.environ['results_file']
+
 files = os.listdir(str(data_directory))
 
 dataset = dict()
@@ -60,7 +62,7 @@ labels = ["SrcAddr", "total_events", "total_duration", "average_duration", "tota
           "average_packets", "last_event_time", "first_event_time"]
 
 try:
-    with open(data_directory + '24_hour_data.csv', 'w') as f:
+    with open(output + '24_hour_data.csv', 'w') as f:
         writer = csv.DictWriter(f, fieldnames=labels)
         writer.writeheader()
         for elem in list_of_dictionaries:
