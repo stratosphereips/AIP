@@ -10,11 +10,12 @@ files = os.listdir(str(data_directory))
 
 dataset = dict()
 for file in files:
+    print(file)
     with open(data_directory + file, 'r') as f:
         reader = csv.DictReader(f, delimiter=',')
         rows = list(reader)
         for row in rows:
-            if row['SrcAddr'] not in dataset:
+            if row['SrcAddr'] not in dataset.keys():
                 total_events = 1
                 total_duration = float(row['Dur'])
                 average_duration = float(row['Dur'])
@@ -55,7 +56,7 @@ list_of_dictionaries = []
 for key in dataset.keys():
     list_of_dictionaries.append(dataset[key])
 
-labels = ["SrcAddr", "total_events", "total_duration", "average_duration", "total_bytes", "average_bytes", "total_packets"
+labels = ["SrcAddr", "total_events", "total_duration", "average_duration", "total_bytes", "average_bytes", "total_packets",
           "average_packets", "last_event_time", "first_event_time"]
 
 try:
@@ -63,6 +64,7 @@ try:
         writer = csv.DictWriter(f, fieldnames=labels)
         writer.writeheader()
         for elem in list_of_dictionaries:
+            print(elem)
             writer.writerow(elem)
 except IOError:
     print("I/O error")
