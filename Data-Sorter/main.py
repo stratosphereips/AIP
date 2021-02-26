@@ -62,7 +62,7 @@ labels = ["SrcAddr", "total_events", "total_duration", "average_duration", "tota
           "average_packets", "last_event_time", "first_event_time"]
 
 try:
-    with open(output + 'aip_program.csv', 'w') as f:
+    with open(output, 'w') as f:
         writer = csv.DictWriter(f, fieldnames=labels)
         writer.writeheader()
         for elem in list_of_dictionaries:
