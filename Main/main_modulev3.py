@@ -256,21 +256,20 @@ def prioritize_consistent_normalized(list_of_flows, time_of_newest_data_file, pa
                                       + bytes_score + average_bytes_score + packets_score + average_packets_score)
         if (time_of_newest_data_file - last_event) < 86400:
             if flow[0] in aging_file_data:
-                time_modifier = float(aging_file_data[flow[0]])
+                aged_score = float(aging_file_data[flow[0]])
             else:
-                time_modifier = 0
+                aged_score = 0
         else:
             total_time_attacking = last_event - first_event
             time_since_last_attack = time_of_newest_data_file - last_event
             percentage_drop = time_since_last_attack/(time_since_last_attack + total_time_attacking)
-            time_modifier = calculated_score - (calculated_score * percentage_drop)
+            aged_score = calculated_score * (1 - percentage_drop)
             if flow[0] in aging_file_data:
-                updated_entry = {flow[0]: time_modifier}
+                updated_entry = {flow[0]: aged_score}
                 aging_file_data.update(updated_entry)
             else:
-                aging_file_data[flow[0]] = time_modifier
-        total_score = calculated_score - time_modifier
-        list_of_raw_ratings.append([flow[0], total_score])
+                aging_file_data[flow[0]] = aged_score
+        list_of_raw_ratings.append([flow[0], aged_score])
         counter += 1
     write_to_aging_file(path_to_aging_file, aging_file_data)
     return list_of_raw_ratings
@@ -372,18 +371,18 @@ def prioritize_new_normalized(list_of_flows, time_of_newest_data_file, path_to_a
                             + bytes_score + average_bytes_score + packets_score + average_packets_score)
         if (time_of_newest_data_file - last_event) < 86400:
             if flow[0] in aging_file_data:
-                time_modifier = float(aging_file_data[flow[0]])
+                aged_score = float(aging_file_data[flow[0]])
             else:
-                time_modifier = 0
+                aged_score = 0
         else:
             time_modifier_factor = (time_of_newest_data_file - last_event) // 86400
-            time_modifier = calculated_score - (calculated_score * (2 / (time_modifier_factor + 2)))
+            aged_score = calculated_score * (2 / (time_modifier_factor + 2))
             if flow[0] in aging_file_data:
-                updated_entry = {flow[0]: time_modifier}
+                updated_entry = {flow[0]: aged_score}
                 aging_file_data.update(updated_entry)
             else:
-                aging_file_data[flow[0]] = time_modifier
-        total_score = calculated_score - time_modifier
+                aging_file_data[flow[0]] = aged_score
+        total_score = aged_score
         list_of_raw_ratings.append([flow[0], total_score])
         counter += 1
     write_to_aging_file(path_to_aging_file, aging_file_data)
