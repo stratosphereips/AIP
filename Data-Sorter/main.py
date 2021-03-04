@@ -66,7 +66,6 @@ try:
         writer = csv.DictWriter(f, fieldnames=labels)
         writer.writeheader()
         for elem in list_of_dictionaries:
-            print(elem)
             writer.writerow(elem)
 except IOError:
     print("I/O error")
