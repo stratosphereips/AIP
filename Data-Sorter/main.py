@@ -18,44 +18,47 @@ for file in files:
         rows = list(reader)
         for row in rows:
             # System Ports (0-1023), User Ports (1024-49151), and the Dynamic and/or Private Ports (49152-65535);
-            if int(row['Sport']) >= 10000:
-                if row['SrcAddr'] not in dataset.keys():
-                    total_events = 1
-                    total_duration = float(row['Dur'])
-                    average_duration = float(row['Dur'])
-                    total_bytes = float(row['TotBytes'])
-                    average_bytes = float(row['TotBytes'])
-                    total_packets = float(row['TotPkts'])
-                    average_packets = float(row['TotPkts'])
-                    last_event_time = float(datetime.datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))
-                    first_event_time = float(datetime.datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))
-                    dataset[row['SrcAddr']] = {"SrcAddr": row['SrcAddr'], "total_events": total_events,
-                                               "total_duration": total_duration,
-                                               "average_duration": average_duration, "total_bytes": total_bytes,
-                                               "average_bytes": average_bytes,
-                                               "total_packets": total_packets, "average_packets": average_packets,
-                                               "last_event_time": last_event_time,
-                                               "first_event_time": first_event_time}
+            try:
+                if int(row['Sport']) >= 10000:
+                    if row['SrcAddr'] not in dataset.keys():
+                        total_events = 1
+                        total_duration = float(row['Dur'])
+                        average_duration = float(row['Dur'])
+                        total_bytes = float(row['TotBytes'])
+                        average_bytes = float(row['TotBytes'])
+                        total_packets = float(row['TotPkts'])
+                        average_packets = float(row['TotPkts'])
+                        last_event_time = float(datetime.datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))
+                        first_event_time = float(datetime.datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))
+                        dataset[row['SrcAddr']] = {"SrcAddr": row['SrcAddr'], "total_events": total_events,
+                                                   "total_duration": total_duration,
+                                                   "average_duration": average_duration, "total_bytes": total_bytes,
+                                                   "average_bytes": average_bytes,
+                                                   "total_packets": total_packets, "average_packets": average_packets,
+                                                   "last_event_time": last_event_time,
+                                                   "first_event_time": first_event_time}
+                    else:
+                        past_data = dataset[row['SrcAddr']]
+                        total_events = 1 + past_data["total_events"]
+                        total_duration = float(row['Dur']) + past_data["total_duration"]
+                        average_duration = (float(row['Dur']) + (past_data["total_events"]*past_data["average_duration"]))/total_events
+                        total_bytes = float(row['TotBytes']) + past_data["total_bytes"]
+                        average_bytes = (float(row['TotBytes']) + (past_data["total_events"]*past_data["average_bytes"]))/total_events
+                        total_packets = float(row['TotPkts']) + past_data["total_packets"]
+                        average_packets = (float(row['TotPkts']) + (past_data["total_events"]*past_data["average_packets"]))/total_events
+                        last_event_time = float(max([past_data["last_event_time"], float(datetime.datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))]))
+                        first_event_time_event_time = float(min([past_data["first_event_time"], float(
+                            datetime.datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))]))
+                        dataset[row['SrcAddr']] = {"SrcAddr": row['SrcAddr'], "total_events": total_events,
+                                                   "total_duration": total_duration,
+                                                   "average_duration": average_duration, "total_bytes": total_bytes,
+                                                   "average_bytes": average_bytes,
+                                                   "total_packets": total_packets, "average_packets": average_packets,
+                                                   "last_event_time": last_event_time,
+                                                   "first_event_time": first_event_time}
                 else:
-                    past_data = dataset[row['SrcAddr']]
-                    total_events = 1 + past_data["total_events"]
-                    total_duration = float(row['Dur']) + past_data["total_duration"]
-                    average_duration = (float(row['Dur']) + (past_data["total_events"]*past_data["average_duration"]))/total_events
-                    total_bytes = float(row['TotBytes']) + past_data["total_bytes"]
-                    average_bytes = (float(row['TotBytes']) + (past_data["total_events"]*past_data["average_bytes"]))/total_events
-                    total_packets = float(row['TotPkts']) + past_data["total_packets"]
-                    average_packets = (float(row['TotPkts']) + (past_data["total_events"]*past_data["average_packets"]))/total_events
-                    last_event_time = float(max([past_data["last_event_time"], float(datetime.datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))]))
-                    first_event_time_event_time = float(min([past_data["first_event_time"], float(
-                        datetime.datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))]))
-                    dataset[row['SrcAddr']] = {"SrcAddr": row['SrcAddr'], "total_events": total_events,
-                                               "total_duration": total_duration,
-                                               "average_duration": average_duration, "total_bytes": total_bytes,
-                                               "average_bytes": average_bytes,
-                                               "total_packets": total_packets, "average_packets": average_packets,
-                                               "last_event_time": last_event_time,
-                                               "first_event_time": first_event_time}
-            else:
+                    continue
+            except ValueError as x:
                 continue
 
 list_of_dictionaries = []
