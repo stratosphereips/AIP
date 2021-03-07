@@ -59,6 +59,7 @@ for file in files:
                 continue
 
 list_of_dictionaries = []
+print(len(list_of_dictionaries))
 for key in dataset.keys():
     list_of_dictionaries.append(dataset[key])
 
