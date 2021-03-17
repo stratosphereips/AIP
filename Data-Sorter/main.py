@@ -19,7 +19,7 @@ for file in files:
         for row in rows:
             # System Ports (0-1023), User Ports (1024-49151), and the Dynamic and/or Private Ports (49152-65535);
             try:
-                if int(row['Sport']) >= 10000:
+                if int(row['Sport']) >= 32000:
                     if row['SrcAddr'] not in dataset.keys():
                         total_events = 1
                         total_duration = float(row['Dur'])
