@@ -11,6 +11,9 @@ output_data_folder=" "
 # A location for the aggregated output data file
 results_file=" "
 
+cd $output_data_folder
+rm *
+
 echo $input_data_folder/*
 
 for entry in $input_data_folder/*
@@ -37,6 +40,3 @@ export results_file
 
 # Call the python file that will extract the data we want
 python3 main.py
-
-cd $output_data_folder
-rm *
