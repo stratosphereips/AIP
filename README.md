@@ -19,7 +19,7 @@ All five of these traits need to be included in the sorting process of AIP and e
 
 ## Data Source
 
-What to program accepts is a directory that contains data files from each day. You assign a directory for the program to look in every time it runs, and it checks if there are any new files to process. If there are, it processes the new files and remembers the names of the new files so that it does not process it the next time it runs.
+The program accepts a directory that contains data files from each day. You assign a directory for the program to look in every time it runs, and it checks if there are any new files to process. If there are, it processes the new files and remembers the names of the new files so that it does not process it the next time it runs.
 
 In terms of file format, it accepts a .csv file that has one IP per line, with each of the following data inputs for each IP on that line, separated by commas:
 
