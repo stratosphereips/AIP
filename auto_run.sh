@@ -17,5 +17,5 @@ python3 $directory_of_AIP/Main/Select_Modules.py
 for entry in $input_data_folder/*
 do
    cp "$entry" $output_folder/Input_Data/
-   python3 $directory_of_AIP/Main/AIP.py
+   python3 $directory_of_AIP/AIP.py
 done

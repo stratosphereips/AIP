@@ -1,12 +1,23 @@
-from inspect import getmembers, isfunction
-from netaddr import IPAddress, IPNetwork
+"""
+GNU GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
+Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+Everyone is permitted to copy and distribute verbatim copies
+of this license document, but changing it is not allowed.
+"""
+#! /usr/local/bin/python3
+
 import csv
 import operator
-from datetime import datetime
-import shutil
 import os
-from whitelist_module import *
-import main_modulev3
+import shutil
+from datetime import datetime
+from inspect import getmembers, isfunction
+
+from netaddr import IPAddress, IPNetwork
+
+from core.safelist import *
+import core.main_modulev3 as modules
 
 # Full path to directory where all the files will be stored
 # (a)
@@ -19,14 +30,9 @@ startTime = datetime.now()
 file_for_functions = os.environ['output_folder'] + '/Selected_modules.csv'
 
 with open(file_for_functions, 'r') as file:
-    list_of_functions_that_were_choosen = []
-    for line in csv.reader(file):
-        if not line:
-            break
-        else:
-            list_of_functions_that_were_choosen.extend(line)
+    list_of_functions_that_were_choosen = [line for line in csv.reader(file) if line]
 
-functions_list = [o for o in getmembers(main_modulev3) if isfunction(o[1])]
+functions_list = [o for o in getmembers(modules) if isfunction(o[1])]
 
 
 # >>>>>>>>> Needs to be here so it can be called immediately, fine what data
@@ -214,30 +220,30 @@ def update_records_files(e, list_of_known_new_IP_data, unknown_IP_flows):
 
     with open(current_directory + '/Main/ASN/strings_to_check.csv', 'r') as read_obj:
         csv_reader = csv.reader(read_obj)
-        list_of_good_organiations = list(csv_reader)
+        list_of_good_organizations = list(csv_reader)
 
     asn_info = get_ASN_data(current_directory + '/Main/ASN/GeoLite2-ASN.mmdb', new_absolute_file_flows)
-    whitelisted_nets, whitelisted_ips = load_whitelist()
+    safelisted_nets, safelisted_ips = load_safelist()
     list_of_FPs = []
     for index, flow in enumerate(new_absolute_file_flows):
-        judgement1 = check_if_ip_is_in_whitelisted_nets(flow[0], whitelisted_nets)
-        judgement2 = check_if_ip_is_in_whitelisted_ips(flow[0], whitelisted_ips)
-        judgement3, entry = check_organization_strings(asn_info[flow[0]], list_of_good_organiations)
-        if judgement1 == True:
+        first_judgement = check_if_ip_is_in_safelisted_nets(flow.src_address, safelisted_nets)
+        second_judgement = check_if_ip_is_in_safelisted_ips(flow.src_address, safelisted_ips)
+        third_judgement, entry = check_organization_strings(asn_info[flow.src_address], list_of_good_organizations)
+        if first_judgement:
             list_of_FPs.append(flow)
             del new_absolute_file_flows[index]
             with open(AIPP_direcory + "/log.txt", "a") as myfile:
-                myfile.write('Found ' + str(flow[0]) + ' in Whitelisted Nets. Deleting entry...' + "\n")
-        elif judgement2 == True:
+                myfile.write('Found ' + flow.src_address + ' in Safelisted Nets. Deleting entry...' + "\n")
+        elif second_judgement:
             list_of_FPs.append(flow)
             del new_absolute_file_flows[index]
             with open(AIPP_direcory + "/log.txt", "a") as myfile:
-                myfile.write('Found ' + str(flow[0]) + ' in Whitelisted IPs. Deleting entry...' + "\n")
-        elif judgement3 == True:
+                myfile.write('Found ' + flow.src_address + ' in Safelisted IPs. Deleting entry...' + "\n")
+        elif third_judgement:
             list_of_FPs.append(flow)
             del new_absolute_file_flows[index]
             with open(AIPP_direcory + "/log.txt", "a") as myfile:
-                myfile.write('Found ' + str(flow[0]) + ' ASN matches organization ' + str(entry) + ' Deleting entry...' + "\n")
+                myfile.write('Found ' + flow.src_address + ' ASN matches organization ' + str(entry) + ' Deleting entry...' + "\n")
         else:
             continue
 
@@ -281,7 +287,7 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
         writer.writeheader()
         writer1 = csv.DictWriter(new_file2, fieldnames=['# Number', 'IP address', 'Rating'])
         writer1.writeheader()
-        if function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[1]):
+        if function_to_use == getattr(modules, list_of_functions_that_were_choosen[1]):
             with open(AIPP_direcory + "log.txt", "a") as myfile:
                 myfile.write('Using Prioritize New Function')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pn))):
@@ -290,7 +296,7 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
                     writer1.writerows([new_entry])
                 else:
                     break
-        elif function_to_use == getattr(main_modulev3, list_of_functions_that_were_choosen[0]):
+        elif function_to_use == getattr(modules, list_of_functions_that_were_choosen[0]):
             with open(AIPP_direcory + "log.txt", "a") as myfile:
                 myfile.write('Using Prioritize Consistent Function')
             for x2, interesting_rating2 in enumerate(sort_data_decending(function_to_use(data_from_absolute_file, current_time, path_aging_modifier_pc))):
@@ -313,9 +319,9 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_us
 # Pull the three functions that were choosen by the user from the dictionary of functions.
 # print(list_of_functions_that_were_choosen)
 
-PCF = getattr(main_modulev3, list_of_functions_that_were_choosen[0])
-PNF = getattr(main_modulev3, list_of_functions_that_were_choosen[1])
-OTF = getattr(main_modulev3, list_of_functions_that_were_choosen[2])
+PCF = getattr(modules, list_of_functions_that_were_choosen[0])
+PNF = getattr(modules, list_of_functions_that_were_choosen[1])
+OTF = getattr(modules, list_of_functions_that_were_choosen[2])
 
 # Call the create blacklist function for each of the three user input functions
 create_final_blacklist(top_IPs_for_all_time, get_updated_flows(record_file_path_for_absolute_data), PCF)
@@ -325,7 +331,7 @@ create_final_blacklist(top_IPs_seen_today, unknown_IP_flows_from_new_data, OTF)
 
 shutil.copy2(record_file_path_to_known_IPs, traditional_blacklist)
 
-with open(AIPP_direcory + "/log.txt", "a") as myfile:
+with open(AIPP_direcory + "/log.txt", "a") as log_file:
     myfile.write('Total Runtime' + str(datetime.now() - startTime) + "\n")
     myfile.write('---------------- AIP run complete ----------------' + "\n")
 

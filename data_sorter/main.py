@@ -1,16 +1,24 @@
-import os
+"""
+GNU GENERAL PUBLIC LICENSE
+Version 3, 29 June 2007
+Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+Everyone is permitted to copy and distribute verbatim copies
+of this license document, but changing it is not allowed.
+"""
+#! /usr/local/bin/python3
+
 import csv
 import datetime
+import os
 
 print("Hello World")
 
 data_directory = os.environ['output_data_folder']
-
 output = os.environ['results_file']
 
-files = os.listdir(str(data_directory))
+files = os.listdir(f"{data_directory}")
 
-dataset = dict()
+dataset = {}
 for file in files:
     print(file)
     with open(data_directory + file, 'r') as f:
@@ -66,8 +74,11 @@ print(len(list_of_dictionaries))
 for key in dataset.keys():
     list_of_dictionaries.append(dataset[key])
 
-labels = ["SrcAddr", "total_events", "total_duration", "average_duration", "total_bytes", "average_bytes", "total_packets",
-          "average_packets", "last_event_time", "first_event_time"]
+fn_create_list_of_dictionaries = lambda k: dataset.get(k) if k in dataset.keys()
+list_of_dictionaries = list(map(fn_create_list_of_dictionaries))
+
+labels = {"SrcAddr", "total_events", "total_duration", "average_duration", "total_bytes", "average_bytes", "total_packets",
+          "average_packets", "last_event_time", "first_event_time"}
 
 try:
     with open(output, 'w') as f:
@@ -75,5 +86,5 @@ try:
         writer.writeheader()
         for elem in list_of_dictionaries:
             writer.writerow(elem)
-except IOError:
+except IOError as e:
     print("I/O error")
