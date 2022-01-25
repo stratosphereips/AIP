@@ -35,8 +35,8 @@ class Flow(Base):
         """
         Flow constructor from CSV line
         """
-        self.src_address = line[0]
-        self.aged_score = line[0] if line[0] else Defaults.ZERO.value
+        self.src_address = str(line[0]) if line[0] else "1.0.0.1"
+        self.aged_score = Defaults.ZERO.value
         self.events = line[1] if line[1] else Defaults.ZERO.value
         self.duration = line[2] if line[2] else Defaults.ZERO.value
         self.average_duration = line[3] if line[3] else Defaults.ZERO.value

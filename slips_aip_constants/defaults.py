@@ -20,6 +20,7 @@ class Defaults(Enum):
     UNSEEN_DAYS = 6
     POS_INFINITY = float("inf")
     NEG_INFINITY = - float("inf")
+    DATE_FORMAT = '%Y-%m-%d'
 
 IP_SAFELIST = {
     '1.0.0.1',
@@ -129,7 +130,7 @@ IP_SAFELIST = {
     '2607:ff68:107::36',
     '2607:ff68:107::37',
     '2607:ff68:107::38'
-    }
+}
 
 CIDR_BLOCK_SAFELIST = {
     '35.190.247.0/24',
@@ -156,9 +157,21 @@ CIDR_BLOCK_SAFELIST = {
     '216.58.192.0/19'
 }
 
+ORG_SAFELIST = {
+    'google',
+    'apple',
+    'microsoft',
+    'wikipedia',
+    'stratosphereips',
+    'spotify',
+    'facebook',
+    'telegram'
+}
+
 class DefaultSafelists(Enum):
     """
     Default safelists
     """
     IP = IP_SAFELIST
     NET = CIDR_BLOCK_SAFELIST
+    ORG = ORG_SAFELIST
