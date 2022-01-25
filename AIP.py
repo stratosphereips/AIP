@@ -82,28 +82,29 @@ FP_log_file = AIPP_directory + '/FP_log_file.csv'
 # Full path to the  folder where the program will look for new data files. It will look in the file and only process the
 # files it has not precessed yet. It will process every file it does not recognize.
 # (b)
-raw_splunk_data_path = AIPP_directory + '/Input_Data'
+raw_splunk_data_filepath = AIPP_directory + '/Input_Data'
 
 # Full path to the file where the program will record the data files it processes
 # (c)
-record_file_path_for_processed_Splunk_files = AIPP_directory + '/Processed_Splunk_Files.txt'
+splunk_processed_files_filepath = AIPP_directory + '/Processed_Splunk_Files.txt'
 
 # A complete list of every IP seen by the program since it was started
 # (d)
-record_file_path_to_known_IPs = AIPP_directory + '/Known_IPs.txt'
+known_ips_filepath = AIPP_directory + '/Known_IPs.txt'
 
 # Full path to the file where the data flows for each IP are stored. Includes all the data the program has received
 # since it was started. This is NOT the file that contains the ratings.
 # (e)
-record_file_path_for_absolute_data = AIPP_directory + '/Absolute_Data.csv'
+absolute_data_path = AIPP_directory + '/Absolute_Data.csv'
 
 # Full path to folder that wil contain the daily rating files. This is a FOLDER!!
 # (f)
-directory_path_historical_ratings = AIPP_directory + '/Historical_Ratings'
+historical_ratings_path = AIPP_directory + '/Historical_Ratings'
 
 
 # >>>>>>>>>>>>>>> Call the find new file function and define the time reference point for the aging function
-new_data_files, reference_date = find_new_data_files(raw_splunk_data_path, record_file_path_for_processed_Splunk_files)
+new_data_files, reference_date = find_new_data_files(raw_splunk_data_filepath, splunk_processed_files_filepath)
+
 with open(AIPP_directory + "/log.txt", "a") as myfile:
     myfile.write('There are ' + str(len(new_data_files)) + ' new data files to process' + "\n")
     myfile.write('Files are ' + str(new_data_files) + "\n")
@@ -116,18 +117,18 @@ with open(AIPP_directory + "/log.txt", "a") as myfile:
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Blacklist Files <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # Path to the file that will contain top IPs from today's data only. Program will overwrite the previous days data.
 # (g)
-top_IPs_seen_today = directory_path_historical_ratings + '/Seen_today_Only/' + reference_date + '_new_blacklist.csv'
+top_IPs_seen_today = historical_ratings_path + '/Seen_today_Only/' + reference_date + '_new_blacklist.csv'
 
 # Path to file that will contain the top IPs from the data from all time. Program will overwrite the previous days data.
 # (h)
-top_IPs_for_all_time = directory_path_historical_ratings + '/Prioritize_Consistent/' + reference_date + '_pc_blacklist.csv'
+top_IPs_for_all_time = historical_ratings_path + '/Prioritize_Consistent/' + reference_date + '_pc_blacklist.csv'
 
 # Path to file that will have the ratings that will prioritize the IPs that are newer over older ones based on
 # all the data.
-top_IPs_all_time_newer_prioritized = directory_path_historical_ratings + '/Prioritize_New/' + reference_date + '_pn_blacklist.csv'
+top_IPs_all_time_newer_prioritized = historical_ratings_path + '/Prioritize_New/' + reference_date + '_pn_blacklist.csv'
 
 # Path to file that will save the traditional blacklist
-traditional_blacklist = directory_path_historical_ratings + '/Traditional/' + reference_date + '_trad_blacklist.csv'
+traditional_blacklist = historical_ratings_path + '/Traditional/' + reference_date + '_trad_blacklist.csv'
 
 # File that will be storing the run times for this script
 time_file = AIPP_directory + '/Times.csv'
@@ -193,10 +194,13 @@ def sort_ips_from_data(ips_from_absolute_data, ip_flows_from_todays_data):
     return unknown_ip_flows, unknown_ips, known_ip_data_flows, known_ips
 
 
-def write_unkown_IPs_to_data_file(list_of_unknown_IPs, d):
-    with open(d, 'a') as data_file:
-        for flow in list_of_unknown_IPs:
-            data_file.write(flow + '\n')
+def write_unkown_ips_to_data_file(list_of_unknown_ips, known_ips_filepath) -> None:
+    try:
+        with open(known_ips_filepath, 'a') as data_file:
+            for flow in list_of_unknown_ips:
+                data_file.write(flow + '\n')
+    except IOError as e:
+        logger.error(f"Unable to append data to {known_ips_filepath} file: {e}")
 
 
 def update_records_files(e, list_of_known_new_IP_data, unknown_ip_flows):
@@ -244,14 +248,15 @@ def update_records_files(e, list_of_known_new_IP_data, unknown_ip_flows):
                     continue
 
     safelist = Safelist()
-    asn_info = get_ASN_data(current_directory + '/Main/ASN/GeoLite2-ASN.mmdb', new_absolute_file_flows)
+    asn_info = safelist.get_ASN_data(current_directory + '/Main/ASN/GeoLite2-ASN.mmdb',
+                                     new_absolute_file_flows)
     safelisted_nets, safelisted_ips, safelisted_orgs = safelist.load_safelists()
     list_of_FPs = []
     for index, flow in enumerate(new_absolute_file_flows):
-        
-        first_judgement = check_if_ip_is_in_safelisted_nets(flow.src_address, safelisted_nets)
-        second_judgement = check_if_ip_is_in_safelisted_ips(flow.src_address, safelisted_ips)
-        third_judgement, entry = check_organization_aligment(asn_info[flow.src_address], safelisted_orgs)
+        first_judgement = safelist.check_if_ip_in_safelisted_nets(flow.src_address, safelisted_nets)
+        second_judgement = safelist.check_if_ip_in_safelisted_ips(flow.src_address, safelisted_ips)
+        third_judgement, entry = safelist.check_organization_alignment(asn_info[flow.src_address], safelisted_orgs)
+
         if first_judgement:
             list_of_FPs.append(flow)
             del new_absolute_file_flows[index]
@@ -289,24 +294,23 @@ def sort_data_decending(data):
 
 # Now call all the functions on the data
 
-list_of_known_data_flows, list_of_known_IPs_in_data = open_sort_abs_file(record_file_path_for_absolute_data)
-
-list_of_new_data_flows, list_of_IPs_in_new_data = open_sort_new_file(folder_path_for_raw_Splunk_data, new_data_files)
+list_of_known_data_flows, list_of_known_IPs_in_data = open_sort_abs_file(absolute_data_path)
+list_of_new_data_flows, list_of_IPs_in_new_data = open_sort_new_file(raw_splunk_data_filepath, new_data_files)
 
 unknown_IP_flows_from_new_data, unknown_IPs_from_new_data, known_IP_data_flows_from_new_data, known_IPs_from_new_data\
     = sort_ips_from_data(list_of_known_IPs_in_data, list_of_new_data_flows)
 
-write_unkown_IPs_to_data_file(unknown_IPs_from_new_data, record_file_path_to_known_IPs)
+write_unkown_ips_to_data_file(unknown_IPs_from_new_data, known_ips_filepath)
 
-update_records_files(record_file_path_for_absolute_data, known_IP_data_flows_from_new_data, unknown_IP_flows_from_new_data)
+update_records_files(absolute_data_path, known_IP_data_flows_from_new_data, unknown_IP_flows_from_new_data)
 
-number_of_lines = len(open(record_file_path_for_absolute_data).readlines())
+number_of_lines = len(open(absolute_data_path).readlines())
 with open(AIPP_directory + "/log.txt", "a") as myfile:
     myfile.write('Number of lines in absolute data' + str(number_of_lines) + "\n")
 
 def create_final_blacklist(path_to_file, data_from_absolute_file, function_to_use):
     with open(path_to_file, 'wt', newline ='') as new_file2:
-        writer = csv.DictWriter(new_file2, fieldnames=['# Top IPs from data gathered in last 24 hours only', date])
+        writer = csv.DictWriter(new_file2, fieldnames=['# Top IPs from data gathered in last 24 hours only', reference_date])
         writer.writeheader()
         writer1 = csv.DictWriter(new_file2, fieldnames=['# Number', 'IP address', 'Rating'])
         writer1.writeheader()
@@ -347,12 +351,12 @@ PNF = getattr(modules, list_of_functions_that_were_choosen[1])
 OTF = getattr(modules, list_of_functions_that_were_choosen[2])
 
 # Call the create blacklist function for each of the three user input functions
-create_final_blacklist(top_IPs_for_all_time, get_updated_flows(record_file_path_for_absolute_data), PCF)
-create_final_blacklist(top_IPs_all_time_newer_prioritized, get_updated_flows(record_file_path_for_absolute_data), PNF)
+create_final_blacklist(top_IPs_for_all_time, get_updated_flows(absolute_data_filepath), PCF)
+create_final_blacklist(top_IPs_all_time_newer_prioritized, get_updated_flows(absolute_data_filepath), PNF)
 create_final_blacklist(top_IPs_seen_today, unknown_IP_flows_from_new_data, OTF)
 
 
-shutil.copy2(record_file_path_to_known_IPs, traditional_blacklist)
+shutil.copy2(known_ips_filepath, traditional_blacklist)
 
 with open(AIPP_directory + "/log.txt", "a") as log_file:
     myfile.write('Total Runtime' + str(datetime.utcnow() - startTime) + "\n")

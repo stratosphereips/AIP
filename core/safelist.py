@@ -18,8 +18,6 @@ from slips_aip_constants.defaults import DefaultSafelists
 
 logger = logging.getLogger(__name__)
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-
 
 class Safelist:
     """
@@ -46,7 +44,7 @@ class Safelist:
         return safelisted_nets_list, safelisted_ips_list, safelisted_orgs_list
 
 
-    def check_if_ip_is_in_safelisted_nets(ip, list_of_safelisted_nets) -> bool:
+    def check_if_ip_in_safelisted_nets(ip, list_of_safelisted_nets) -> bool:
         """
         Validates if ip belongs to the list_of_safelisted_nets
 
@@ -60,7 +58,7 @@ class Safelist:
         return is_net_safelisted
 
 
-    def check_if_ip_is_in_safelisted_ips(ip, list_of_safelisted_ips) -> bool:
+    def check_if_ip_in_safelisted_ips(ip, list_of_safelisted_ips) -> bool:
         """
         Validates if ip belongs to the list_of_safelisted_ips
 
@@ -99,22 +97,21 @@ class Safelist:
         return dictionary
 
 
-    def check_organization_alingment(org, list_of_good_organizations) -> tuple:
+    def check_organization_alignment(org, safelisted_organizations) -> tuple:
         """
-        Validates if org belongs to the list_of_good_organizations
+        Validates if org belongs to the safelisted_organizations
 
         :param org: string with organization name
-        :param list_of_good_organizations: list of good organizations
+        :param safelisted_organizations: list of safelisted organizations
 
-        :return: bool. True for belonging. False, otherwise.
+        :return: tuple(bool,str): belonging, safelisted_org_name
         """
-        is_a_good_organization = False
+        is_safelisted_organization = False
         filler = None
-        for ENTRY in list_of_good_organizations:
-            expression = re.compile(ENTRY[0], re.IGNORECASE)
+        for safelisted_org in safelisted_organizations:
+            expression = re.compile(safelisted_org, re.IGNORECASE)
             if expression.search(org):
-                is_a_good_organization = True
-                return is_a_good_organization, ENTRY[0]
-            else:
-                continue
-        return is_a_good_organization, filler
+                is_safelisted_organization = True
+                return is_safelisted_organization, safelisted_org
+
+        return is_safelisted_organization, filler
