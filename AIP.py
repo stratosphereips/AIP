@@ -18,6 +18,7 @@ from netaddr import IPAddress, IPNetwork
 
 from core.safelist import *
 import core.main_modulev3 as modules
+from models.flows import Flow
 
 # Full path to directory where all the files will be stored
 # (a)
@@ -132,40 +133,33 @@ def open_sort_new_file(b, list_of_new_files):
 
 
 def open_sort_abs_file(e):
-    IP_flows = []
-    IPs_in_absolute_file = []
-    with open(e, 'r') as csvfile:
-        for line in csv.reader(csvfile):
-            if not line:
-                break
-            else:
-                IP_flows.append([line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10]])
-                IPs_in_absolute_file.append(line[0])
-    return IP_flows, IPs_in_absolute_file
+    ip_flows = []
+    ips_in_absolute_file = []
+    with open(e, 'r') as csv_file:
+        for line in csv.reader(csv_file):
+            if line:
+                ip_flows.append(Flow(line))
+                ips_in_absolute_file.append(line[0])
+    return ip_flows, ips_in_absolute_file
 
 def get_updated_flows(location_of_absolute_data_file):
-    IP_flows = []
-    with open(location_of_absolute_data_file, 'r') as csvfile:
-        for line in csv.reader(csvfile):
-            if not line:
-                break
-            else:
-                IP_flows.append([line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10]])
-    return IP_flows
+    with open(location_of_absolute_data_file, 'r') as csv_file:
+        ip_flows = [Flow(line) for line in csv.reader(csv_file) if line]
+    return ip_flows
 
-def sort_IPs_from_data(IPs_from_absolute_data, IP_flows_from_todays_data):
-    unknown_IP_flows = []
-    unknown_IPs = []
-    known_IPs = []
-    known_IP_data_flows = []
-    for IP in IP_flows_from_todays_data:
-        if IP[0] in IPs_from_absolute_data:
-            known_IP_data_flows.append(IP)
-            known_IPs.append(IP[0])
-        elif IP[0] not in IPs_from_absolute_data:
-            unknown_IP_flows.append(IP)
-            unknown_IPs.append(IP[0])
-    return unknown_IP_flows, unknown_IPs, known_IP_data_flows, known_IPs
+def sort_IPs_from_data(ips_from_absolute_data, ip_flows_from_todays_data):
+    unknown_ip_flows = []
+    unknown_ips = []
+    known_ips = []
+    known_ip_data_flows = []
+    for ip_flow in ip_flows_from_todays_data:
+        if ip_flow.src_address in ips_from_absolute_data:
+            known_ip_data_flows.append(ip_flow)
+            known_ips.append(ip_flow.src_address)
+        elif ip_flow.src_address not in ips_from_absolute_data:
+            unknown_ip_flows.append(ip_flow)
+            unknown_ips.append(ip_flow.src_address)
+    return unknown_ip_flows, unknown_ips, known_ip_data_flows, known_ips
 
 
 def write_unkown_IPs_to_data_file(list_of_unknown_IPs, d):
