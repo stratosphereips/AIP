@@ -21,6 +21,7 @@ class Defaults(Enum):
     POS_INFINITY = float("inf")
     NEG_INFINITY = - float("inf")
     DATE_FORMAT = '%Y-%m-%d'
+    SPLUNK_DATE_FORMAT = '%Y/%m/%d %H:%M:%S.%f'
 
 IP_SAFELIST = {
     '1.0.0.1',

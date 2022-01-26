@@ -10,17 +10,19 @@ of this license document, but changing it is not allowed.
 import csv
 import datetime
 import os
+from logging import getLogger
 
-print("Hello World")
+logger = getLogger(__name__)
+
+logger.info("AIP: Hello world")
 
 data_directory = os.environ['output_data_folder']
 output = os.environ['results_file']
-
 files = os.listdir(f"{data_directory}")
 
 dataset = {}
 for file in files:
-    print(file)
+    logger.debug(f"Filename: {file}")
     with open(data_directory + file, 'r') as f:
         reader = csv.DictReader(f, delimiter=',')
         rows = list(reader)

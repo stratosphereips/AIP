@@ -10,7 +10,7 @@ of this license document, but changing it is not allowed.
 import pytest
 
 from core.safelist import Safelist
-from slips_aip_constants.defaults import DefaultSafelists, Defaults
+from slips_aip_constants.defaults import DefaultSafelists
 
 CURRENT_IP_SAFELIST_SIZE = 107
 CURRENT_NET_SAFELIST_SIZE = 22

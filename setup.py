@@ -22,7 +22,7 @@ setup(
     author='Stratosphere IPS',
     author_email='stratosphereips@agents.fel.cvut.cz',
     url='https://github.com/stratosphereips/AIP-Blacklist-Algorithm',
-    download_url='https://github.com/stratosphereips/AIP-Blacklist-Algorithm/tarball/%s' % version,
+    download_url=f"https://github.com/stratosphereips/AIP-Blacklist-Algorithm/tarball/{version}",
     description='The Attacker IP Prioritizer (AIP) algorithm is a IPv4 address blacklist generator.',
     license='GPL-3.0 License',
     install_requires=['netaddr',

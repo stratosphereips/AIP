@@ -48,8 +48,8 @@ then
 				touch $output_folder/Selected_modules.csv
 				touch $output_folder/FP_log_file.csv
 				touch $output_folder/log.txt
-        touch $output_folder/Aging-modifiers-pc.csv
-        touch $output_folder/Aging-modifiers-pn.csv
+				touch $output_folder/Aging-modifiers-pc.csv
+				touch $output_folder/Aging-modifiers-pn.csv
 		  elif [ "$answer" = "$answer2" ]
 		  then
 		  	echo Input different location:

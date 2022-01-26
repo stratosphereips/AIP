@@ -12,7 +12,7 @@ export input_data_folder
 
 directory_of_AIP=$(pwd)
 
-python3 $directory_of_AIP/Main/Select_Modules.py
+python3 $directory_of_AIP/core/select_modules.py
 
 for entry in $input_data_folder/*
 do

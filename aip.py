@@ -8,13 +8,11 @@ of this license document, but changing it is not allowed.
 #! /usr/local/bin/python3
 
 import csv
-import operator
 import os
 import shutil
 from datetime import datetime
 from inspect import getmembers, isfunction
 from logging import getLogger
-from sre_parse import FLAGS
 
 from core.safelist import Safelist
 import core.main_modulev3 as modules
@@ -28,11 +26,86 @@ logger = getLogger(__name__)
 
 class AIP:
     """
-    Generates IPv4 address blacklists
+    Generates IPv4 address blocklists
 
     Stratosphere IPS | Attacker IP Prioritizer (AIP)
     """
-    pass
+    
+    def __init__(self):
+        """
+        TODO: Update function specs
+        """
+        pass
+
+
+    def find_new_data_files(self, raw_data_dir_path, processed_files_filepath) -> tuple:
+        """
+        Finds which data files have not been processed yet
+
+        :param raw_data_dir_path: stirng with data dir path
+        :param processed_files_filepath: string with filepath for processed files
+
+        :return: tuple[list, list]. new_data_files_list, reference_date
+        """
+        pass
+
+    def open_sort_new_file(raw_data_dir_path, new_files) -> tuple:
+        """
+        TODO: Update function specs
+        """
+        pass
+
+
+    def open_sort_abs_file(absolute_data_path) -> tuple:
+        """
+        TODO: Update function specs
+        """
+        pass
+
+
+    def get_updated_flows(absolute_data_path) -> list:
+        """
+        TODO: Update function specs
+        """
+        pass
+
+
+    def sort_ips_from_data(ips_from_absolute_data, ip_flows_from_today: list[Flow]) -> tuple:
+        """
+        TODO: Update function specs
+        """
+        pass
+
+
+    def write_unkown_ips_to_data_file(unknown_ips, known_ips_filepath) -> None:
+        """
+        TODO: Update function specs
+        """
+        pass
+
+
+    def update_records_files(absolute_data_path: str,
+                            new_known_ip_flows: list[Flow],
+                            unknown_ip_flows: list[Flow]) -> None:
+        """
+        TODO: Update function specs
+        """
+        pass
+
+
+    def sort_data_descending(raw_ratings: list[RawRating]) -> list[RawRating]:
+        """
+        TODO: Update function specs
+        """
+        pass
+
+
+    def create_final_blacklist(path_to_file, data_from_absolute_file, chosen_fn) -> None:
+        """
+        Creates final blacklists
+        """
+        pass
+
 
 # Full path to directory where all the files will be stored
 # (a)
@@ -64,14 +137,14 @@ def find_new_data_files(self, raw_data_dir_path, processed_files_filepath) -> tu
     files_dates = {}
 
     try:
-        with open(processed_files_filepath, 'r') as record:
-            list_of_processed_data_files = record.read().split('\n')
+        with open(processed_files_filepath, 'r') as records_file:
+            processed_files = records_file.read().split('\n')
     except IOError as e:
         logger.error(f"Unable to open {processed_files_filepath} file: {e}")
-        list_of_processed_data_files = []
+        processed_files = []
 
     for file in list_of_data_files:
-        if file not in list_of_processed_data_files:
+        if file not in processed_files:
             new_data_files.extend([file])
             files_dates[file[0:10]] = file
 
@@ -95,18 +168,17 @@ current_directory = os.getcwd()
 FP_log_file = AIPP_directory + '/FP_log_file.csv'
 
 # Full path to the  folder where the program will look for new data files. It will look in the file and only process the
-# files it has not precessed yet. It will process every # >>>>>>>>> Needs to be here so it can be called immediately, fine what data
-# files have not been processed.file it does not recognize.
+# files it has not precessed yet. It will process every file it does not recognize.
 # (b)
-raw_splunk_data_filepath = AIPP_directory + '/Input_Data'
+splunk_raw_data_path = AIPP_directory + '/Input_Data'
 
 # Full path to the file where the program will record the data files it processes
 # (c)
-splunk_processed_files_filepath = AIPP_directory + '/Processed_Splunk_Files.txt'
+splunk_processed_files_path = AIPP_directory + '/Processed_Splunk_Files.txt'
 
 # A complete list of every IP seen by the program since it was started
 # (d)
-known_ips_filepath = AIPP_directory + '/Known_IPs.txt'
+known_ips_path = AIPP_directory + '/Known_IPs.txt'
 
 # Full path to the file where the data flows for each IP are stored. Includes all the data the program has received
 # since it was started. This is NOT the file that contains the ratings.
@@ -119,7 +191,7 @@ historical_ratings_path = AIPP_directory + '/Historical_Ratings'
 
 
 # >>>>>>>>>>>>>>> Call the find new file function and define the time reference point for the aging function
-new_data_files, reference_date = find_new_data_files(raw_splunk_data_filepath, splunk_processed_files_filepath)
+new_data_files, reference_date = find_new_data_files(splunk_raw_data_path, splunk_processed_files_path)
 
 logger.info(f"{__name__} there are ({len(new_data_files)}) new data files to process\n")
 logger.info(f"{__name__} files are {new_data_files}\n")
@@ -153,18 +225,19 @@ time_file = AIPP_directory + '/Times.csv'
 path_aging_modifier_pc = AIPP_directory + '/Aging-modifiers-pc.csv'
 path_aging_modifier_pn = AIPP_directory + '/Aging-modifiers-pn.csv'
 
-def open_sort_new_file(raw_splunk_data_path, new_files):
+def open_sort_new_file(raw_data_dir_path, new_files):
     """
     TODO: Update function specs
     """
     new_ip_flows = []
     new_ips = []
     for file in new_files:
-        with open(f"{raw_splunk_data_path}/{file}", 'r') as csv_file:
+        with open(f"{raw_data_dir_path}/{file}", 'r') as csv_file:
             for line in csv.reader(csv_file):
                 if line[0] != 'SrcAddr':
                     new_ip_flows.append(Flow(line))
                     new_ips.append(line[0])
+
     return new_ip_flows, new_ips
 
 
@@ -179,6 +252,7 @@ def open_sort_abs_file(absolute_data_path) -> tuple:
             if line:
                 ip_flows.append(Flow(line=line))
                 ips_in_absolute_file.append(line[0])
+
     return ip_flows, ips_in_absolute_file
 
 
@@ -193,10 +267,11 @@ def get_updated_flows(absolute_data_filepath) -> list:
     except IOError as e:
         logger.error(f"Unable to open {absolute_data_filepath} file: {e}")
         return []
+
     return ip_flows
 
 
-def sort_ips_from_data(ips_from_absolute_data, ip_flows_from_todays_data: list[Flow]) -> tuple:
+def sort_ips_from_data(ips_from_absolute_data, ip_flows_from_today: list[Flow]) -> tuple:
     """
     TODO: Update function specs
     """
@@ -204,13 +279,14 @@ def sort_ips_from_data(ips_from_absolute_data, ip_flows_from_todays_data: list[F
     unknown_ips = []
     known_ips = []
     known_ip_flows = []
-    for ip_flow in ip_flows_from_todays_data:
+    for ip_flow in ip_flows_from_today:
         if ip_flow.src_address in ips_from_absolute_data:
             known_ip_flows.append(ip_flow)
             known_ips.append(ip_flow.src_address)
         else:
             unknown_ip_flows.append(ip_flow)
             unknown_ips.append(ip_flow.src_address)
+
     return unknown_ip_flows, unknown_ips, known_ip_flows, known_ips
 
 
@@ -239,8 +315,8 @@ def update_records_files(absolute_data_path: str,
     new_absolute_flows.extend(new_unknown_ip_flows)
 
     if new_known_ip_flows:
-        for x1, new_flow in enumerate(new_known_ip_flows):
-            for x2, absolute_flow in enumerate(new_absolute_flows):
+        for idx1, new_flow in enumerate(new_known_ip_flows):
+            for idx2, absolute_flow in enumerate(new_absolute_flows):
                 if absolute_flow.src_address == new_flow.src_address:
                     days_since_first_seen = (current_time - absolute_flow.last_event) // Defaults.MINUTES_A_DAY.value
                     dh_events = (absolute_flow.avg_events * (days_since_first_seen - 1)) + new_flow.events
@@ -263,7 +339,7 @@ def update_records_files(absolute_data_path: str,
                     updated_flow.last_event = new_flow.last_event
                     updated_flow.avg_events = updated_event_average
 
-                    new_absolute_flows[x2] = updated_flow
+                    new_absolute_flows[idx2] = updated_flow
 
     safelist = Safelist()
     asn_info = safelist.get_asn_data(f"{current_directory}/core/asn/GeoLite2-ASN.mmdb",
@@ -306,15 +382,16 @@ def sort_data_descending(raw_ratings: list[RawRating]) -> list[RawRating]:
 # Now call all the functions on the data
 
 known_data_flows, known_ips = open_sort_abs_file(absolute_data_path)
-new_ip_flows, new_ips = open_sort_new_file(raw_splunk_data_filepath, new_data_files)
+new_ip_flows, new_ips = open_sort_new_file(splunk_raw_data_path, new_data_files)
 new_unknown_ip_flows, unknown_ips, known_ip_flows, new_known_ips = sort_ips_from_data(known_ips, new_ip_flows)
 
-write_unkown_ips_to_data_file(unknown_ips, known_ips_filepath)
+write_unkown_ips_to_data_file(unknown_ips, known_ips_path)
 update_records_files(absolute_data_path, known_ip_flows, new_unknown_ip_flows)
 
 number_of_lines = len(open(absolute_data_path).readlines())
 
 logger.info(f"Number of lines in absolute data {number_of_lines}\n")
+
 
 def create_final_blacklist(path_to_file, data_from_absolute_file, chosen_fn):
     """
@@ -329,7 +406,7 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, chosen_fn):
             logger.info("Using Prioritize New Function")
             new_ratings = chosen_fn(data_from_absolute_file, current_time, path_aging_modifier_pn)
             for idx2, rating in enumerate(sort_data_descending(new_ratings)):
-                if rating.total_score >= 0.002:
+                if rating.total_score >= 0.002: # What does this value mean???
                     new_entry = {'number': idx2,
                                  'ip_address': rating.src_address,
                                  'rating': rating.total_score}
@@ -356,6 +433,7 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, chosen_fn):
                              'rating': rating.total_score}
                 csv_writer.writerows([new_entry])
 
+
 # Pull the three functions that were choosen by the user from the dictionary of functions.
 # print(list_of_functions_that_were_choosen)
 
@@ -368,7 +446,7 @@ create_final_blacklist(top_ips_for_all_time, get_updated_flows(absolute_data_pat
 create_final_blacklist(top_ips_all_time_newer_prioritized, get_updated_flows(absolute_data_path), PNF)
 create_final_blacklist(top_ips_seen_today, new_unknown_ip_flows, OTF)
 
-shutil.copy2(known_ips_filepath, traditional_blacklist)
+shutil.copy2(known_ips_path, traditional_blacklist)
 
 logger.info(f"Total runtime: {datetime.utcnow() - startTime}\n")
 logger.info("---------------- AIP run complete ----------------\n")
