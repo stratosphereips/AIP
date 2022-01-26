@@ -8,4 +8,4 @@ netaddr = "==0.8.0"
 maxminddb = "==2.2.0"
 
 [requires]
-python_version = "3.8"
+python_version = "3.8.5"

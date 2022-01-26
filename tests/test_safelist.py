@@ -14,6 +14,8 @@ from slips_aip_constants.defaults import DefaultSafelists, Defaults
 
 CURRENT_IP_SAFELIST_SIZE = 107
 CURRENT_NET_SAFELIST_SIZE = 22
+CURRENT_ORG_SAFELIST_SIZE = 8
+
 
 def test_default_ip_safelist():
     """
@@ -27,6 +29,7 @@ def test_default_ip_safelist():
     assert '139.59.173.249' in default_ip_safelist
     assert '216.245.221.84' in default_ip_safelist
     assert '2607:ff68:107::21' in default_ip_safelist
+
 
 def test_default_net_safelist():
     """
@@ -42,11 +45,22 @@ def test_default_net_safelist():
     assert '216.58.192.0/19' in default_net_safelist
 
 
+def test_default_org_safelist():
+    """
+    Verifies that DefaultSafelists.ORG has correct values
+    """
+    default_org_safelist = DefaultSafelists.ORG.value
+    assert isinstance(default_org_safelist, set)
+    assert len(default_org_safelist) == CURRENT_ORG_SAFELIST_SIZE
+    assert 'stratosphereips' in default_org_safelist
+
+
 def test_safelist_instantiation():
     safelist = Safelist()
-    safelisted_nets, safelisted_ips = safelist.load_safelists()
+    safelisted_ips, safelisted_nets, safelisted_orgs = safelist.load_safelists()
     assert len(safelisted_ips) == len(DefaultSafelists.IP.value)
     assert len(safelisted_nets) == len(DefaultSafelists.NET.value)
+    assert len(safelisted_orgs) == len(DefaultSafelists.ORG.value)
 
 
 #----------------Debugging--------------------

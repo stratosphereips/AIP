@@ -14,11 +14,6 @@ file_for_functions = os.environ['output_folder'] + '/Selected_modules.csv'
 if manual == 1:
     # Put the options for modules in a dictionary, so user can pick which one they want
     functions_list = [o for o in getmembers(main_modulev3) if isfunction(o[1])]
-    # print(functions_list)
-
-    dictionary_of_functions = {}
-    for function in functions_list:
-        dictionary_of_functions[function[0]] = function[1]
 
     # Call the methods listing functions to list the possible choices for each function.
     # Models available for prioritize CONSISTENT function.

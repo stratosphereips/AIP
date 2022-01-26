@@ -17,5 +17,5 @@ class RawRating(Base):
     """
     dataclass used to describe raw ratings
     """
-    aged_score: float
+    src_address: str
     total_score: float

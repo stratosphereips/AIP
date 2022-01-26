@@ -158,14 +158,14 @@ CIDR_BLOCK_SAFELIST = {
 }
 
 ORG_SAFELIST = {
-    'google',
     'apple',
-    'microsoft',
-    'wikipedia',
-    'stratosphereips',
-    'spotify',
     'facebook',
-    'telegram'
+    'google',
+    'telegram',
+    'microsoft',
+    'spotify',
+    'stratosphereips',
+    'wikipedia'
 }
 
 class DefaultSafelists(Enum):

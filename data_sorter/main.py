@@ -64,18 +64,13 @@ for file in files:
                                                    "total_packets": total_packets, "average_packets": average_packets,
                                                    "last_event_time": last_event_time,
                                                    "first_event_time": first_event_time}
-                else:
-                    continue
             except ValueError as x:
                 continue
 
 list_of_dictionaries = []
 print(len(list_of_dictionaries))
-for key in dataset.keys():
-    list_of_dictionaries.append(dataset[key])
 
-fn_create_list_of_dictionaries = lambda k: dataset.get(k) if k in dataset.keys()
-list_of_dictionaries = list(map(fn_create_list_of_dictionaries))
+list_of_dictionaries = [dataset.get(key) for key in dataset.keys()]
 
 labels = {"SrcAddr", "total_events", "total_duration", "average_duration", "total_bytes", "average_bytes", "total_packets",
           "average_packets", "last_event_time", "first_event_time"}
