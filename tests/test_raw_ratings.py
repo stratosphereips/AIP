@@ -23,7 +23,7 @@ def test_raw_rating_instantiation():
 
 def test_failed_raw_rating_instantiation():
     """
-    Verifies that Weights.NORMALIZED has correct values
+    Verifies that RawRating instantiation fails if missing args
     """
     with pytest.raises(Exception) as e:
         return RawRating()
