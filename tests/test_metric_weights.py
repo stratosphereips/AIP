@@ -21,14 +21,14 @@ def test_normalized_weight():
     assert isinstance(current_original_weight, MetricWeights)
     TEN_PERCENTAGE = 0.10
     TWENTY_PERCENTAGE = 0.20
-    assert current_original_weight.total_event == TWENTY_PERCENTAGE
-    assert current_original_weight.average_event == TEN_PERCENTAGE
+    assert current_original_weight.total_events == TWENTY_PERCENTAGE
+    assert current_original_weight.average_events == TEN_PERCENTAGE
     assert current_original_weight.total_duration == TEN_PERCENTAGE
     assert current_original_weight.average_duration == TEN_PERCENTAGE
-    assert current_original_weight.total_byte == TWENTY_PERCENTAGE
-    assert current_original_weight.byte_average == TEN_PERCENTAGE
+    assert current_original_weight.total_bytes == TWENTY_PERCENTAGE
+    assert current_original_weight.average_bytes == TEN_PERCENTAGE
     assert current_original_weight.total_packets == TEN_PERCENTAGE
-    assert current_original_weight.average_packet == TEN_PERCENTAGE
+    assert current_original_weight.average_packets == TEN_PERCENTAGE
 
 
 def test_original_weight():
@@ -39,14 +39,15 @@ def test_original_weight():
     assert isinstance(current_normalized_weight, MetricWeights)
     FIVE_PERCENTAGE = 0.05
     TWENTY_PERCENTAGE = 0.20
-    assert current_normalized_weight.total_event == FIVE_PERCENTAGE
-    assert current_normalized_weight.average_event == TWENTY_PERCENTAGE
+    assert current_normalized_weight.total_events == FIVE_PERCENTAGE
+    assert current_normalized_weight.average_events == TWENTY_PERCENTAGE
     assert current_normalized_weight.total_duration == FIVE_PERCENTAGE
     assert current_normalized_weight.average_duration == TWENTY_PERCENTAGE
-    assert current_normalized_weight.total_byte == FIVE_PERCENTAGE
-    assert current_normalized_weight.byte_average == TWENTY_PERCENTAGE
+    assert current_normalized_weight.total_bytes == FIVE_PERCENTAGE
+    assert current_normalized_weight.average_bytes == TWENTY_PERCENTAGE
     assert current_normalized_weight.total_packets == FIVE_PERCENTAGE
-    assert current_normalized_weight.average_packet == TWENTY_PERCENTAGE
+    assert current_normalized_weight.average_packets == TWENTY_PERCENTAGE
+
 
 def test_weights_length():
     """

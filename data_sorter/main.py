@@ -8,7 +8,7 @@ of this license document, but changing it is not allowed.
 #! /usr/local/bin/python3
 
 import csv
-import datetime
+from datetime import datetime
 import os
 from logging import getLogger
 
@@ -38,8 +38,8 @@ for file in files:
                         average_bytes = float(row['TotBytes'])
                         total_packets = float(row['TotPkts'])
                         average_packets = float(row['TotPkts'])
-                        last_event_time = float(datetime.datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))
-                        first_event_time = float(datetime.datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))
+                        last_event_time = float(datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))
+                        first_event_time = float(datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))
                         dataset[row['SrcAddr']] = {"SrcAddr": row['SrcAddr'], "total_events": total_events,
                                                    "total_duration": total_duration,
                                                    "average_duration": average_duration, "total_bytes": total_bytes,
@@ -56,9 +56,8 @@ for file in files:
                         average_bytes = (float(row['TotBytes']) + (past_data["total_events"]*past_data["average_bytes"]))/total_events
                         total_packets = float(row['TotPkts']) + past_data["total_packets"]
                         average_packets = (float(row['TotPkts']) + (past_data["total_events"]*past_data["average_packets"]))/total_events
-                        last_event_time = float(max([past_data["last_event_time"], float(datetime.datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))]))
-                        first_event_time_event_time = float(min([past_data["first_event_time"], float(
-                            datetime.datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))]))
+                        last_event_time = float(max([past_data["last_event_time"], float(datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))]))
+                        first_event_time_event_time = float(min([past_data["first_event_time"], float(datetime.strptime(row['StartTime'], '%Y/%m/%d %H:%M:%S.%f').strftime("%s"))]))
                         dataset[row['SrcAddr']] = {"SrcAddr": row['SrcAddr'], "total_events": total_events,
                                                    "total_duration": total_duration,
                                                    "average_duration": average_duration, "total_bytes": total_bytes,

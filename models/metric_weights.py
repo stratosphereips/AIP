@@ -16,12 +16,17 @@ from models.base import Base
 class MetricWeights(Base):
     """
     dataclass used to describe metric weights
+
+    These values define metric is the most important
     """
-    total_event: float
-    average_event: float
+    total_events: float
+    average_events: float
     total_duration: float
     average_duration: float
-    total_byte: float
-    byte_average: float
+    total_bytes: float
+    average_bytes: float
     total_packets: float
-    average_packet: float
+    average_packets: float
+
+    __slots__ = ['total_events', 'average_events', 'total_duration', 'average_duration',
+                 'total_bytes', 'average_bytes', 'total_packets', 'average_packets']

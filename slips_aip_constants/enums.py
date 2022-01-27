@@ -12,43 +12,59 @@ from enum import Enum
 from models.metric_weights import MetricWeights
 
 
-class Original(MetricWeights):
+class BlocklistSTypes(Enum):
     """
-    Weights used to ponder original data
+    Parameterized file paths
     """
+    NEW_BLOCKLIST = '_new_blocklist.csv'
+    PC_BLOCKLIST = '_pc_blocklist.csv'
+    PN_BLOCKLIST = '_pn_blocklist.csv'
+    TRAD_BLOCKLIST = '_trad_blocklist.csv'
 
-    def __init__(self):
-        self.total_event = 0.20
-        self.average_event = 0.10
-        self.total_duration = 0.10
-        self.average_duration = 0.10
-        self.total_byte = 0.20
-        self.byte_average = 0.10
-        self.total_packets = 0.10
-        self.average_packet = 0.10
+class FlowKeys(Enum):
+    """
+    Parameterized keys for Flow
+    """
+    SRC_ADDRESS = 'src_address'
+    EVENTS = 'events'
+    DURATION = 'duration'
+    AVG_DURATION = 'avg_duration'
+    BYTES = 'bytes'
+    AVG_BYTES = 'avg_bytes'
+    PACKETS = 'packets'
+    AVG_PACKETS = 'avg_packets'
+    FIRST_EVENT = 'first_event'
+    LAST_EVENT = 'last_event'
+    AVG_EVENTS = 'avg_events'
+    AGED_SCORE = 'aged_score'
 
 class Normalized(MetricWeights):
     """
     Weights used to ponder normalized data
     """
-
     def __init__(self):
-        self.total_event = 0.05
-        self.average_event = 0.20
+        self.total_events = 0.05
+        self.average_events = 0.20
         self.total_duration = 0.05
         self.average_duration = 0.20
-        self.total_byte = 0.05
-        self.byte_average = 0.20
+        self.total_bytes = 0.05
+        self.average_bytes = 0.20
         self.total_packets = 0.05
-        self.average_packet = 0.20
+        self.average_packets = 0.20
 
-
-class Weights(Enum):
+class Original(MetricWeights):
     """
-    Parameterized MetricWeights
+    Weights used to ponder original data
     """
-    NORMALIZED = Normalized()
-    ORIGINAL = Original()
+    def __init__(self):
+        self.total_events = 0.20
+        self.average_events = 0.10
+        self.total_duration = 0.10
+        self.average_duration = 0.10
+        self.total_bytes = 0.20
+        self.average_bytes = 0.10
+        self.total_packets = 0.10
+        self.average_packets = 0.10
 
 class Paths(Enum):
     """
@@ -62,11 +78,9 @@ class Paths(Enum):
     SELECTED_MODULES = '/selected_modules.csv'
     TIMES = '/times.csv'
 
-class BlocklistSTypes(Enum):
+class Weights(Enum):
     """
-    Parameterized file paths
+    Parameterized MetricWeights
     """
-    NEW_BLOCKLIST = '_new_blocklist.csv'
-    PC_BLOCKLIST = '_pc_blocklist.csv'
-    PN_BLOCKLIST = '_pn_blocklist.csv'
-    TRAD_BLOCKLIST = '_trad_blocklist.csv'
+    NORMALIZED = Normalized()
+    ORIGINAL = Original()

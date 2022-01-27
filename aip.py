@@ -308,7 +308,7 @@ def update_records_files(absolute_data_path: str,
     """
     TODO: Update function specs
     """
-    known_ip_flows, ips_in_abs_file = open_sort_abs_file(absolute_data_path) # figure out 'e'
+    known_ip_flows, ips_in_abs_file = open_sort_abs_file(absolute_data_path)
     new_absolute_flows = []
     new_absolute_flows.extend(known_ip_flows)
     new_unknown_ip_flows = [unknown_ip_flow for unknown_ip_flow in unknown_ip_flows]
@@ -322,9 +322,9 @@ def update_records_files(absolute_data_path: str,
                     dh_events = (absolute_flow.avg_events * (days_since_first_seen - 1)) + new_flow.events
 
                     if days_since_first_seen != 0:
-                        updated_event_average = dh_events / days_since_first_seen
+                        updated_events_average = dh_events / days_since_first_seen
                     else:
-                        updated_event_average = dh_events
+                        updated_events_average = dh_events
 
                     updated_flow = Flow()
                     updated_flow.src_address = new_flow.src_address
@@ -337,14 +337,14 @@ def update_records_files(absolute_data_path: str,
                     updated_flow.avg_packets = (absolute_flow.avg_packets + new_flow.avg_packets) / 2.0
                     updated_flow.first_event = absolute_flow.first_event
                     updated_flow.last_event = new_flow.last_event
-                    updated_flow.avg_events = updated_event_average
+                    updated_flow.avg_events = updated_events_average
 
                     new_absolute_flows[idx2] = updated_flow
 
     safelist = Safelist()
     asn_info = safelist.get_asn_data(f"{current_directory}/core/asn/GeoLite2-ASN.mmdb",
                                      new_absolute_flows)
-    list_of_FPs = []
+    list_of_FPs = [] # What does FPs stand for?
     for index, flow in enumerate(new_absolute_flows):
         first_judgement = safelist.check_if_ip_in_safelisted_nets(flow.src_address)
         second_judgement = safelist.check_if_ip_in_safelisted_ips(flow.src_address)

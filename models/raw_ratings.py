@@ -19,3 +19,5 @@ class RawRating(Base):
     """
     src_address: str
     total_score: float
+
+    __slots__ = ['src_address', 'total_score']

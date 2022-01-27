@@ -23,6 +23,8 @@ class Safelist:
     Class to handle all safelisting operations
     """
 
+    __slots__ = ['ips_safelist', 'nets_safelist', 'orgs_safelist']
+
     def __init__(self):
         """
         Safelist default constructor
@@ -69,7 +71,7 @@ class Safelist:
         """
         safelisted_ips_list = list({*self.ips_safelist})
         is_ip_safelisted = any(safelisted_ip for safelisted_ip in safelisted_ips_list
-                            if ip == safelisted_ip)
+                               if ip == safelisted_ip)
         return is_ip_safelisted
 
 
@@ -109,10 +111,11 @@ class Safelist:
         for ip in list_of_ips:
             data = reader.get(ip.src_address)
             if data:
+                org_key = 'autonomous_system_organization'
                 try:
-                    organization = data['autonomous_system_organization']
+                    organization = data.get(org_key)
                 except KeyError as e:
-                    logger.exception(f"'autonomous_system_organization' key not found in data")
+                    logger.exception(f"{org_key} key not found in data")
                     organization = ' '
             else:
                 organization = ' '
