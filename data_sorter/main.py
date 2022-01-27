@@ -8,11 +8,13 @@ of this license document, but changing it is not allowed.
 #! /usr/local/bin/python3
 
 import csv
-from datetime import datetime
 import os
+from datetime import datetime
 from logging import getLogger
 
+
 logger = getLogger(__name__)
+
 
 logger.info("AIP: Hello world")
 
@@ -68,9 +70,6 @@ for file in files:
             except ValueError as x:
                 continue
 
-list_of_dictionaries = []
-print(len(list_of_dictionaries))
-
 list_of_dictionaries = [dataset.get(key) for key in dataset.keys()]
 
 labels = {"SrcAddr", "total_events", "total_duration", "average_duration", "total_bytes", "average_bytes", "total_packets",
@@ -83,4 +82,4 @@ try:
         for elem in list_of_dictionaries:
             writer.writerow(elem)
 except IOError as e:
-    print("I/O error")
+    logger.error(f"I/O error: {e}")
