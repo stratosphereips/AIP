@@ -47,48 +47,42 @@ class Safelist:
 
     def check_if_ip_in_safelisted_nets(self, ip) -> bool:
         """
-        Validates if ip belongs to the list_of_safelisted_nets
+        Validates if ip belongs to nets_safelist
 
         :param ip: string with source address
-        :param list_of_safelisted_nets: list with safelisted nets
 
         :return: bool. True for belonging. False, otherwise.
         """
-        safelisted_nets_list = list({*self.nets_safelist})
-        is_net_safelisted = any(safelisted_net for safelisted_net in safelisted_nets_list
-                                if IPAddress(ip) in IPNetwork(safelisted_net))
+        is_net_safelisted = any(safelisted_net for safelisted_net in self.nets_safelist
+                                if IPAddress(ip) in IPNetwork(safelisted_net))                                
         return is_net_safelisted
 
 
     def check_if_ip_in_safelisted_ips(self, ip) -> bool:
         """
-        Validates if ip belongs to the list_of_safelisted_ips
+        Validates if ip belongs to ips_safelist
 
         :param ip: string with source address
-        :param list_of_safelisted_ips: list with safelisted nets
 
         :return: bool. True for belonging. False, otherwise.
         """
-        safelisted_ips_list = list({*self.ips_safelist})
-        is_ip_safelisted = any(safelisted_ip for safelisted_ip in safelisted_ips_list
+        is_ip_safelisted = any(safelisted_ip for safelisted_ip in self.ips_safelist
                                if ip == safelisted_ip)
         return is_ip_safelisted
 
 
     def check_if_org_in_safelisted_orgs(self, org) -> tuple:
         """
-        Validates if org belongs to the safelisted_organizations
+        Validates if org belongs to the orgs_safelist
 
         :param org: string with organization name
-        :param safelisted_organizations: list of safelisted organizations
 
         :return: tuple(bool,str): belonging, safelisted_org
         """
-        safelisted_orgs_list = list({*self.orgs_safelist})
         is_safelisted_organization = False
         filler = None
 
-        for safelisted_org in safelisted_orgs_list:
+        for safelisted_org in self.orgs_safelist:
             expression = re.compile(safelisted_org, re.IGNORECASE)
             if expression.search(org):
                 is_safelisted_organization = True

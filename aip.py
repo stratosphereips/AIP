@@ -11,11 +11,10 @@ import csv
 import os
 import shutil
 from datetime import datetime
-from inspect import getmembers, isfunction
 from logging import getLogger
 
-from core.safelist import Safelist
-import core.main_modulev3 as modules
+from main.methodology import Methodology
+from main.safelist import Safelist
 from models.flows import Flow
 from models.raw_ratings import RawRating
 from slips_aip_constants.defaults import Defaults
@@ -48,6 +47,7 @@ class AIP:
         :return: tuple[list, list]. new_data_files_list, reference_date
         """
         pass
+
 
     def open_sort_new_file(raw_data_dir_path, new_files) -> tuple:
         """
@@ -115,12 +115,10 @@ startTime = datetime.utcnow()
 
 # Open the file that stored the selected modules, and store the selections in
 # a list.
-file_for_functions = AIPP_directory + '/Selected_modules.csv'
+file_for_functions = AIPP_directory + '/selected_modules.csv'
 
-with open(file_for_functions, 'r') as file:
-    list_of_functions_that_were_choosen = [line for line in csv.reader(file) if line]
-
-functions_list = [o for o in getmembers(modules) if isfunction(o[1])]
+with open(file_for_functions, 'r') as csv_file:
+    chosen_functions = [line for line in csv.reader(csv_file) if line]
 
 
 def find_new_data_files(self, raw_data_dir_path, processed_files_filepath) -> tuple:
@@ -402,19 +400,9 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, chosen_fn):
         header_writer.writeheader()
         csv_writer = csv.DictWriter(blocklist_file, fieldnames=['# Number', 'IP address', 'Rating'])
         csv_writer.writeheader()
-        if chosen_fn == getattr(modules, list_of_functions_that_were_choosen[1]):
-            logger.info("Using Prioritize New Function")
-            new_ratings = chosen_fn(data_from_absolute_file, current_time, path_aging_modifier_pn)
-            for idx2, rating in enumerate(sort_data_descending(new_ratings)):
-                if rating.total_score >= 0.002: # What does this value mean???
-                    new_entry = {'number': idx2,
-                                 'ip_address': rating.src_address,
-                                 'rating': rating.total_score}
-                    csv_writer.writerows([new_entry])
-                else:
-                    break
-        elif chosen_fn == getattr(modules, list_of_functions_that_were_choosen[0]):
-            logger.info("Using Prioritize Consistent Function")
+
+        if chosen_fn == getattr(Methodology, chosen_functions[0]):
+            logger.info("Using Prioritize Consistent IPs Function")
             new_ratings = chosen_fn(data_from_absolute_file, current_time, path_aging_modifier_pc)
             for idx2, rating in enumerate(sort_data_descending(new_ratings)):
                 if rating.total_score >= 0.057: # What does this value mean???
@@ -424,8 +412,19 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, chosen_fn):
                     csv_writer.writerows([new_entry])
                 else:
                     break
+        elif chosen_fn == getattr(Methodology, chosen_functions[1]):
+            logger.info("Using Prioritize New IPs Function")
+            new_ratings = chosen_fn(data_from_absolute_file, current_time, path_aging_modifier_pn)
+            for idx2, rating in enumerate(sort_data_descending(new_ratings)):
+                if rating.total_score >= 0.002: # What does this value mean???
+                    new_entry = {'number': idx2,
+                                 'ip_address': rating.src_address,
+                                 'rating': rating.total_score}
+                    csv_writer.writerows([new_entry])
+                else:
+                    break
         else:
-            logger.info("Using Only New IPs Function")
+            logger.info("Using Prioritize Only Today IPs Function")
             new_ratings = chosen_fn(data_from_absolute_file, current_time, path_aging_modifier_pc)
             for idx2, rating in enumerate(sort_data_descending(new_ratings)):
                 new_entry = {'number': idx2,
@@ -434,12 +433,9 @@ def create_final_blacklist(path_to_file, data_from_absolute_file, chosen_fn):
                 csv_writer.writerows([new_entry])
 
 
-# Pull the three functions that were choosen by the user from the dictionary of functions.
-# print(list_of_functions_that_were_choosen)
-
-PCF = getattr(modules, list_of_functions_that_were_choosen[0])
-PNF = getattr(modules, list_of_functions_that_were_choosen[1])
-OTF = getattr(modules, list_of_functions_that_were_choosen[2])
+PCF = getattr(Methodology, chosen_functions[0])
+PNF = getattr(Methodology, chosen_functions[1])
+OTF = getattr(Methodology, chosen_functions[2])
 
 # Call the create blacklist function for each of the three user input functions
 create_final_blacklist(top_ips_for_all_time, get_updated_flows(absolute_data_path), PCF)

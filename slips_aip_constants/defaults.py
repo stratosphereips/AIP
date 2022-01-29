@@ -10,19 +10,6 @@ of this license document, but changing it is not allowed.
 from enum import Enum
 
 
-class Defaults(Enum):
-    """
-    Default values
-    """
-    MINUTES_AN_HOUR = (60**2)
-    MINUTES_A_DAY = 24*MINUTES_AN_HOUR
-    ZERO = 0.0
-    UNSEEN_DAYS = 6
-    POS_INFINITY = float("inf")
-    NEG_INFINITY = - float("inf")
-    DATE_FORMAT = '%Y-%m-%d'
-    SPLUNK_DATE_FORMAT = '%Y/%m/%d %H:%M:%S.%f'
-
 IP_SAFELIST = {
     '1.0.0.1',
     '1.1.1.1',
@@ -168,6 +155,22 @@ ORG_SAFELIST = {
     'stratosphereips',
     'wikipedia'
 }
+
+
+class Defaults(Enum):
+    """
+    Default values
+    """
+    MINUTES_AN_HOUR = (60**2)
+    MINUTES_A_DAY = 24*MINUTES_AN_HOUR
+    ZERO = 0.0
+    UNSEEN_DAYS = 6
+    POS_INFINITY = float("inf")
+    NEG_INFINITY = - float("inf")
+    DATE_FORMAT = "%Y-%m-%d"
+    SPLUNK_DATE_FORMAT = "%Y/%m/%d %H:%M:%S.%f"
+    UTF_8 = "utf-8"
+
 
 class DefaultSafelists(Enum):
     """

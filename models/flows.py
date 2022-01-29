@@ -78,16 +78,16 @@ class Flow(Base):
         Flow constructor from config dict
         """
         f = cls()
-        f.src_address = config.get('src_address')
-        f.events = float(config.get('events'))
-        f.duration = float(config.get('duration'))
-        f.avg_duration = float(config.get('avg_duration'))
-        f.bytes = float(config.get('bytes'))
-        f.avg_bytes = float(config.get('avg_bytes'))
-        f.packets = float(config.get('packets'))
-        f.avg_packets = float(config.get('avg_packets'))
-        f.first_event = float(config.get('first_event'))
-        f.last_event = float(config.get('last_event'))
-        f.avg_events = float(config.get('avg_events'))
+        f.src_address = config.get(FlowKeys.SRC_ADDRESS.value)
+        f.events = float(config.get(FlowKeys.EVENTS.value))
+        f.duration = float(config.get(FlowKeys.DURATION.value))
+        f.avg_duration = float(config.get(FlowKeys.AVG_DURATION.value))
+        f.bytes = float(config.get(FlowKeys.BYTES.value))
+        f.avg_bytes = float(config.get(FlowKeys.AVG_BYTES.value))
+        f.packets = float(config.get(FlowKeys.PACKETS.value))
+        f.avg_packets = float(config.get(FlowKeys.AVG_PACKETS.value))
+        f.first_event = float(config.get(FlowKeys.FIRST_EVENT.value))
+        f.last_event = float(config.get(FlowKeys.LAST_EVENT.value))
+        f.avg_events = float(config.get(FlowKeys.AVG_EVENTS.value))
 
         return f
