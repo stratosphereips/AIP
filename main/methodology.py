@@ -11,7 +11,6 @@ import csv
 import math
 from logging import getLogger
 
-from models.flows import Flow
 from models.raw_ratings import RawRating
 from slips_aip_constants.defaults import Defaults
 from slips_aip_constants.enums import Weights
@@ -38,8 +37,8 @@ class Methodology:
         
         :return: dict with two functions
         """
-        options_dict = {'1': 'prioritize_consistent_normalized_ips',
-                        '2': 'prioritize_consistent_original_ips'}
+        options_dict = {1: 'prioritize_consistent_normalized_ips',
+                        2: 'prioritize_consistent_original_ips'}
         return options_dict
 
     @staticmethod
@@ -47,8 +46,8 @@ class Methodology:
         """
         Provides functions to prioritize new IPs
         """
-        options_dict = {'1': 'prioritize_new_normalized_ips',
-                        '2': 'prioritize_new_original_ips'}
+        options_dict = {1: 'prioritize_new_normalized_ips',
+                        2: 'prioritize_new_original_ips'}
         return options_dict
 
     @staticmethod
@@ -56,8 +55,8 @@ class Methodology:
         """
         Provides functions to prioritize today IPs
         """
-        options_dict = {'1': 'prioritize_only_normalized_today_ips',
-                        '2': 'prioritize_only_today_ips'}
+        options_dict = {1: 'prioritize_only_normalized_today_ips',
+                        2: 'prioritize_only_today_ips'}
         return options_dict
 
 
@@ -97,9 +96,10 @@ class Methodology:
 
 
     # Consistent IPs
-    def prioritize_consistent_normalized_ips(self, flows: list[Flow],
+    def prioritize_consistent_normalized_ips(self,
+                                             flows,
                                              data_newest_time,
-                                             path_to_aging_file) -> list[RawRating]:
+                                             path_to_aging_file):
         """
         Prioritizes normalized consistent IP flows
 
@@ -246,8 +246,9 @@ class Methodology:
         return raw_ratings
 
 
-    def prioritize_consistent_original_ips(self, flows: list[Flow],
-                                        data_newest_time) -> list[RawRating]:
+    def prioritize_consistent_original_ips(self,
+                                           flows,
+                                           data_newest_time):
         """
         Prioritizes original consistent IP flows
 
@@ -317,9 +318,10 @@ class Methodology:
 
 
     # New IPs
-    def prioritize_new_normalized_ips(self, flows: list[Flow],
+    def prioritize_new_normalized_ips(self,
+                                      flows,
                                       data_newest_time,
-                                      path_to_aging_file) -> list[RawRating]:
+                                      path_to_aging_file):
         """
         Prioritizes normalized new IP flows
 
@@ -461,8 +463,9 @@ class Methodology:
         return raw_ratings
 
 
-    def prioritize_new_original_ips(self, flows: list[Flow],
-                                    data_newest_time) -> list[RawRating]:
+    def prioritize_new_original_ips(self,
+                                    flows,
+                                    data_newest_time):
         """
         Prioritizes new original IP flows
 
@@ -532,9 +535,10 @@ class Methodology:
 
 
     # Today IPs
-    def prioritize_only_normalized_today_ips(self, flows: list[Flow],
-                                         data_newest_time,
-                                         path_to_aging_file) -> list[RawRating]:
+    def prioritize_only_normalized_today_ips(self,
+                                             flows,
+                                             data_newest_time,
+                                             path_to_aging_file):
         """
         Prioritizes only normalized today IP flows
 
@@ -659,8 +663,9 @@ class Methodology:
         return raw_ratings
 
 
-    def prioritize_only_today_ips(self, flows: list[Flow],
-                                data_newest_time) -> list[RawRating]:
+    def prioritize_only_today_ips(self,
+                                  flows,
+                                  data_newest_time):
         """
         Prioritizes only today IP flows
 

@@ -18,9 +18,16 @@ from main.safelist import Safelist
 from models.flows import Flow
 from models.raw_ratings import RawRating
 from slips_aip_constants.defaults import Defaults
+from slips_aip_constants.enums import BlocklistTypes, DirPaths, EnvVars, FilePaths
+from utils.utils import Utils
 
 
 logger = getLogger(__name__)
+
+
+# Full path to directory where all the files will be stored
+# (a)
+AIPP_directory = os.environ[EnvVars.OUTPUT_FOLDER.value]
 
 
 class AIP:
@@ -30,11 +37,34 @@ class AIP:
     Stratosphere IPS | Attacker IP Prioritizer (AIP)
     """
     
-    def __init__(self):
+    def __init__(self, start_time):
         """
-        TODO: Update function specs
+        AIP class default constructor
         """
-        pass
+        # Datetime when AIP started (a)
+        self.start_time = start_time
+        # Directory path where all the files will be stored to (b)
+        self.aipp_directory = os.environ[EnvVars.OUTPUT_FOLDER.value]
+        # Filepath with stored selected modules (c)
+        self.functions_filepath = f"{self.aipp_directory}{FilePaths.SELECTED_MODULES.value}"
+        # Filepath where FPs will be stored (d)
+        self.fp_log_filepath = f"{self.aipp_directory}{FilePaths.FP_LOG.value}"
+        # Directory path where AIP will look for new data files (e)
+        self.raw_data_dirpath = f"{self.aipp_directory}{DirPaths.INPUT_DATA.value}"
+        # Filepath where AIP will save files it processes (f)
+        self.processed_files_filepath = f"{self.aipp_directory}{FilePaths.PROCESSED_FILES.value}"
+        # Filepath with complete list of IPs seen since AIP started (g)
+        self.known_ips_filepath = f"{self.aipp_directory}{FilePaths.KNOWN_IPS.value}"
+        # Filepath where all IP data flows are stored since AIP started (h)
+        self.absolute_data_dirpath = f"{self.aipp_directory}{FilePaths.ABSOLUTE_DATA.value}"
+        # Directory path which will contain daily rating files (i)
+        self.historical_ratings_dirpath = f"{self.aipp_directory}{DirPaths.HISTORICAL_RATINGS.value}"
+        # Filepath which will store run times for AIP (j)
+        self.times_filepath = f"{self.aipp_directory}{FilePaths.TIMES.value}"
+        # Filepath which will keep track of PC aging modifiers (k)
+        self.aging_modifier_pc_filepath = f"{self.aipp_directory}{FilePaths.AGING_PC_MODS.value}"
+        # Filepath which will keep track of PN aging modifiers (l)
+        self.aging_modifier_pn_filepath = f"{self.aipp_directory}{FilePaths.AGING_PN_MODS.value}"
 
 
     def find_new_data_files(self, raw_data_dir_path, processed_files_filepath) -> tuple:
@@ -70,7 +100,7 @@ class AIP:
         pass
 
 
-    def sort_ips_from_data(ips_from_absolute_data, ip_flows_from_today: list[Flow]) -> tuple:
+    def sort_ips_from_data(ips_from_absolute_data, ip_flows_from_today) -> tuple:
         """
         TODO: Update function specs
         """
@@ -84,9 +114,9 @@ class AIP:
         pass
 
 
-    def update_records_files(absolute_data_path: str,
-                            new_known_ip_flows: list[Flow],
-                            unknown_ip_flows: list[Flow]) -> None:
+    def update_records_files(absolute_data_path,
+                             new_known_ip_flows,
+                             unknown_ip_flows) -> None:
         """
         TODO: Update function specs
         """
@@ -106,18 +136,82 @@ class AIP:
         """
         pass
 
+    def get_blocklist_filenames(self, reference_date):
+        """
+        Returns the blocklists filenames
 
-# Full path to directory where all the files will be stored
-# (a)
-AIPP_directory = os.environ['output_folder']
+        :param reference_date: datetime with reference date
+
+        :return: dict with four (4) known blocklists filenames
+        """
+        # Path to the file that will contain top IPs from today's data only. Program will overwrite the previous days data.
+        # (g)
+        top_ips_seen_today = historical_ratings_path + '/Seen_today_Only/' + reference_date + '_new_blacklist.csv'
+
+        # Path to file that will contain the top IPs from the data from all time. Program will overwrite the previous days data.
+        # (h)
+        top_ips_for_all_time = historical_ratings_path + '/Prioritize_Consistent/' + reference_date + '_pc_blacklist.csv'
+
+        # Path to file that will have the ratings that will prioritize the IPs that are newer over older ones based on
+        # all the data.
+        top_ips_all_time_newer_prioritized = historical_ratings_path + '/Prioritize_New/' + reference_date + '_pn_blacklist.csv'
+
+        # Path to file that will save the traditional blacklist
+        traditional_blocklist = historical_ratings_path + '/Traditional/' + reference_date + '_trad_blacklist.csv'
+        blocklists_filenames = {
+            "consistent": top_ips_for_all_time,
+            "new": top_ips_all_time_newer_prioritized,
+            "today": top_ips_seen_today,
+            "traditional": traditional_blocklist
+        }
+
+        return blocklists_filenames
+
+
+    def create_all_final_blocklists(self, reference_date):
+        # Call the create blacklist function for each of the three user input functions
+        #create_final_blacklist(top_ips_for_all_time, get_updated_flows(absolute_data_path), PCF)
+        #create_final_blacklist(top_ips_all_time_newer_prioritized, get_updated_flows(absolute_data_path), PNF)
+        #create_final_blacklist(top_ips_seen_today, new_unknown_ip_flows, OTF)
+        try:
+            with open(self.functions_filepath, 'r') as csv_file:
+                chosen_functions = [line for line in csv.reader(csv_file) if line]
+        except IOError as e:
+            logger.exception(f"Unable to open {self.functions_filepath} file")
+
+        # Get blocklists methods
+        PCF = getattr(Methodology, chosen_functions[0])
+        PNF = getattr(Methodology, chosen_functions[1])
+        OTF = getattr(Methodology, chosen_functions[2])
+
+        # Get blocklists filenames
+        blocklists_filenames = self.get_blocklist_filenames(reference_date)
+        top_ips_for_all_time = blocklists_filenames.get("consistent")
+        top_ips_all_time_newer_prioritized = blocklists_filenames.get("new")
+        top_ips_seen_today = blocklists_filenames.get("today")
+        traditional_blocklist = blocklists_filenames.get("traditional")
+
+        # Create blocklist for each of the user chosen functions
+        create_final_blacklist(top_ips_for_all_time, get_updated_flows(absolute_data_path), PCF)
+        create_final_blacklist(top_ips_all_time_newer_prioritized, get_updated_flows(absolute_data_path), PNF)
+        create_final_blacklist(top_ips_seen_today, new_unknown_ip_flows, OTF)
+
+        # Copy known IPs as the traditional blocklist
+        shutil.copy2(self.known_ips_filepath, traditional_blocklist)
+
+        with open(self.times_filepath, 'a') as csv_time_file:
+            csv_writer = csv.writer(csv_time_file, quoting=csv.QUOTE_ALL)
+            csv_writer.writerow([reference_date, datetime.utcnow() - self.start_time])
+
+
 
 startTime = datetime.utcnow()
 
 # Open the file that stored the selected modules, and store the selections in
 # a list.
-file_for_functions = AIPP_directory + '/selected_modules.csv'
+functions_file = AIPP_directory + '/selected_modules.csv'
 
-with open(file_for_functions, 'r') as csv_file:
+with open(functions_file, 'r') as csv_file:
     chosen_functions = [line for line in csv.reader(csv_file) if line]
 
 
@@ -393,7 +487,12 @@ logger.info(f"Number of lines in absolute data {number_of_lines}\n")
 
 def create_final_blacklist(path_to_file, data_from_absolute_file, chosen_fn):
     """
-    Creates final blacklists
+    Creates final blacklist
+
+    :param:
+    :param:
+    :param:
+    :param:
     """
     with open(path_to_file, 'wt', newline ='') as blocklist_file:
         header_writer = csv.DictWriter(blocklist_file, fieldnames=['# Top IPs from data gathered in last 24 hours only', reference_date])
@@ -451,3 +550,19 @@ logger.info("---------------- AIP run complete ----------------\n")
 with open(time_file, 'a') as csv_time_file:
     csv_writer = csv.writer(csv_time_file, quoting=csv.QUOTE_ALL)
     csv_writer.writerow([reference_date, datetime.utcnow() - startTime])
+
+
+if __name__ == "__main__":
+    """
+    Generates IPv4 address blocklists
+    """
+    logger.info("---- Stratosphere IPS | Attacker IP Prioritizer (AIP) ----\n")
+    start_time = Utils.now()
+    logger.info(f"AIP start time {start_time}\n")
+    aip = AIP(start_time)
+    logger.info("-------------------- AIP STARTED ----------------\n")
+    aip.create_all_final_blocklists()
+    logger.info("-------------------- AIP FINISHED ----------------\n")
+    finish_time = Utils.now()
+    logger.info(f"AIP finish time {finish_time}\n")
+    logger.info(f"Total runtime: {finish_time - start_time}\n")

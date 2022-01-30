@@ -12,20 +12,22 @@ import os
 from datetime import datetime
 from logging import getLogger
 
+from slips_aip_constants.enums import EnvVars
+
 
 logger = getLogger(__name__)
 
 
 logger.info("AIP: Hello world")
 
-data_directory = os.environ['output_data_folder']
-output = os.environ['results_file']
+data_directory = os.environ[EnvVars.OUTPUT_DATA_FOLDER.value]
+output = os.environ[EnvVars.RESULTS_FILE.value]
 files = os.listdir(f"{data_directory}")
 
 dataset = {}
 for file in files:
     logger.debug(f"Filename: {file}")
-    with open(data_directory + file, 'r') as f:
+    with open(f"{data_directory}{file}", "r") as f:
         reader = csv.DictReader(f, delimiter=',')
         rows = list(reader)
         for row in rows:

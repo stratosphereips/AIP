@@ -161,16 +161,18 @@ class Defaults(Enum):
     """
     Default values
     """
+    DATE_FORMAT = "%Y-%m-%d"
+    FIVE_PERCENTAGE = 0.05
     MINUTES_AN_HOUR = (60**2)
     MINUTES_A_DAY = 24*MINUTES_AN_HOUR
-    ZERO = 0.0
-    UNSEEN_DAYS = 6
-    POS_INFINITY = float("inf")
     NEG_INFINITY = - float("inf")
-    DATE_FORMAT = "%Y-%m-%d"
+    POS_INFINITY = float("inf")
     SPLUNK_DATE_FORMAT = "%Y/%m/%d %H:%M:%S.%f"
+    TEN_PERCENTAGE = 0.10
+    TWENTY_PERCENTAGE = 0.20
+    UNSEEN_DAYS = 6
     UTF_8 = "utf-8"
-
+    ZERO = 0.0
 
 class DefaultSafelists(Enum):
     """
