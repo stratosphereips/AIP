@@ -1,23 +1,23 @@
 11/12/2020
 V2.0.5
-- Added complete runtime logging system to Master branch
+- Added complete runtime logging system to main branch
 
 09/12/2020
 V2.0.4
 - Added ASN checker for major organizations
 - Added tcp flag checker for import data
 - Create ASN branch for testing
-- Merged ASN branch with Master
+- Merged ASN branch with main
 
 16/10/2020
 V2.0.3
-- Updated safelist for master branch
+- Updated safelist for main branch
 
 07/10/2020
 V2.0.2
 - Created branch V2.0.2 for testing
 - Fixed problem with parenthesis in the blocklist headers
-- Merged V2.0.2 with master
+- Merged V2.0.2 with main
 
 18/09/2020
 - Modified thresholds to shrink lists

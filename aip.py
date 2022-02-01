@@ -131,7 +131,7 @@ class AIP:
 
     def open_sort_abs_file(self, absolute_data_path) -> tuple:
         """
-        Provides a tuple(list, list) with IPs flow and IPs from the master
+        Provides a tuple(list, list) with IPs flow and IPs from the main
         data file
 
         :param absolute_data_path: filepath where all IPs flows are stored
