@@ -18,7 +18,7 @@ In this document, I will describe how to use the AIP algorithm tool. Since it is
 7. Follow the onscreen instructions. Depending on whether this is the first time you have run it or not, it will ask you for the location of your input data files, and then the location that you want the output to be saved to.
 8. cd /the/location/you/specified/for/the/output/Files
 9. There you will see a number of folders and files. These are the files AIP uses to remember past runs. 
-10. Go to the directory /Historical_Ratings/ to see the output blacklists.
+10. Go to the directory /Historical_Ratings/ to see the output blocklists.
 
 ## The Input Data
 In terms of file format for the input data, the program accepts a .csv file that has one IP per line, with each of the following data inputs for each IP on that line, separated by commas:
@@ -38,4 +38,4 @@ For example, a single line in the file could look like this:
 
 ## Useful Information
 The tool is designed to be run once a day at a time of your choosing after copying the .csv file that contains the data from the last 24 hours to the Input-Data directory. If it is not run once a day, the rating system will be thrown off, but it will still work.
-The Run-AIP script is designed to simply run the python script for AIP, and then copy the generated blacklist files to another location to be saved.
+The Run-AIP script is designed to simply run the python script for AIP, and then copy the generated blocklist files to another location to be saved.

@@ -4,7 +4,7 @@
 
 # The Idea
 
-The Attacker IP Prioritizer (AIP) algorithm aims to generate a IoT friendly blacklist. With the advent of 5G, many IoT devices are going to be directly connected to the internet instead of being protected by a routers firewall. Therefore we need blacklists that are small and portable, and designed to blacklist IPs that are targeting IoT. The IPs of interest, from a statistics point of view, should have a couple of recognizable features:
+The Attacker IP Prioritizer (AIP) algorithm aims to generate a IoT friendly blocklist. With the advent of 5G, many IoT devices are going to be directly connected to the internet instead of being protected by a routers firewall. Therefore we need blocklists that are small and portable, and designed to blocklist IPs that are targeting IoT. The IPs of interest, from a statistics point of view, should have a couple of recognizable features:
 
 First, they should be attacking more often than other IPs. In terms of our collected training data, we increase the priority of the IPs that attack more.
 

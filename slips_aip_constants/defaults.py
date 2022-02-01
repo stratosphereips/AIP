@@ -9,6 +9,8 @@ of this license document, but changing it is not allowed.
 
 from enum import Enum
 
+from models.metric_weights import MetricWeights
+
 
 IP_SAFELIST = {
     '1.0.0.1',
@@ -156,6 +158,33 @@ ORG_SAFELIST = {
     'wikipedia'
 }
 
+class Blocklists(Enum):
+    """
+    Default blocklists names
+    """
+    NEW_BLOCKLIST = "new_blocklist"
+    PC_BLOCKLIST = "pc_blocklist"
+    PN_BLOCKLIST = "pn_blocklist"
+    TRADITIONAL_BLOCKLIST = "trad_blocklist"
+
+class BlocklistConfig(Enum):
+    """
+    Blocklist configuration keys
+    """
+    CHOSEN_FUNCTION = "chosen_function"
+    CURRENT_TIME = "current_time"
+    INPUT_FILEPATH = "absolute_data_filepath"
+    OUTPUT_FILEPATH = "blocklist_filepath"
+    REFERENCE_DATE = "reference_date"
+
+class BlocklistTypes(Enum):
+    """
+    Parameterized file paths
+    """
+    NEW = f"_{Blocklists.NEW_BLOCKLIST.value}.csv"
+    PC = f"_{Blocklists.PC_BLOCKLIST.value}.csv"
+    PN = f"_{Blocklists.PN_BLOCKLIST.value}.csv"
+    TRADITIONAL = f"_{Blocklists.TRADITIONAL_BLOCKLIST.value}.csv"
 
 class Defaults(Enum):
     """
@@ -181,3 +210,100 @@ class DefaultSafelists(Enum):
     IP = IP_SAFELIST
     NET = CIDR_BLOCK_SAFELIST
     ORG = ORG_SAFELIST
+
+class DirPaths(Enum):
+    """
+    Parameterized directories paths
+    """
+    ASN = "core/asn/"
+    HISTORICAL_RATINGS = "historical_ratings/"
+    INPUT_DATA = "input_data/"
+    PRIORITIZE_CONSISTENT = "prioritize_consistent/"
+    PRIORITIZE_NEW = "prioritize_new/"
+    PRIORITIZE_TODAY_ONLY = "prioritize_today_only/"
+    TRADITIONAL = "traditional/"
+
+class EnvVars(Enum):
+    """
+    Parameterized environment variables
+    """
+    OUTPUT_FOLDER = "output_folder"
+    OUTPUT_DATA_FOLDER = "output_data_folder"
+    RESULTS_FILE ="results_file"
+
+class FilePaths(Enum):
+    """
+    Parameterized file paths
+    """
+    ASN_DB = "asn.mmdb"
+    ABSOLUTE_DATA = 'absolute_data.csv'
+    AGING_PC_MODS = 'aging_modifiers_pc.csv'
+    AGING_PN_MODS = 'aging_modifiers_pn.csv'
+    FP_LOG = 'fp_log_file.csv'
+    KNOWN_IPS = 'known_ips.txt'
+    PROCESSED_FILES = 'processed_splunk_files.txt'
+    SELECTED_MODULES = 'selected_modules.csv'
+    TIMES = 'times.csv'
+
+class FlowKeys(Enum):
+    """
+    Parameterized keys for Flow
+    """
+    SRC_ADDRESS = "src_address"
+    EVENTS = "events"
+    DURATION = "duration"
+    AVG_DURATION = "avg_duration"
+    BYTES = "bytes"
+    AVG_BYTES = "avg_bytes"
+    PACKETS = "packets"
+    AVG_PACKETS = "avg_packets"
+    FIRST_EVENT = "first_event"
+    LAST_EVENT = "last_event"
+    AVG_EVENTS = "avg_events"
+    AGED_SCORE = "aged_score"
+
+class Functions(Enum):
+    """
+    Defaults functions
+    """
+    PCN = "prioritize_consistent_normalized_ips"
+    PCO = "prioritize_consistent_original_ips"
+    PNN = "prioritize_new_normalized_ips"
+    PNO = "prioritize_new_original_ips"
+    POTN = "prioritize_only_normalized_today_ips"
+    POT = "prioritize_only_today_ips"
+
+class Normalized(MetricWeights):
+    """
+    Weights used to ponder normalized data
+    """
+    def __init__(self):
+        self.total_events = Defaults.FIVE_PERCENTAGE.value
+        self.average_events = Defaults.TWENTY_PERCENTAGE.value
+        self.total_duration = Defaults.FIVE_PERCENTAGE.value
+        self.average_duration = Defaults.TWENTY_PERCENTAGE.value
+        self.total_bytes = Defaults.FIVE_PERCENTAGE.value
+        self.average_bytes = Defaults.TWENTY_PERCENTAGE.value
+        self.total_packets = Defaults.FIVE_PERCENTAGE.value
+        self.average_packets = Defaults.TWENTY_PERCENTAGE.value
+
+class Original(MetricWeights):
+    """
+    Weights used to ponder original data
+    """
+    def __init__(self):
+        self.total_events = Defaults.TWENTY_PERCENTAGE.value
+        self.average_events = Defaults.TEN_PERCENTAGE.value
+        self.total_duration = Defaults.TEN_PERCENTAGE.value
+        self.average_duration = Defaults.TEN_PERCENTAGE.value
+        self.total_bytes = Defaults.TWENTY_PERCENTAGE.value
+        self.average_bytes = Defaults.TEN_PERCENTAGE.value
+        self.total_packets = Defaults.TEN_PERCENTAGE.value
+        self.average_packets = Defaults.TEN_PERCENTAGE.value
+
+class Weights(Enum):
+    """
+    Parameterized MetricWeights
+    """
+    NORMALIZED = Normalized()
+    ORIGINAL = Original()

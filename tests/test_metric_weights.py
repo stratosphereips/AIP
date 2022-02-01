@@ -10,17 +10,20 @@ of this license document, but changing it is not allowed.
 import pytest
 
 from models.metric_weights import MetricWeights
-from slips_aip_constants.enums import Weights
+from slips_aip_constants.defaults import Defaults, Weights
+
+
+FIVE_PERCENTAGE = Defaults.FIVE_PERCENTAGE.value
+TEN_PERCENTAGE = Defaults.TEN_PERCENTAGE.value
+TWENTY_PERCENTAGE = Defaults.TWENTY_PERCENTAGE.value
 
 
 def test_normalized_weight():
     """
-    Verifies that Weights.ORIGINAL has correct values
+    Verifies that Weights.NORMALIZED has correct values
     """
     current_normalized_weight = Weights.NORMALIZED.value
     assert isinstance(current_normalized_weight, MetricWeights)
-    FIVE_PERCENTAGE = 0.05
-    TWENTY_PERCENTAGE = 0.20
     assert current_normalized_weight.total_events == FIVE_PERCENTAGE
     assert current_normalized_weight.average_events == TWENTY_PERCENTAGE
     assert current_normalized_weight.total_duration == FIVE_PERCENTAGE
@@ -33,12 +36,10 @@ def test_normalized_weight():
 
 def test_original_weight():
     """
-    Verifies that Weights.NORMALIZED has correct values
+    Verifies that Weights.ORIGINAL has correct values
     """
     current_original_weight = Weights.ORIGINAL.value
     assert isinstance(current_original_weight, MetricWeights)
-    TEN_PERCENTAGE = 0.10
-    TWENTY_PERCENTAGE = 0.20
     assert current_original_weight.total_events == TWENTY_PERCENTAGE
     assert current_original_weight.average_events == TEN_PERCENTAGE
     assert current_original_weight.total_duration == TEN_PERCENTAGE

@@ -12,7 +12,7 @@ import pytest
 from models.raw_ratings import RawRating
 
 
-def test_raw_rating_instantiation():
+def test_raw_rating_instantiation_success():
     """
     Verifies that RawRating has correct data types
     """
@@ -21,9 +21,9 @@ def test_raw_rating_instantiation():
     assert isinstance(new_rating.total_score, float)
 
 
-def test_failed_raw_rating_instantiation():
+def test_raw_rating_instantiation_failure_without_params():
     """
-    Verifies that RawRating instantiation fails if missing args
+    Verifies that RawRating instantiation fails without params
     """
-    with pytest.raises(Exception) as e:
+    with pytest.raises(TypeError) as e:
         return RawRating()

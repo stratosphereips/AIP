@@ -12,8 +12,7 @@ import math
 from logging import getLogger
 
 from models.raw_ratings import RawRating
-from slips_aip_constants.defaults import Defaults
-from slips_aip_constants.enums import Weights
+from slips_aip_constants.defaults import Defaults, Functions, Weights
 
 
 logger = getLogger(__name__)
@@ -37,8 +36,8 @@ class Methodology:
         
         :return: dict with two functions
         """
-        options_dict = {1: 'prioritize_consistent_normalized_ips',
-                        2: 'prioritize_consistent_original_ips'}
+        options_dict = {1: Functions.PCN.value,
+                        2: Functions.PCO.value}
         return options_dict
 
     @staticmethod
@@ -46,8 +45,8 @@ class Methodology:
         """
         Provides functions to prioritize new IPs
         """
-        options_dict = {1: 'prioritize_new_normalized_ips',
-                        2: 'prioritize_new_original_ips'}
+        options_dict = {1: Functions.PNN.value,
+                        2: Functions.PNO.value}
         return options_dict
 
     @staticmethod
@@ -55,8 +54,8 @@ class Methodology:
         """
         Provides functions to prioritize today IPs
         """
-        options_dict = {1: 'prioritize_only_normalized_today_ips',
-                        2: 'prioritize_only_today_ips'}
+        options_dict = {1: Functions.POTN.value,
+                        2: Functions.POT.value}
         return options_dict
 
 
@@ -74,7 +73,7 @@ class Methodology:
                                     in csv.reader(csv_file)}
             return aged_scores_dict
         except IOError as e:
-            logger.exception("Unable to retrieve dict with aged_scores")
+            logger.exception("Unable to retrieve dict with aged_scores: {e}")
             raise e
 
 
@@ -91,7 +90,7 @@ class Methodology:
                 for ip, age in aged_scores_dict.items():
                     csv_writer.writerow([ip, age])
         except IOError as e:
-            logger.exception("Unable to save dict with aged_scores")
+            logger.exception("Unable to save dict with aged_scores: {e}")
             raise e
 
 
@@ -248,7 +247,8 @@ class Methodology:
 
     def prioritize_consistent_original_ips(self,
                                            flows,
-                                           data_newest_time):
+                                           data_newest_time,
+                                           path_to_aging_file):
         """
         Prioritizes original consistent IP flows
 
@@ -465,7 +465,8 @@ class Methodology:
 
     def prioritize_new_original_ips(self,
                                     flows,
-                                    data_newest_time):
+                                    data_newest_time,
+                                    path_to_aging_file):
         """
         Prioritizes new original IP flows
 
@@ -665,7 +666,8 @@ class Methodology:
 
     def prioritize_only_today_ips(self,
                                   flows,
-                                  data_newest_time):
+                                  data_newest_time,
+                                  path_to_aging_file):
         """
         Prioritizes only today IP flows
 

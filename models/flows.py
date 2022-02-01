@@ -10,8 +10,7 @@ of this license document, but changing it is not allowed.
 from dataclasses import dataclass
 
 from models.base import Base
-from slips_aip_constants.defaults import Defaults
-from slips_aip_constants.enums import FlowKeys
+from slips_aip_constants.defaults import Defaults, FlowKeys
 
 
 @dataclass
@@ -55,7 +54,7 @@ class Flow(Base):
     @classmethod
     def from_line(cls, line):
         """
-        Flow constructor from config dict
+        Flow constructor from CSV line
         """
         f = cls()
         f.src_address = str(line[0])

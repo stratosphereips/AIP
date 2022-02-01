@@ -21,9 +21,9 @@ setup(
     version=version,
     author='Stratosphere IPS',
     author_email='stratosphereips@agents.fel.cvut.cz',
-    url='https://github.com/stratosphereips/AIP-Blacklist-Algorithm',
-    download_url=f"https://github.com/stratosphereips/AIP-Blacklist-Algorithm/tarball/{version}",
-    description='The Attacker IP Prioritizer (AIP) algorithm is a IPv4 address blacklist generator.',
+    url='https://github.com/stratosphereips/AIP-Blocklist-Algorithm',
+    download_url=f"https://github.com/stratosphereips/AIP-Blocklist-Algorithm/tarball/{version}",
+    description='The Attacker IP Prioritizer (AIP) algorithm is a IPv4 address blocklist generator.',
     license='GPL-3.0 License',
     install_requires=['netaddr',
                       'maxminddb'
