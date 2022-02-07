@@ -4,18 +4,22 @@ Note: This tool is meant to be used in conjunction with at least one honeypot fr
 In this document, I will describe how to use the AIP algorithm tool. Since it is written in python, it is quite simple to set up for your system.
 ## Requirements
 1. A Linux based OS. I have used it on Ubuntu, Kali, Mint, PopOS, and Elementary.
-2. Python 3.7+….. I have never tested it on an older version, so I am not sure. If you test it on an older version and it works, please let me know.
-3. Python modules: csv, operator, time, datetime, os, inspect and shutil (most of these are default so it should not be a problem).
+2. Python 3.8/3.9 support. Test implemented using `pytest`
+3. Python dependencies: `csv`, `datetime`, `operator`, `time`,  `os`, `inspect` and `shutil` (__builtins__).
 4. An input data file collected from your honeypots in a format described below.
+
 ## Steps
 1. Download or clone the repo to a directory of your choosing. It contains all necessary files and folders
-2. cd /the/location/of/the/AIP_repo
-3. chmod u+x Run_AIP.sh
-4. To run AIP, execute ./Run_AIP.sh
-5. Follow the onscreen instructions. Depending on whether this is the first time you have run it or not, it will ask you for the location of your input data files, and then the location that you want the output to be saved to.
-6. cd /the/location/you/specified/for/the/output/Files
-7. There you will see a number of folders and files. These are the files AIP uses to remember past runs. 
-8. Go to the directory /Historical_Ratings/ to see the output blacklists.
+2. **`cd /the/location/of/the/AIP_repo`**
+3. **`chmod u+x AIP_auto_run.sh`**
+4. **`chmod u+x AIP_manual_run.sh`**
+5. **`AIP_auto_run`** and **`AIP_manual_run`** are configured similarly.
+6. To run AIP, execute either **`AIP_auto_run`** or **`AIP_manual_run`**, as: `sh AIP_auto_run.sh`
+7. Follow the onscreen instructions. Depending on whether this is the first time you have run it or not, it will ask you for the location of your input data files, and then the location that you want the output to be saved to.
+8. cd /the/location/you/specified/for/the/output/Files
+9. There you will see a number of folders and files. These are the files AIP uses to remember past runs. 
+10. Go to the directory /Historical_Ratings/ to see the output blocklists.
+
 ## The Input Data
 In terms of file format for the input data, the program accepts a .csv file that has one IP per line, with each of the following data inputs for each IP on that line, separated by commas:
 1. The IP address
@@ -34,4 +38,4 @@ For example, a single line in the file could look like this:
 
 ## Useful Information
 The tool is designed to be run once a day at a time of your choosing after copying the .csv file that contains the data from the last 24 hours to the Input-Data directory. If it is not run once a day, the rating system will be thrown off, but it will still work.
-The Run-AIP script is designed to simply run the python script for AIP, and then copy the generated blacklist files to another location to be saved.
+The Run-AIP script is designed to simply run the python script for AIP, and then copy the generated blocklist files to another location to be saved.

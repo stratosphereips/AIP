@@ -1,29 +1,29 @@
 11/12/2020
 V2.0.5
-- Added complete runtime logging system to Master branch
+- Added complete runtime logging system to main branch
 
 09/12/2020
 V2.0.4
 - Added ASN checker for major organizations
 - Added tcp flag checker for import data
 - Create ASN branch for testing
-- Merged ASN branch with Master
+- Merged ASN branch with main
 
 16/10/2020
 V2.0.3
-- Updated Whitelist for master branch
+- Updated safelist for main branch
 
 07/10/2020
 V2.0.2
 - Created branch V2.0.2 for testing
-- Fixed problem with parenthesis in the blacklist headers
-- Merged V2.0.2 with master
+- Fixed problem with parenthesis in the blocklist headers
+- Merged V2.0.2 with main
 
 18/09/2020
 - Modified thresholds to shrink lists
 
 17/09/2020
-- Moved the daily blacklists to a separate repository
+- Moved the daily blocklists to a separate repository
 
 15/09/2020
 - Created branch V3.0.0 for next major update
@@ -34,11 +34,11 @@ V2.0.1
 
 22/07/2020
 V2.0.0
-- Added a whitlist module, namely before using the main data file, program will check for IPs that should not be blacklisted
+- Added a whitlist module, namely before using the main data file, program will check for IPs that should not be blocklisted
 - Added an auto-run script. 
 - Changed the aging function so it keeps track og how much an IP needs to be reduced over time
 - Changed the threshold so that it is dynamic again
-- Fixed the cannot check whitelist bug
+- Fixed the cannot check safelist bug
 - Fixed the infinite loop bug for the prioritize new normalized rating function
 - Fixed other small bugs and improved code
 

@@ -48,8 +48,8 @@ then
 				touch $output_folder/Selected_modules.csv
 				touch $output_folder/FP_log_file.csv
 				touch $output_folder/log.txt
-        touch $output_folder/Aging-modifiers-pc.csv
-        touch $output_folder/Aging-modifiers-pn.csv
+				touch $output_folder/Aging-modifiers-pc.csv
+				touch $output_folder/Aging-modifiers-pn.csv
 		  elif [ "$answer" = "$answer2" ]
 		  then
 		  	echo Input different location:
@@ -85,14 +85,14 @@ export input_data_folder
 directory_of_AIP=$(dirname $(readlink -f "manual_run.sh"))
 
 echo $directory_of_AIP
-echo $directory_of_AIP/Main/Select_Modules.py
+echo $directory_of_AIP/core/select_modules.py
 
-python3 $directory_of_AIP/Main/Select_Modules.py
+python3 $directory_of_AIP/core/select_modules.py
 
 for entry in $input_data_folder/*
 do
    cp "$entry" $output_folder/Input_Data/
    echo "$entry" >> $output_folder/log.txt
    echo $entry
-   python3 $directory_of_AIP/Main/AIP.py
+   python3 $directory_of_AIP/AIP.py
 done

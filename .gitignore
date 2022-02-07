@@ -1,5 +1,5 @@
 .idea/
-Main/__pycache__/
+*/__pycache__/
 edna-run.sh
 automatic_run.sh
 venv/
