@@ -1,0 +1,16 @@
+name: null
+
+channels:
+  - intel
+  - conda-forge
+  - defaults
+
+dependencies:
+  - git
+  - matplotlib
+  - pandas
+  - pip
+  - pip:
+    - -r file:requirements.txt
+  - python
+  - xeus-python
