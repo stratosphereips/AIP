@@ -1,9 +1,8 @@
 name: null
 
 channels:
-  - intel
   - conda-forge
-  - defaults
+    #- defaults
 
 dependencies:
   - git
@@ -11,6 +10,6 @@ dependencies:
   - pandas
   - pip
   - pip:
-    - -r file:requirements.txt
+    - -r file:/tmp/requirements.txt
   - python
-  - xeus-python
+  #- xeus-python

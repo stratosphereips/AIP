@@ -58,9 +58,9 @@ WORKDIR $PROJECT_DIR
 
 
 ENV ENV_PREFIX $PROJECT_DIR/env
-RUN conda update --name base --channel defaults conda && \
-    conda env create --prefix $ENV_PREFIX --file /tmp/environment.yml --force && \
-    conda clean --all --yes
+RUN conda update --name base conda
+RUN conda env create --prefix $ENV_PREFIX --file /tmp/environment.yml --force
+RUN conda clean --all --yes
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
 
