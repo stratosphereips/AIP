@@ -1,4 +1,4 @@
-name: null
+name: aip
 
 channels:
   - conda-forge
@@ -6,6 +6,7 @@ channels:
 
 dependencies:
   - git
+  - pytest
   - matplotlib
   - pandas
   - pip

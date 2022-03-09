@@ -7,7 +7,7 @@ LABEL maintainer="Joaquin Bogado <joaquinbogado@duck.com>"
 SHELL [ "/bin/bash", "--login", "-c" ]
 
 RUN apt-get update --fix-missing && \
-    apt-get install -y wget bzip2 curl git && \
+    apt-get install -y wget bzip2 curl git vim&& \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -57,9 +57,9 @@ RUN mkdir $PROJECT_DIR
 WORKDIR $PROJECT_DIR
 
 
-ENV ENV_PREFIX $PROJECT_DIR/env
+ENV ENV_PREFIX $HOME/env
 RUN conda update --name base conda
-RUN conda env create --prefix $ENV_PREFIX --file /tmp/environment.yml --force
+RUN conda env create --file /tmp/environment.yml --force
 RUN conda clean --all --yes
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
