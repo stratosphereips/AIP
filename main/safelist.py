@@ -13,7 +13,7 @@ import re
 from netaddr import IPAddress, IPNetwork
 import maxminddb
 
-from slips_aip_constants.defaults import DefaultSafelists
+from constants.defaults import DefaultSafelists
 
 logger = logging.getLogger(__name__)
 

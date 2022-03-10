@@ -16,7 +16,7 @@ from logging import getLogger
 from main.methodology import Methodology
 from main.safelist import Safelist
 from models.flows import Flow
-from slips_aip_constants.defaults import (Blocklists,
+from constants.defaults import (Blocklists,
     BlocklistConfig,
     BlocklistTypes,
     Defaults,

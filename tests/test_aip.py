@@ -12,7 +12,7 @@ import pytest
 from datetime import datetime
 
 from aip import AIP
-from slips_aip_constants.defaults import Blocklists, Defaults, EnvVars, Functions
+from constants.defaults import Blocklists, Defaults, EnvVars, Functions
 
 
 MOCK_DATA_DIR = "/tests/mock_data/"

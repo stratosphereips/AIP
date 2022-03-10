@@ -12,7 +12,7 @@ import math
 from logging import getLogger
 
 from models.raw_ratings import RawRating
-from slips_aip_constants.defaults import Defaults, Functions, Weights
+from constants.defaults import Defaults, Functions, Weights
 
 
 logger = getLogger(__name__)

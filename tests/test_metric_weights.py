@@ -10,7 +10,7 @@ of this license document, but changing it is not allowed.
 import pytest
 
 from models.metric_weights import MetricWeights
-from slips_aip_constants.defaults import Defaults, Weights
+from constants.defaults import Defaults, Weights
 
 
 FIVE_PERCENTAGE = Defaults.FIVE_PERCENTAGE.value

@@ -12,7 +12,7 @@ import os
 from datetime import datetime
 from logging import getLogger
 
-from slips_aip_constants.defaults import Defaults, EnvVars
+from constants.defaults import Defaults, EnvVars
 
 
 logger = getLogger(__name__)

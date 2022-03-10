@@ -11,7 +11,7 @@ import pytest
 from inspect import isfunction
 
 from main.methodology import Methodology
-from slips_aip_constants.defaults import Functions
+from constants.defaults import Functions
 
 
 def test_get_functions_for_method_A():

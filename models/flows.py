@@ -10,7 +10,7 @@ of this license document, but changing it is not allowed.
 from dataclasses import dataclass
 
 from models.base import Base
-from slips_aip_constants.defaults import Defaults, FlowKeys
+from constants.defaults import Defaults, FlowKeys
 
 
 @dataclass
