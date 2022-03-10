@@ -12,7 +12,7 @@ RUN apt-get update --fix-missing && \
     rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user
-ARG username=aip-ng
+ARG username=aip
 ARG uid=1000
 ARG gid=100
 ENV USER $username
