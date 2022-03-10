@@ -2,7 +2,7 @@ FROM ubuntu:focal
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-LABEL maintainer="Joaquin Bogado <joaquinbogado@duck.com>"
+LABEL maintainer="Joaquin Bogado <joaquin.bogado@aic.fel.cvut.cz>"
 
 SHELL [ "/bin/bash", "--login", "-c" ]
 
