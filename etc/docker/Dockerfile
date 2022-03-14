@@ -62,5 +62,8 @@ RUN conda update --name base conda
 RUN conda env create --file /tmp/environment.yml --force
 RUN conda clean --all --yes
 
+# Include AIP as python package
+RUN ln -s /home/aip/AIP/lib/aip  lib/python3.10/site-packages/
+
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
 
