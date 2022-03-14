@@ -227,9 +227,9 @@ class EnvVars(Enum):
     """
     Parameterized environment variables
     """
-    OUTPUT_FOLDER = "output_folder"
-    OUTPUT_DATA_FOLDER = "output_data_folder"
-    RESULTS_FILE ="results_file"
+    OUTPUT_FOLDER = "data/processed"
+    OUTPUT_DATA_FOLDER = "data/interim"
+    RESULTS_FILE ="data/processed"
 
 class FilePaths(Enum):
     """

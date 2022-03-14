@@ -6,6 +6,10 @@ channels:
 
 dependencies:
   - git
+  - click
+  - pathlib
+  - joblib
+  - python-dotenv
   - pytest
   - matplotlib
   - pandas
