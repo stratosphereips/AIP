@@ -39,5 +39,5 @@ class BaseModel():
 
     def run(self):
         # Model execution. The result of the function should be a list of IPs to block.
-        return blocklist
+        return self.blocklist
         
