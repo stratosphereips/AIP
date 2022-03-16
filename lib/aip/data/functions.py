@@ -10,7 +10,7 @@ from joblib import Parallel, delayed
 from pathlib import Path
 from os import makedirs, path
 
-_project_dir = Path(__file__).resolve().parents[2]
+_project_dir = Path(__file__).resolve().parents[3]
 _config = {
     **dotenv_values(path.join(_project_dir, ".env")),  # load sensitive variables
 }
