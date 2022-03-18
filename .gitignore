@@ -1,4 +1,5 @@
 .idea/
+.env
 *__pycache__*
 src/data/__pycache__/
 edna-run.sh
