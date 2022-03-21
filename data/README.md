@@ -7,6 +7,7 @@ This folder structure follows the convention of the [cookiecutter datascience pr
     │   ├── external       <- Data from third party sources.
     │   ├── interim        <- Intermediate data that has been transformed.
     │   ├── processed      <- The final, canonical data sets for modeling.
-    │   └── raw            <- The original, immutable data dump.
+    │   ├── raw            <- The original, immutable data dump.
+    │   └── output	   <- The outputs of the models. Intended ONLY for aip.py script to write in.  
 
 Data is also inmutable, and thus no need to track it. Thus, data folder is in .gitignore file.
