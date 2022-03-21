@@ -16,7 +16,7 @@ docker run -v $(pwd):/home/aip/AIP/:rw -it aip:aip bash
 ### Run the tests
 Once inside the container you need to activate the conda aip environment in order to be able to run the tests.
 ```
-(base) aip-ng@a2aa875c07cf:~/AIP$ conda activate aip
-(aip) aip-ng@a2aa875c07cf:~/AIP$ pytest tests/
+(base) aip@a2aa875c07cf:~/AIP$ conda activate aip
+(aip) aip@a2aa875c07cf:~/AIP$ pytest tests/
 ```
 
