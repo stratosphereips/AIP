@@ -2,3 +2,4 @@ external/*
 interim/*
 processed/*
 raw/*
+output/*
