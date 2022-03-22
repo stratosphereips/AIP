@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+""" 
+AIP - Attacker IP Prioritizer
+
+Complete rewrite of AIP by Thomas O'Hara to make AIP easily extensible and docker
+compatible. 
+
+Original code in
+https://github.com/the-o-man/AIP-Blacklist-Algorithm
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+You should have received a copy of the GNU General Public License along with
+this program. If not, see <http://www.gnu.org/licenses/>.
+"""
+
+__authors__ = ["Joaquin Bogado <joaquinbogado@duck.com>"]
+__contact__ = "stratosphere@aic.fel.cvut.cz"
+__copyright__ = "Copyright 2022, Stratosphere Laboratory."
+__credits__ = ["Joaquín Bogado"]
+__deprecated__ = False
+__license__ = "GPLv3"
+__maintainer__ = "Joaquin Bogado"
+__version__ = "1.0.0"
+
+import logging
+import pandas as pd
+
+from aip.models.alpha import Alpha
+from pathlib import Path
+from os import makedirs, path, scandir
+from datetime import date, timedelta
+
+
+project_dir = Path(__file__).resolve().parents[1]
+
+if __name__ == '__main__':
+    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    #logging.basicConfig(level=logging.INFO, format=log_fmt)
+    logging.basicConfig(level=logging.DEBUG, format=log_fmt)
+
+    # not used in this stub but often useful for finding various files
+    
+    # load up the .env entries as environment variables
+    #load_dotenv(find_dotenv())
+
+
+    #Alpha Model
+    output_dir = path.join(project_dir, 'data', 'output', 'alpha_model')
+    if not path.exists(output_dir):
+        makedirs(output_dir)
+    alpha = Alpha()
+    blocklist = alpha.run()
+    pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir, f'alpha_{str(date.today() - timedelta(days=1))}.csv'), index=False)
+
