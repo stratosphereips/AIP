@@ -63,7 +63,10 @@ RUN conda env create --file /tmp/environment.yml --force
 RUN conda clean --all --yes
 
 # Include AIP as python package
-RUN ln -s /home/aip/AIP/lib/aip  lib/python3.10/site-packages/
+# RUN mkdir -p /home/aip/AIP/lib/python3.10/site-packages/
+RUN ln -s /home/aip/AIP/lib/aip /home/aip/miniconda3/envs/aip/lib/python3.10/site-packages/
+
+RUN echo 'conda activate aip' >> $HOME/.bashrc
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
 
