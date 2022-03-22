@@ -5,3 +5,4 @@ src/data/__pycache__/
 edna-run.sh
 automatic_run.sh
 venv/
+*.swp
