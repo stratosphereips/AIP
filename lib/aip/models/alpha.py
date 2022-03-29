@@ -35,12 +35,13 @@ class Alpha(BaseModel):
     def __init__(self, lookback=1):
         # should be possible to set an arbitrary start and lookback or start and end to the model?
         super().__init__()
-        self.start = str(date.today() - timedelta(days=lookback))
-        self.end = str(date.today() - timedelta(days=1))
+        self.lookback = lookback
 
-    def run(self):
+    def run(self, for_date=date.today()):
+        start = str(for_date - timedelta(days=lookback))
+        end = str(for_date - timedelta(days=1))
         # get all the attackers IPs
-        attacks = get_attacks(self.start, self.end, usecols=['orig'])
+        attacks = get_attacks(start, end, usecols=['orig'])
         attacks = pd.concat(attacks)
         blocklist = list(set(attacks['orig'].values))
         return blocklist
