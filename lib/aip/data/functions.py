@@ -62,10 +62,10 @@ def getrawdata(date):
     commands = [shlex.split(_config['magic'] + f'{date}/conn.{x:02}* ' + p) for x in range(0,24)]
     Parallel(n_jobs=24, backend='threading')(delayed(subprocess.run)(c) for c in commands)
 
-def removerawdata(date):
+def removerawdata(date, force=False):
     dt.datetime.strptime(date, '%Y-%m-%d')
     p = path.join(_project_dir,'data','raw', date)
     # Only delete raw data if explicitly allowed in the configuration file
-    if _config['remove_raw_data'].lower() == 'true':
+    if (_config['remove_raw_data'].lower() == 'true') or force:
         shutil.rmtree(p)
 
