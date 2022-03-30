@@ -65,4 +65,7 @@ def getrawdata(date):
 def removerawdata(date):
     dt.datetime.strptime(date, '%Y-%m-%d')
     p = path.join(_project_dir,'data','raw', date)
-    shutil.rmtree(p)
+    # Only delete raw data if explicitly allowed in the configuration file
+    if _config['remove_raw_data'].lower() == 'true':
+        shutil.rmtree(p)
+
