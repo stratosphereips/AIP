@@ -38,7 +38,7 @@ class Alpha(BaseModel):
         self.lookback = lookback
 
     def run(self, for_date=date.today()):
-        start = str(for_date - timedelta(days=lookback))
+        start = str(for_date - timedelta(days=self.lookback))
         end = str(for_date - timedelta(days=1))
         # get all the attackers IPs
         attacks = get_attacks(start, end, usecols=['orig'])
