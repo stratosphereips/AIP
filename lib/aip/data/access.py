@@ -43,6 +43,9 @@ from aip.data.functions import scramble, read_zeek, getrawdata, removerawdata
 
 project_dir = Path(__file__).resolve().parents[3]
 
+data_path = path.join(project_dir,'data')
+
+
 def _process_zeek_file(date):
     '''
     Create a dataset for the date string date in the data/interim folder
@@ -178,3 +181,4 @@ if __name__ == '__main__':
     #load_dotenv(find_dotenv())
 
     extract_attacks()
+
