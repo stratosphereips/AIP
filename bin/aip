@@ -32,13 +32,16 @@ __version__ = "1.0.0"
 import logging
 import pandas as pd
 
+from aip.data.access import data_path, project_dir
 from aip.models.alpha import Alpha
+from aip.models.prioritize import New
+from aip.models.prioritize import Consistent
 from pathlib import Path
 from os import makedirs, path, scandir
 from datetime import date, timedelta
 
 
-project_dir = Path(__file__).resolve().parents[1]
+#project_dir = Path(__file__).resolve().parents[1]
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -59,3 +62,18 @@ if __name__ == '__main__':
     blocklist = alpha.run()
     pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir, f'alpha_{str(date.today() - timedelta(days=1))}.csv'), index=False)
 
+    # Prioritize New Model
+    output_dir = path.join(data_path, 'output', 'prioritize_new')
+    if not path.exists(output_dir):
+        makedirs(output_dir)
+    pn = New()
+    blocklist = pn.run()
+    blocklist.to_csv(path.join(output_dir, f'prioritize-new_{str(date.today() - timedelta(days=1))}.csv'), index=False)
+
+    # Prioritize Consistent Model
+    output_dir = path.join(data_path, 'output', 'prioritize_consistent')
+    if not path.exists(output_dir):
+        makedirs(output_dir)
+    pc = Consistent()
+    blocklist = pc.run()
+    blocklist.to_csv(path.join(output_dir, f'prioritize-consistent_{str(date.today() - timedelta(days=1))}.csv'), index=False)
