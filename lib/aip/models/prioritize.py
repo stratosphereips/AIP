@@ -31,8 +31,45 @@ import pandas as pd
 from aip.data.access import data_path, get_attacks
 from aip.models.base import BaseModel
 #from aip.models.prioritize import Knowledgebase
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from os import path
+
+
+def _add_knowledge(last_knowledge, day):
+    print(f'DEBUG: PROCESSING DATE {day}')
+    day = datetime.strptime(day, '%Y-%m-%d').date()
+    p = path.join(data_path, 'processed', 'prioritizers')
+    attacks = get_attacks(dates=[day])
+    df = attacks[0]
+    df = df.rename(columns={"count": "flows"})
+    df.loc[:, 'first_seen'] = day
+    df.loc[:, 'last_seen'] = day
+    df.loc[:, 'days_active'] = 1
+    df.loc[df['flows'] == 0, 'flows'] = 1
+    last_knowledge = pd.concat([last_knowledge, df])
+    dates_min = last_knowledge.groupby('orig').first_seen.min()
+    dates_max = last_knowledge.groupby('orig').last_seen.max()
+    knowledge = last_knowledge.groupby('orig').sum()
+    knowledge.loc[:,'first_seen'] = dates_min
+    knowledge.loc[:,'last_seen'] = dates_max
+    knowledge.loc[:,'mean_flows'] = knowledge['flows']/knowledge['days_active']
+    knowledge.loc[:,'mean_duration'] = knowledge['duration']/knowledge['flows']
+    knowledge.loc[:,'mean_bytes'] = knowledge['bytes']/knowledge['flows']
+    knowledge.loc[:,'mean_packets'] = knowledge['packets']/knowledge['flows']  
+    knowledge.reset_index(inplace=True)
+    knowledge.to_csv(path.join(p, f'knowledgebase-{day}-snapshot'),
+            columns=['orig', 'flows', 'duration','bytes', 'packets',
+                'mean_flows', 'mean_duration', 'mean_bytes', 'mean_packets',
+                'days_active', 'first_seen', 'last_seen'],
+            index=False)
+    return knowledge
+
+def _build_knowledge(start, end):
+    dates = pd.date_range(start=start, end=end)
+    last_knowledge = pd.DataFrame()
+    for day in dates:
+        last_knowledge = _add_knowledge(last_knowledge, str(day.date()))
+    return last_knowledge
 
 
 class Knowledgebase():
@@ -40,85 +77,56 @@ class Knowledgebase():
     Object that represents the IP features database
     '''
     
-    def __init__(self):
-        self.path = path.join(data_path, 'processed', 'prioritizers', 'prioritizer_knowledgebase')
-        try:
-            self.knowledge = pd.read_csv(self.path)
-            self.knowledge.loc[:, 'last_seen'] = pd.to_datetime(self.knowledge.last_seen)
-            self.knowledge.loc[:, 'first_seen'] = pd.to_datetime(self.knowledge.first_seen)
-            self.timeframe = (self.knowledge.last_seen.min(), self.knowledge.last_seen.max())
-        except FileNotFoundError:
-            print('No knowledgebase found, use build() to create it')
-            pass
+    def _check_date_param(self, day_unchk):
+        if day_unchk == 'yesterday':
+            day = str(date.today() - timedelta(days=1))
+        elif type(day_unchk) is str:
+            # force is a date or throw and exception
+            day = str(datetime.strptime(day_unchk, '%Y-%m-%d').date())
+        elif type(day_unchk) is date:
+            day = str(day_unchk)
+        return day
 
-    def build(self, start=date(2022, 1, 1), end=date.today() - timedelta(days=1), force=False):
+    def _load_knowledge_until(self, day):
+        day = self._check_date_param(day)
+        self.path = path.join(data_path,
+                'processed', 'prioritizers', f'knowledgebase-{day}-snapshot')
+        if not path.exists(self.path):
+            self.build(end=datetime.strptime(day, '%Y-%m-%d').date())
+        self.knowledge = pd.read_csv(self.path)
+        self.knowledge.loc[:, 'last_seen'] = pd.to_datetime(self.knowledge.last_seen)
+        self.knowledge.loc[:, 'first_seen'] = pd.to_datetime(self.knowledge.first_seen)
+        self.timeframe = (self.knowledge.last_seen.min(), self.knowledge.last_seen.max())
+    
+    def __init__(self, load_until='yesterday'):
+        day = self._check_date_param(load_until)
+        self.path = path.join(data_path,
+                'processed', 'prioritizers', f'knowledgebase-{day}-snapshot')
+        self._load_knowledge_until(day)
+    
+
+    def build(self, start=date(2021, 8, 1), end=date.today() - timedelta(days=1), force=False):
         if path.exists(self.path) and not force:
             print('Knowledge exists already. Use force=True to rebuild it')
             return
-        dates = pd.date_range(str(start), str(end))
-        attacks = get_attacks(start, end)
-        aggregated = pd.DataFrame()
-        for day, df in zip(dates, attacks):
-            df.loc[:, 'date'] = day
-            df.loc[:, 'days_active'] = 1
-            aggregated = pd.concat([aggregated, df])
-        dates_min = aggregated.groupby('orig').date.min()
-        dates_max = aggregated.groupby('orig').date.max()
-        knowledge = aggregated.groupby('orig').sum()
-        knowledge.loc[:,'first_seen'] = dates_min
-        knowledge.loc[:,'last_seen'] = dates_max
-        knowledge.loc[:,'flows'] = knowledge['count']
-        knowledge.loc[knowledge['flows'] == 0, 'flows'] = 1
-        knowledge.loc[:,'mean_flows'] = knowledge['flows']/knowledge['days_active']
-        knowledge.loc[:,'mean_duration'] = knowledge['duration']/knowledge['flows']
-        knowledge.loc[:,'mean_bytes'] = knowledge['bytes']/knowledge['flows']
-        knowledge.loc[:,'mean_packets'] = knowledge['packets']/knowledge['flows']  
-        knowledge.reset_index(inplace=True)
-        self.knowledge = knowledge
-        #knowledgebase.to_csv(self.path, index=False)
-        knowledge.to_csv(self.path,
-                columns=['orig', 'flows', 'duration','bytes', 'packets',
-                    'mean_flows', 'mean_duration', 'mean_bytes', 'mean_packets',
-                    'days_active', 'first_seen', 'last_seen'],
-                index=False)
-        return
-
-    def _add_knowledge(self, date):
-        attacks = get_attacks(dates=[date])[0]
-        # check knowledge dates integrity
-        if (date > self.knowledge.date.min()) and (date < self.knowledge.date.max()):
-            print('Can\'t add information for that date. Rebuild the knowledgebase including the new date.')
-            return
-        attacks.loc[:, 'date'] = date
-        attacks.loc[:, 'days_active'] = 1
-        # THIS WILL BE SLOWER AND SLOWER OVERTIME
-        # Maybe is better to go IP by IP on the attacks updating the knowledgebase.
-        # Please fix
-        aggregated = pd.concat([self.knowledge, attacks])
-        dates_min = aggregated.groupby('orig').date.min()
-        dates_max = aggregated.groupby('orig').date.max()
-        knowledge = aggregated.groupby('orig').sum()
-        knowledge.loc[:,'first_seen'] = dates_min
-        knowledge.loc[:,'last_seen'] = dates_max
-        knowledge.loc[:,'flows'] = knowledge['count']
-        knowledge.loc[knowledge['flows'] == 0, 'flows'] = 1
-        knowledge.loc[:,'mean_flows'] = knowledge['flows']/knowledge['days_active']
-        knowledge.loc[:,'mean_duration'] = knowledge['duration']/knowledge['flows']
-        knowledge.loc[:,'mean_bytes'] = knowledge['bytes']/knowledge['flows']
-        knowledge.loc[:,'mean_packets'] = knowledge['packets']/knowledge['flows']
-        knowledge.reset_index(inplace=True)
-        self.knowledge = knowledge
-        knowledge.to_csv(self.path,
-                columns=['orig', 'flows', 'duration','bytes', 'packets',
-                    'mean_flows', 'mean_duration', 'mean_bytes', 'mean_packets',
-                    'days_active', 'last_seen'],
-                index=True)
-        return
-    
-    def update(self):
-        # FIXME: Need to code the update function so models don't worry about knowledge updates
-        # Knowledge should be always updated upon Knowledge instantiation?
-        pass
+        # check if the snapshot for the start date exists
+        # if not, all the snapshots must be created again
+        p = path.join(data_path, 'processed', 'prioritizers')
+        if not path.exists(path.join(p, f'knowledgebase-{str(start)}-snapshot')):
+            last_knowledge = _build_knowledge(start=start, end=end)
+        else:
+            days_ago = 1
+            day = str(end - timedelta(days=days_ago))
+            while not path.exists(path.join(p, f'knowledgebase-{day}-snapshot')):
+                days_ago += 1
+                day = str(end - timedelta(days=days_ago))
+            last_knowledge = pd.read_csv(path.join(p, f'knowledgebase-{day}-snapshot'))
+            last_knowledge.loc[:, 'first_seen'] = pd.to_datetime(last_knowledge.first_seen).dt.date
+            last_knowledge.loc[:, 'last_seen'] = pd.to_datetime(last_knowledge.last_seen).dt.date
+            while days_ago >= 1:
+                days_ago -= 1
+                day = str(end - timedelta(days=days_ago))
+                last_knowledge = _add_knowledge(last_knowledge, day)
 
 
 class Consistent(BaseModel):
@@ -128,7 +136,7 @@ class Consistent(BaseModel):
 
     def __init__(self):
         super().__init__()
-        self.db = Knowledgebase()
+        #self.db = Knowledgebase()
         # Weights from Thomas' Thesis
         # nflows, conns, nbytes, npackets,
         # mean_flows, mean_conns, mean_bytes, mean_packets
@@ -153,6 +161,7 @@ class Consistent(BaseModel):
         return ipscores
 
     def run(self, for_date=date.today()):
+        self.db = Knowledgebase(load_until=for_date - timedelta(days=1))
         ipscores = self._get_IP_scores()
         df = pd.DataFrame()
         df['ip'] = self.db.knowledge['orig'].values
@@ -161,14 +170,14 @@ class Consistent(BaseModel):
         return df[df.score > self.score_threshold]
 
 
-class New(BaseModel):
+class New(Consistent):
     '''
     Prioritize New algorithm
     '''
 
     def __init__(self):
         super().__init__()
-        self.db = Knowledgebase()
+        #self.db = Knowledgebase()
         # Weights from Thomas' Thesis
         # nflows, conns, nbytes, npackets,
         # mean_flows, mean_conns, mean_bytes, mean_packets
@@ -190,10 +199,11 @@ class New(BaseModel):
         ipscores *= aging
         return ipscores
 
-    def run(self, for_date=date.today()):
-        ipscores = self._get_IP_scores()
-        df = pd.DataFrame()
-        df['ip'] = self.db.knowledge['orig'].values
-        df['score'] = ipscores
-        df = df.sort_values(by='score', ascending=False)
-        return df[df.score > self.score_threshold]
+#    def run(self, for_date=date.today()):
+#        self.db = Knowledge(load_until=for_date - timedelta(days=1)
+#        ipscores = self._get_IP_scores()
+#        df = pd.DataFrame()
+#        df['ip'] = self.db.knowledge['orig'].values
+#        df['score'] = ipscores
+#        df = df.sort_values(by='score', ascending=False)
+#        return df[df.score > self.score_threshold]
