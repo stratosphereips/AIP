@@ -40,7 +40,7 @@ from os import makedirs, path, scandir
 
 #project_dir = Path(__file__).resolve().parents[1]
 
-start = '2021-08-15'
+start = '2021-08-02'
 end = str(date.today())
 
 if __name__ == '__main__':
@@ -60,7 +60,7 @@ if __name__ == '__main__':
             makedirs(output_dir)
         alpha = Alpha()
         blocklist = alpha.run(for_date=day)
-        pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir, f'alpha_{str(day)}.csv'), index=False)
+        pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir, f'alpha_{str(day)}.csv.gz'), index=False, compression='gzip')
     
     def run_model_pn(day):
         # Prioritize New Model
@@ -69,7 +69,7 @@ if __name__ == '__main__':
             makedirs(output_dir)
         pn = New()
         blocklist = pn.run(for_date=day)
-        blocklist.to_csv(path.join(output_dir, f'prioritize-new_{str(day)}.csv'), index=False)
+        blocklist.to_csv(path.join(output_dir, f'prioritize-new_{str(day)}.csv.gz'), index=False, compression='gzip')
     
     def run_model_pc(day):
         # Prioritize Consistent Model
@@ -78,7 +78,7 @@ if __name__ == '__main__':
             makedirs(output_dir)
         pc = Consistent()
         blocklist = pc.run(for_date=day)
-        blocklist.to_csv(path.join(output_dir, f'prioritize-consistent_{str(day)}.csv'), index=False)
+        blocklist.to_csv(path.join(output_dir, f'prioritize-consistent_{str(day)}.csv.gz'), index=False, compression='gzip')
     
     def run_models(day):
         run_model_alpha(day)

@@ -73,11 +73,11 @@ def _process_zeek_file(date):
         for ip in ips:
             #hourly = hourly.append(zeekdata[zeekdata['id.resp_h'] == ip])
             hourly = pd.concat([hourly, zeekdata[zeekdata['id.resp_h'] == ip]])
-        #hourly.to_csv(path.join(project_dir,'data','interim', f'hourly.conn.{date}-{z.name[5:10]}.csv'), index=False)
+        #hourly.to_csv(path.join(project_dir,'data','interim', f'hourly.conn.{date}-{z.name[5:10]}.csv'), index=False, compression='gzip')
         #logger.debug('Writting file: ' + path.join(project_dir,'data','interim', f'hourly.conn.{date}-{z.name[5:10]}.csv'))
         #daily = daily.append(hourly)
         daily = pd.concat([daily, hourly])
-    daily.to_csv(path.join(project_dir,'data','interim', f'daily.conn.{date}.csv'), index=False)
+    daily.to_csv(path.join(project_dir,'data','interim', f'daily.conn.{date}.csv'), index=False, compression='gzip')
     logger.debug('Writting file: ' + path.join(project_dir,'data','interim', f'daily.conn.{date}.csv'))
     #logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
     #removerawdata(date)
@@ -97,7 +97,7 @@ def _extract_attacks(date):
         logger.warning(f'Skipping {path.join(project_dir,"data","interim", f"daily.conn.{date}.csv")}. File not exist.')
         # Generate an empty attacks file
         pd.DataFrame(columns=['orig', 'flows', 'duration', 'packets', 'bytes']).to_csv(
-                path.join(project_dir,'data','processed', f'attacks.{date}.csv'), index=False)
+                path.join(project_dir,'data','processed', f'attacks.{date}.csv'), index=False, compression='gzip')
         return
 
     # Calculate the total attacks for each origin
@@ -107,8 +107,8 @@ def _extract_attacks(date):
     df['flows'] = daily.groupby(['id.orig_h']).count().ts.values
     df.reset_index(drop=True, inplace=True)
     logger.debug('Writting file: ' + path.join(project_dir,'data','processed', f'attacks.{date}.csv'))
-    df.to_csv(path.join(project_dir,'data','processed', f'attacks.{date}.csv'), columns=['orig', 'flows', 'duration', 'packets', 'bytes'], index=False)
-    logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
+    df.to_csv(path.join(project_dir,'data','processed', f'attacks.{date}.csv'), columns=['orig', 'flows', 'duration', 'packets', 'bytes'], index=False, compression='gzip')
+    # logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
     removerawdata(date)
     return
 

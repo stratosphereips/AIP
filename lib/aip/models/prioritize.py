@@ -61,7 +61,7 @@ def _add_knowledge(last_knowledge, day):
             columns=['orig', 'flows', 'duration','bytes', 'packets',
                 'mean_flows', 'mean_duration', 'mean_bytes', 'mean_packets',
                 'days_active', 'first_seen', 'last_seen'],
-            index=False)
+            index=False, compression='gzip')
     return knowledge
 
 def _build_knowledge(start, end):
