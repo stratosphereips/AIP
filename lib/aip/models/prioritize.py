@@ -152,7 +152,7 @@ class Consistent(BaseModel):
         normalized_features = np.zeros_like(features)
         for i in range(8):
             normalized_features[:,i] = (features[:,i] - features[:,i].min()) / (features[:,i].max() - features[:,i].min())
-        ipscores = features * self.weights
+        ipscores = normalized_features * self.weights
         ipscores = ipscores.sum(axis=1)
         days_since_last_seen = np.array([x.days for x in (pd.to_datetime(date.today()) - self.db.knowledge.last_seen)])
         total_attack_time = np.array([x.days for x in (self.db.knowledge.last_seen - self.db.knowledge.first_seen)])
@@ -193,7 +193,7 @@ class New(Consistent):
         normalized_features = np.zeros_like(features)
         for i in range(8):
             normalized_features[:,i] = (features[:,i] - features[:,i].min()) / (features[:,i].max() - features[:,i].min())
-        ipscores = features * self.weights
+        ipscores = normalized_features * self.weights
         ipscores = ipscores.sum(axis=1)
         aging = 2 / (2 + days_since_last_seen)
         ipscores *= aging
