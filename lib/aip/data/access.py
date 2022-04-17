@@ -73,12 +73,12 @@ def _process_zeek_file(date):
         for ip in ips:
             #hourly = hourly.append(zeekdata[zeekdata['id.resp_h'] == ip])
             hourly = pd.concat([hourly, zeekdata[zeekdata['id.resp_h'] == ip]])
-        #hourly.to_csv(path.join(project_dir,'data','interim', f'hourly.conn.{date}-{z.name[5:10]}.csv'), index=False, compression='gzip')
+        #hourly.to_csv(path.join(project_dir,'data','interim', f'hourly.conn.{date}-{z.name[5:10]}.csv.gz'), index=False, compression='gzip')
         #logger.debug('Writting file: ' + path.join(project_dir,'data','interim', f'hourly.conn.{date}-{z.name[5:10]}.csv'))
         #daily = daily.append(hourly)
         daily = pd.concat([daily, hourly])
-    daily.to_csv(path.join(project_dir,'data','interim', f'daily.conn.{date}.csv'), index=False, compression='gzip')
-    logger.debug('Writting file: ' + path.join(project_dir,'data','interim', f'daily.conn.{date}.csv'))
+    daily.to_csv(path.join(project_dir,'data','interim', f'daily.conn.{date}.csv.gz'), index=False, compression='gzip')
+    logger.debug('Writting file: ' + path.join(project_dir,'data','interim', f'daily.conn.{date}.csv.gz'))
     #logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
     #removerawdata(date)
     return
@@ -90,14 +90,14 @@ def _extract_attacks(date):
     '''
     logger = logging.getLogger(__name__)
     try:
-        daily = pd.read_csv(path.join(project_dir,"data","interim", f'daily.conn.{date}.csv'))
+        daily = pd.read_csv(path.join(project_dir,"data","interim", f'daily.conn.{date}.csv.gz'))
         daily['ts'] = pd.to_datetime(daily['ts'])
         daily['duration'] = daily.duration.replace('-',0).astype(float)
     except FileNotFoundError:
-        logger.warning(f'Skipping {path.join(project_dir,"data","interim", f"daily.conn.{date}.csv")}. File not exist.')
+        logger.warning(f'Skipping {path.join(project_dir,"data","interim", f"daily.conn.{date}.csv.gz")}. File not exist.')
         # Generate an empty attacks file
         pd.DataFrame(columns=['orig', 'flows', 'duration', 'packets', 'bytes']).to_csv(
-                path.join(project_dir,'data','processed', f'attacks.{date}.csv'), index=False, compression='gzip')
+                path.join(project_dir,'data','processed', f'attacks.{date}.csv.gz'), index=False, compression='gzip')
         return
 
     # Calculate the total attacks for each origin
@@ -106,8 +106,8 @@ def _extract_attacks(date):
     df['orig'] = df.index.values
     df['flows'] = daily.groupby(['id.orig_h']).count().ts.values
     df.reset_index(drop=True, inplace=True)
-    logger.debug('Writting file: ' + path.join(project_dir,'data','processed', f'attacks.{date}.csv'))
-    df.to_csv(path.join(project_dir,'data','processed', f'attacks.{date}.csv'), columns=['orig', 'flows', 'duration', 'packets', 'bytes'], index=False, compression='gzip')
+    logger.debug('Writting file: ' + path.join(project_dir,'data','processed', f'attacks.{date}.csv.gz'))
+    df.to_csv(path.join(project_dir,'data','processed', f'attacks.{date}.csv.gz'), columns=['orig', 'flows', 'duration', 'packets', 'bytes'], index=False, compression='gzip')
     # logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
     removerawdata(date)
     return
@@ -138,7 +138,7 @@ def extract_attacks(dates=None):
     filesready = [x.name for x in scandir(path.join(project_dir, 'data', 'processed'))]
     datesnotready = []
     for date in dates:
-        if f'daily.conn.{date}.csv' not in filesready:
+        if f'daily.conn.{date}.csv.gz' not in filesready:
             datesnotready.append(date)
     process_zeek_files(datesnotready)
     if dates is None:
@@ -163,11 +163,11 @@ def get_attacks(start=None, end=None, dates=None, usecols=None):
     filesready = [x.name for x in scandir(path.join(project_dir, 'data', 'processed'))]
     datesnotready = []
     for date in dates:
-        if f'attacks.{date}.csv' not in filesready:
+        if f'attacks.{date}.csv.gz' not in filesready:
             datesnotready.append(date)
     if len(datesnotready) > 0:
         extract_attacks(datesnotready)
-    dfs = [pd.read_csv(path.join(project_dir, 'data', 'processed',f'attacks.{date}.csv'), usecols=usecols)
+    dfs = [pd.read_csv(path.join(project_dir, 'data', 'processed',f'attacks.{date}.csv.gz'), usecols=usecols)
             for date in dates]
     return dfs
 

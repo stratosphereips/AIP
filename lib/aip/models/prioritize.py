@@ -57,7 +57,7 @@ def _add_knowledge(last_knowledge, day):
     knowledge.loc[:,'mean_bytes'] = knowledge['bytes']/knowledge['flows']
     knowledge.loc[:,'mean_packets'] = knowledge['packets']/knowledge['flows']  
     knowledge.reset_index(inplace=True)
-    knowledge.to_csv(path.join(p, f'knowledgebase-{day}-snapshot'),
+    knowledge.to_csv(path.join(p, f'knowledgebase-{day}-snapshot.gz'),
             columns=['orig', 'flows', 'duration','bytes', 'packets',
                 'mean_flows', 'mean_duration', 'mean_bytes', 'mean_packets',
                 'days_active', 'first_seen', 'last_seen'],
@@ -90,7 +90,7 @@ class Knowledgebase():
     def _load_knowledge_until(self, day):
         day = self._check_date_param(day)
         self.path = path.join(data_path,
-                'processed', 'prioritizers', f'knowledgebase-{day}-snapshot')
+                'processed', 'prioritizers', f'knowledgebase-{day}-snapshot.gz')
         if not path.exists(self.path):
             self.build(end=datetime.strptime(day, '%Y-%m-%d').date())
         self.knowledge = pd.read_csv(self.path)
@@ -101,7 +101,7 @@ class Knowledgebase():
     def __init__(self, load_until='yesterday'):
         day = self._check_date_param(load_until)
         self.path = path.join(data_path,
-                'processed', 'prioritizers', f'knowledgebase-{day}-snapshot')
+                'processed', 'prioritizers', f'knowledgebase-{day}-snapshot.gz')
         self._load_knowledge_until(day)
     
 
@@ -112,15 +112,15 @@ class Knowledgebase():
         # check if the snapshot for the start date exists
         # if not, all the snapshots must be created again
         p = path.join(data_path, 'processed', 'prioritizers')
-        if not path.exists(path.join(p, f'knowledgebase-{str(start)}-snapshot')):
+        if not path.exists(path.join(p, f'knowledgebase-{str(start)}-snapshot.gz')):
             last_knowledge = _build_knowledge(start=start, end=end)
         else:
             days_ago = 1
             day = str(end - timedelta(days=days_ago))
-            while not path.exists(path.join(p, f'knowledgebase-{day}-snapshot')):
+            while not path.exists(path.join(p, f'knowledgebase-{day}-snapshot.gz')):
                 days_ago += 1
                 day = str(end - timedelta(days=days_ago))
-            last_knowledge = pd.read_csv(path.join(p, f'knowledgebase-{day}-snapshot'))
+            last_knowledge = pd.read_csv(path.join(p, f'knowledgebase-{day}-snapshot.gz'))
             last_knowledge.loc[:, 'first_seen'] = pd.to_datetime(last_knowledge.first_seen).dt.date
             last_knowledge.loc[:, 'last_seen'] = pd.to_datetime(last_knowledge.last_seen).dt.date
             while days_ago >= 1:
