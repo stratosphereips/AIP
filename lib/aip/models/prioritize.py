@@ -27,20 +27,23 @@ __version__ = "0.0.1"
 
 import numpy as np
 import pandas as pd
-  
+import time
+
 from aip.data.access import data_path, get_attacks
 from aip.models.base import BaseModel
-#from aip.models.prioritize import Knowledgebase
 from datetime import date, datetime, timedelta
 from os import path
 
 
 def _add_knowledge(last_knowledge, day):
     print(f'DEBUG: PROCESSING DATE {day}')
+    st_time = time.time()
     day = datetime.strptime(day, '%Y-%m-%d').date()
     p = path.join(data_path, 'processed', 'prioritizers')
     attacks = get_attacks(dates=[day])
     df = attacks[0]
+    if df.empty is True:
+        return last_knowledge
     df = df.rename(columns={"count": "flows"})
     df.loc[:, 'first_seen'] = day
     df.loc[:, 'last_seen'] = day
@@ -62,6 +65,7 @@ def _add_knowledge(last_knowledge, day):
                 'mean_flows', 'mean_duration', 'mean_bytes', 'mean_packets',
                 'days_active', 'first_seen', 'last_seen'],
             index=False, compression='gzip')
+    print(f'DEBUG: PROCESSED IN {(time.time() - st_time)/60} MINUTES.')
     return knowledge
 
 def _build_knowledge(start, end):
@@ -105,7 +109,7 @@ class Knowledgebase():
         self._load_knowledge_until(day)
     
 
-    def build(self, start=date(2021, 8, 1), end=date.today() - timedelta(days=1), force=False):
+    def build(self, start=date(2020, 1, 1), end=date.today() - timedelta(days=1), force=False):
         if path.exists(self.path) and not force:
             print('Knowledge exists already. Use force=True to rebuild it')
             return

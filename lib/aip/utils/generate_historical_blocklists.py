@@ -40,7 +40,7 @@ from os import makedirs, path, scandir
 
 #project_dir = Path(__file__).resolve().parents[1]
 
-start = '2021-08-02'
+start = '2020-01-01'
 end = str(date.today())
 
 if __name__ == '__main__':
@@ -95,4 +95,7 @@ if __name__ == '__main__':
     print(f'Knowledge created in {(time.time() - st_time)/60} minutes.')
 #    for day in dates:
 #       run_models(day)
+    st_time = time.time()
+    print('Running models')
     Parallel(n_jobs=12, backend='multiprocessing')(delayed(run_models)(day) for day in dates)
+    print(f'Models run after {(time.time() - st_time)/60} minutes.')
