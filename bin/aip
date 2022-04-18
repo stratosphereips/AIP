@@ -61,7 +61,7 @@ if __name__ == '__main__':
     alpha = Alpha()
     blocklist = alpha.run()
     pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir,
-        f'alpha_{str(date.today() - timedelta(days=1))}.csv.gz'), index=False, compression='gzip')
+        f'alpha_{str(date.today())}.csv.gz'), index=False, compression='gzip')
 
     # Prioritize New Model
     output_dir = path.join(data_path, 'output', 'prioritize_new')
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     pn = New()
     blocklist = pn.run()
     blocklist.to_csv(path.join(output_dir,
-        f'prioritize-new_{str(date.today() - timedelta(days=1))}.csv.gz'), index=False, compression='gzip')
+        f'prioritize-new_{str(date.today())}.csv.gz'), index=False, compression='gzip')
 
     # Prioritize Consistent Model
     output_dir = path.join(data_path, 'output', 'prioritize_consistent')
@@ -79,4 +79,4 @@ if __name__ == '__main__':
     pc = Consistent()
     blocklist = pc.run()
     blocklist.to_csv(path.join(output_dir,
-        f'prioritize-consistent_{str(date.today() - timedelta(days=1))}.csv.gz'), index=False, compression='gzip')
+        f'prioritize-consistent_{str(date.today())}.csv.gz'), index=False, compression='gzip')
