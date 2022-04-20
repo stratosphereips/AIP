@@ -33,7 +33,6 @@ from datetime import date, timedelta
 
 class Alpha(BaseModel):
     def __init__(self, lookback=1):
-        # should be possible to set an arbitrary start and lookback or start and end to the model?
         super().__init__()
         self.lookback = lookback
 
