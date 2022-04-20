@@ -164,7 +164,7 @@ def get_attacks(start=None, end=None, dates=None, usecols=None):
     datesnotready = []
     for date in dates:
         if f'attacks.{date}.csv.gz' not in filesready:
-            datesnotready.append(date)
+            datesnotready.append(str(date))
     if len(datesnotready) > 0:
         extract_attacks(datesnotready)
     dfs = [pd.read_csv(path.join(project_dir, 'data', 'processed',f'attacks.{date}.csv.gz'), usecols=usecols)
