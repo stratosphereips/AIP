@@ -40,7 +40,7 @@ from os import makedirs, path, scandir
 
 #project_dir = Path(__file__).resolve().parents[1]
 
-start = '2020-01-01'
+start = '2020-07-05'
 end = str(date.today())
 
 if __name__ == '__main__':
