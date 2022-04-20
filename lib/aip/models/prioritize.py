@@ -109,7 +109,7 @@ class Knowledgebase():
         self._load_knowledge_until(day)
     
 
-    def build(self, start=date(2020, 1, 1), end=date.today() - timedelta(days=1), force=False):
+    def build(self, start=date(2020, 7, 4), end=date.today() - timedelta(days=1), force=False):
         if path.exists(self.path) and not force:
             print('Knowledge exists already. Use force=True to rebuild it')
             return
@@ -140,12 +140,11 @@ class Consistent(BaseModel):
 
     def __init__(self):
         super().__init__()
-        #self.db = Knowledgebase()
         # Weights from Thomas' Thesis
         # nflows, conns, nbytes, npackets,
         # mean_flows, mean_conns, mean_bytes, mean_packets
         self.weights = [0.05, 0.05, 0.05, 0.05, 0.2, 0.2, 0.2, 0.2]
-        self.score_threshold = 0.002
+        self.score_threshold = 0.0002
 
     def _get_IP_scores(self):
         days_since_last_seen = np.array([x.days for x in (pd.to_datetime(date.today()) - self.db.knowledge.last_seen)])
@@ -181,12 +180,11 @@ class New(Consistent):
 
     def __init__(self):
         super().__init__()
-        #self.db = Knowledgebase()
         # Weights from Thomas' Thesis
         # nflows, conns, nbytes, npackets,
         # mean_flows, mean_conns, mean_bytes, mean_packets
         self.weights = [0.2, 0.2, 0.2, 0.2, 0.05, 0.05, 0.05, 0.05]
-        self.score_threshold = 0.002
+        self.score_threshold = 0.0002
 
     def _get_IP_scores(self):
         days_since_last_seen = np.array([x.days for x in (pd.to_datetime(date.today()) - self.db.knowledge.last_seen)])
@@ -203,11 +201,3 @@ class New(Consistent):
         ipscores *= aging
         return ipscores
 
-#    def run(self, for_date=date.today()):
-#        self.db = Knowledge(load_until=for_date - timedelta(days=1)
-#        ipscores = self._get_IP_scores()
-#        df = pd.DataFrame()
-#        df['ip'] = self.db.knowledge['orig'].values
-#        df['score'] = ipscores
-#        df = df.sort_values(by='score', ascending=False)
-#        return df[df.score > self.score_threshold]
