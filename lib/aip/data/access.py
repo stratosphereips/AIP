@@ -43,7 +43,8 @@ from aip.data.functions import scramble, read_zeek, getrawdata, removerawdata
 
 project_dir = Path(__file__).resolve().parents[3]
 
-data_path = path.join(project_dir,'data')
+data_path = path.join(project_dir,'data')  # Deprecated, do not use
+data_dir = path.join(project_dir,'data')
 
 
 def _process_zeek_file(date):
