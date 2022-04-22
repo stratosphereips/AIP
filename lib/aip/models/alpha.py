@@ -42,6 +42,8 @@ class Alpha(BaseModel):
         # get all the attackers IPs
         attacks = get_attacks(start, end, usecols=['orig'])
         attacks = pd.concat(attacks)
-        blocklist = list(set(attacks['orig'].values))
-        return blocklist
+        attacks = attacks.rename(columns={'orig':'ip'})
+        self.blocklist = attacks
+        self.sanitize()
+        return self.blocklist
 

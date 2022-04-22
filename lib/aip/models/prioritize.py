@@ -171,6 +171,7 @@ class Consistent(BaseModel):
         df['ip'] = self.db.knowledge['orig'].values
         df['score'] = ipscores
         df = df.sort_values(by='score', ascending=False)
+        df = self.sanitize(df)
         if len(df[df.score > self.score_threshold]) < self.min_ip_number:
             df = df.iloc[:self.min_ip_number]
         else:

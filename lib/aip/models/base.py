@@ -24,7 +24,10 @@ __license__ = "GPLv3"
 __maintainer__ = "Joaquin Bogado"
 __version__ = "0.0.1"
 
-from aip.utils.metrics import MCC
+import pandas as pd
+
+from aip.data.access import data_dir
+from os import path
 
 class BaseModel():
     '''
@@ -32,11 +35,16 @@ class BaseModel():
     '''
     def __init__(self):
         # Model initialization and configuration
-        self.blocklist = []
-    
-    def efficiency(self, attacks):
-        return MCC(attacks, self.blocklist)
+        self.blocklist = pd.DataFrame()
+        self.donotblocklist = pd.read_csv(path.join(data_dir, 'external', 'do_not_block_these_ips.csv'))
 
+    def sanitize(self, blocklist=None):
+        if blocklist is None:
+            blocklist = self.blocklist
+        blocklist = blocklist[blocklist.ip.isin(self.donotblocklist.ip) == False]
+        self.blocklist = blocklist
+        return blocklist
+    
     def run(self):
         # Model execution. The result of the function should be a list of IPs to block.
         return self.blocklist
