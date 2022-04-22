@@ -144,7 +144,8 @@ class Consistent(BaseModel):
         # nflows, conns, nbytes, npackets,
         # mean_flows, mean_conns, mean_bytes, mean_packets
         self.weights = [0.05, 0.05, 0.05, 0.05, 0.2, 0.2, 0.2, 0.2]
-        self.score_threshold = 0.0002
+        self.score_threshold = 0.00002
+        self.min_ip_number = 5000
 
     def _get_IP_scores(self):
         days_since_last_seen = np.array([x.days for x in (pd.to_datetime(date.today()) - self.db.knowledge.last_seen)])
@@ -170,7 +171,11 @@ class Consistent(BaseModel):
         df['ip'] = self.db.knowledge['orig'].values
         df['score'] = ipscores
         df = df.sort_values(by='score', ascending=False)
-        return df[df.score > self.score_threshold]
+        if len(df[df.score > self.score_threshold]) < self.min_ip_number:
+            df = df.iloc[:self.min_ip_number]
+        else:
+            df = df[df.score > self.score_threshold]
+        return df
 
 
 class New(Consistent):
@@ -184,7 +189,8 @@ class New(Consistent):
         # nflows, conns, nbytes, npackets,
         # mean_flows, mean_conns, mean_bytes, mean_packets
         self.weights = [0.2, 0.2, 0.2, 0.2, 0.05, 0.05, 0.05, 0.05]
-        self.score_threshold = 0.0002
+        self.score_threshold = 0.00002
+        self.min_ip_number = 10000
 
     def _get_IP_scores(self):
         days_since_last_seen = np.array([x.days for x in (pd.to_datetime(date.today()) - self.db.knowledge.last_seen)])
