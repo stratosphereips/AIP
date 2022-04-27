@@ -36,6 +36,7 @@ from aip.data.access import data_path, project_dir
 from aip.models.alpha import Alpha
 from aip.models.prioritize import New
 from aip.models.prioritize import Consistent
+from aip.models.prioritize import RandomForest
 from pathlib import Path
 from os import makedirs, path, scandir
 from datetime import date, timedelta
@@ -80,3 +81,12 @@ if __name__ == '__main__':
     blocklist = pc.run()
     blocklist.to_csv(path.join(output_dir,
         f'prioritize-consistent_{str(date.today())}.csv.gz'), index=False, compression='gzip')
+    
+    # Prioritize Random Forest Model
+    output_dir = path.join(data_path, 'output', 'random_forest')
+    if not path.exists(output_dir):
+        makedirs(output_dir)
+    pc = Consistent()
+    blocklist = pc.run()
+    blocklist.to_csv(path.join(output_dir,
+        f'rf_v1_30estimators_{str(date.today())}.csv.gz'), index=False, compression='gzip')
