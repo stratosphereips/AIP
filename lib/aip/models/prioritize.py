@@ -251,6 +251,7 @@ class RandomForest(BaseModel):
             pred = clf.predict(target.X)
             df = target.features[pred.astype(bool)]
             df = df.rename(columns={'orig': 'ip'})
+            df = self.sanitize(df)
             return df['ip']
         else:
             df = pd.DataFrame(columns=['ip'])
