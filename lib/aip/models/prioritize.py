@@ -33,6 +33,7 @@ from aip.data.access import data_path, get_attacks
 from aip.models.base import BaseModel
 from datetime import date, datetime, timedelta
 from os import path
+from sklearn.ensemble import RandomForestClassifier
 
 
 def _add_knowledge(last_knowledge, day):
@@ -190,8 +191,8 @@ class New(Consistent):
         # nflows, conns, nbytes, npackets,
         # mean_flows, mean_conns, mean_bytes, mean_packets
         self.weights = [0.2, 0.2, 0.2, 0.2, 0.05, 0.05, 0.05, 0.05]
-        self.score_threshold = 0.00002
-        self.min_ip_number = 10000
+        self.score_threshold = 0.00001
+        self.min_ip_number = 5000
 
     def _get_IP_scores(self):
         days_since_last_seen = np.array([x.days for x in (pd.to_datetime(date.today()) - self.db.knowledge.last_seen)])
@@ -208,3 +209,49 @@ class New(Consistent):
         ipscores *= aging
         return ipscores
 
+class RandomForest(BaseModel):
+    '''
+    Prioritize Random Forest from Thomas O'Hara's thesis
+    '''
+
+    def __init__(self):
+        super().__init__()
+
+    def _get_training_target_set(self, for_date=date.today()):
+        
+        target = Knowledgebase(load_until=for_date - timedelta(days=1))
+        target.attacks = get_attacks(dates=[(for_date - timedelta(days=1))])[-1]
+        days_since_last_seen = np.array([x.days for x in (pd.to_datetime(for_date) - target.knowledge.last_seen)])
+        total_attack_time = np.array([x.days for x in (target.knowledge.last_seen - target.knowledge.first_seen)])
+        target.knowledge['last_attack_days'] = days_since_last_seen
+        target.knowledge['first_attack_days'] = total_attack_time
+        target.features = target.knowledge[target.knowledge['orig'].isin(target.attacks['orig'])]
+        target.features = target.knowledge
+        target.X = target.features.drop(columns=['orig', 'first_seen', 'last_seen']).values
+        
+        training = Knowledgebase(load_until=for_date - timedelta(days=2))
+        training.knowledge.loc[training.knowledge['flows'] == 0, 'flows'] = 1
+        training.attacks = pd.concat(get_attacks(dates=[(for_date - timedelta(days=2))]))
+        days_since_last_seen = np.array([x.days for x in (pd.to_datetime(for_date) - training.knowledge.last_seen)])
+        total_attack_time = np.array([x.days for x in (training.knowledge.last_seen - training.knowledge.first_seen)])
+        training.knowledge['last_attack_days'] = days_since_last_seen
+        training.knowledge['first_attack_days'] = total_attack_time
+        training.knowledge['target'] = training.knowledge['orig'].isin(target.attacks['orig']).values.astype(int)
+        training.features = training.knowledge[training.knowledge['orig'].isin(training.attacks['orig'])]
+        training.features = training.knowledge
+        training.X = training.features.drop(columns=['orig', 'first_seen', 'last_seen', 'target']).values
+        training.Y = training.features['target'].values
+        return training, target
+
+    def run(self, for_date=date.today()):
+        training, target = self._get_training_target_set(for_date=for_date)
+        clf = RandomForestClassifier(n_estimators=30)
+        if (target.X.shape[0] > 0) and (training.X.shape[0] > 0):
+            clf = clf.fit(training.X, training.Y)
+            pred = clf.predict(target.X)
+            df = target.features[pred.astype(bool)]
+            df = df.rename(columns={'orig': 'ip'})
+            return df['ip']
+        else:
+            df = pd.DataFrame(columns=['ip'])
+            return df
