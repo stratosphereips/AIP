@@ -7,7 +7,7 @@ LABEL maintainer="Joaquin Bogado <joaquin.bogado@aic.fel.cvut.cz>"
 SHELL [ "/bin/bash", "--login", "-c" ]
 
 RUN apt-get update --fix-missing && \
-    apt-get install -y wget bzip2 curl git vim&& \
+    apt-get install -y wget bzip2 curl git vim argus-client&& \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
