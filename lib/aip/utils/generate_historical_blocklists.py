@@ -31,6 +31,7 @@ from aip.data.access import data_path, project_dir
 from aip.models.alpha import Alpha
 from aip.models.prioritize import New
 from aip.models.prioritize import Consistent
+from aip.models.prioritize import RandomForest
 from aip.models.prioritize import Knowledgebase
 from datetime import date, timedelta
 from joblib import Parallel, delayed
@@ -40,7 +41,7 @@ from os import makedirs, path, scandir
 
 #project_dir = Path(__file__).resolve().parents[1]
 
-start = '2020-07-05'
+start = '2020-12-01'
 end = str(date.today())
 
 if __name__ == '__main__':
@@ -80,10 +81,20 @@ if __name__ == '__main__':
         blocklist = pc.run(for_date=day)
         blocklist.to_csv(path.join(output_dir, f'prioritize-consistent_{str(day)}.csv.gz'), index=False, compression='gzip')
     
+    def run_model_rf(day):
+        # Prioritize Consistent Model
+        output_dir = path.join(data_path, 'output', 'random_forest')
+        if not path.exists(output_dir):
+            makedirs(output_dir)
+        rf = RandomForest()
+        blocklist = rf.run(for_date=day)
+        blocklist.to_csv(path.join(output_dir, f'rf_v1_30est_{str(day)}.csv.gz'), index=False, compression='gzip')
+    
     def run_models(day):
-        run_model_alpha(day)
-        run_model_pn(day)
-        run_model_pc(day)
+        #run_model_alpha(day)
+        #run_model_pn(day)
+        #run_model_pc(day)
+        run_model_rf(day)
 
     dates = [x.date() for x in (pd.date_range(start=start, end=end))]
     st_time = time.time()
