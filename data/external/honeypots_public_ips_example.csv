@@ -1,0 +1,3 @@
+# List of IPs to look for to generate the attack files.
+public_ip,operation_start_date,operation_end_date
+192.168.0.1,2020-01-01,
