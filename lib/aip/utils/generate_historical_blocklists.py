@@ -41,7 +41,7 @@ from os import makedirs, path, scandir
 
 #project_dir = Path(__file__).resolve().parents[1]
 
-start = '2020-12-01'
+start = '2020-07-05'
 end = str(date.today())
 
 if __name__ == '__main__':
@@ -61,6 +61,7 @@ if __name__ == '__main__':
             makedirs(output_dir)
         alpha = Alpha()
         blocklist = alpha.run(for_date=day)
+        blocklist = blocklist.rename(columns={'ip':'attacker'})
         pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir, f'alpha_{str(day)}.csv.gz'), index=False, compression='gzip')
     
     def run_model_pn(day):
@@ -82,18 +83,19 @@ if __name__ == '__main__':
         blocklist.to_csv(path.join(output_dir, f'prioritize-consistent_{str(day)}.csv.gz'), index=False, compression='gzip')
     
     def run_model_rf(day):
-        # Prioritize Consistent Model
+        # RandomForest Model
         output_dir = path.join(data_path, 'output', 'random_forest')
         if not path.exists(output_dir):
             makedirs(output_dir)
         rf = RandomForest()
         blocklist = rf.run(for_date=day)
-        blocklist.to_csv(path.join(output_dir, f'rf_v1_30est_{str(day)}.csv.gz'), index=False, compression='gzip')
+        blocklist.to_csv(path.join(output_dir, f'rf_v1_30estimators_{str(day)}.csv.gz'), index=False, compression='gzip')
     
     def run_models(day):
-        #run_model_alpha(day)
-        #run_model_pn(day)
-        #run_model_pc(day)
+        print(day)
+        run_model_alpha(day)
+        run_model_pn(day)
+        run_model_pc(day)
         run_model_rf(day)
 
     dates = [x.date() for x in (pd.date_range(start=start, end=end))]
@@ -108,5 +110,5 @@ if __name__ == '__main__':
 #       run_models(day)
     st_time = time.time()
     print('Running models')
-    Parallel(n_jobs=12, backend='multiprocessing')(delayed(run_models)(day) for day in dates)
+    Parallel(n_jobs=16, backend='multiprocessing')(delayed(run_models)(day) for day in dates)
     print(f'Models run after {(time.time() - st_time)/60} minutes.')

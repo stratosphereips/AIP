@@ -61,6 +61,7 @@ if __name__ == '__main__':
         makedirs(output_dir)
     alpha = Alpha()
     blocklist = alpha.run()
+    blocklist = blocklist.rename(columns={'ip':'attacker'})
     pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir,
         f'alpha_{str(date.today())}.csv.gz'), index=False, compression='gzip')
 
@@ -86,7 +87,7 @@ if __name__ == '__main__':
     output_dir = path.join(data_path, 'output', 'random_forest')
     if not path.exists(output_dir):
         makedirs(output_dir)
-    pc = Consistent()
-    blocklist = pc.run()
+    rf = RandomForest()
+    blocklist = rf.run()
     blocklist.to_csv(path.join(output_dir,
         f'rf_v1_30estimators_{str(date.today())}.csv.gz'), index=False, compression='gzip')
