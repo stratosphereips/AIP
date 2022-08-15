@@ -31,6 +31,7 @@ from aip.data.access import data_path, project_dir
 from aip.models.alpha import Alpha
 from aip.models.prioritize import New
 from aip.models.prioritize import Consistent
+from aip.models.prioritize import RandomForest
 from aip.models.prioritize import Knowledgebase
 from datetime import date, timedelta
 from joblib import Parallel, delayed
@@ -41,7 +42,7 @@ from os import makedirs, path, scandir
 #project_dir = Path(__file__).resolve().parents[1]
 
 start = '2020-07-05'
-end = str(date.today())
+end = '2022-08-14'
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -60,6 +61,7 @@ if __name__ == '__main__':
             makedirs(output_dir)
         alpha = Alpha()
         blocklist = alpha.run(for_date=day)
+        blocklist = blocklist.rename(columns={'ip':'attacker'})
         pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir, f'alpha_{str(day)}.csv.gz'), index=False, compression='gzip')
     
     def run_model_pn(day):
@@ -80,10 +82,21 @@ if __name__ == '__main__':
         blocklist = pc.run(for_date=day)
         blocklist.to_csv(path.join(output_dir, f'prioritize-consistent_{str(day)}.csv.gz'), index=False, compression='gzip')
     
+    def run_model_rf(day):
+        # RandomForest Model
+        output_dir = path.join(data_path, 'output', 'random_forest')
+        if not path.exists(output_dir):
+            makedirs(output_dir)
+        rf = RandomForest()
+        blocklist = rf.run()
+        blocklist.to_csv(path.join(output_dir, f'rf_v1_30estimators_{str(day)}.csv.gz'), index=False, compression='gzip')
+    
     def run_models(day):
+        print(day)
         run_model_alpha(day)
-        run_model_pn(day)
-        run_model_pc(day)
+        #run_model_pn(day)
+        #run_model_pc(day)
+        #run_model_rf(day)
 
     dates = [x.date() for x in (pd.date_range(start=start, end=end))]
     st_time = time.time()
@@ -97,5 +110,5 @@ if __name__ == '__main__':
 #       run_models(day)
     st_time = time.time()
     print('Running models')
-    Parallel(n_jobs=12, backend='multiprocessing')(delayed(run_models)(day) for day in dates)
+    Parallel(n_jobs=16, backend='multiprocessing')(delayed(run_models)(day) for day in dates)
     print(f'Models run after {(time.time() - st_time)/60} minutes.')
