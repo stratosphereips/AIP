@@ -31,10 +31,10 @@ import time
 
 from aip.data.access import data_path, get_attacks
 from aip.models.base import BaseModel
+from aip.utils.autoload import register, models
 from datetime import date, datetime, timedelta
 from os import path
 from sklearn.ensemble import RandomForestClassifier
-
 
 def _add_knowledge(last_knowledge, day):
     print(f'DEBUG: PROCESSING DATE {day}')
@@ -133,7 +133,7 @@ class Knowledgebase():
                 day = str(end - timedelta(days=days_ago))
                 last_knowledge = _add_knowledge(last_knowledge, day)
 
-
+@register
 class Consistent(BaseModel):
     '''
     Prioritize Consistent algorithm
@@ -179,7 +179,7 @@ class Consistent(BaseModel):
             df = df[df.score > self.score_threshold]
         return df
 
-
+@register
 class New(Consistent):
     '''
     Prioritize New algorithm
@@ -209,6 +209,7 @@ class New(Consistent):
         ipscores *= aging
         return ipscores
 
+@register
 class RandomForest(BaseModel):
     '''
     Prioritize Random Forest from Thomas O'Hara's thesis

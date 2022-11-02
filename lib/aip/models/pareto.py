@@ -1,5 +1,5 @@
 """ 
-AIP - AlphaX Model
+AIP - Pareto Model
 
 This model filter the attackers of the previous X days. 
 
@@ -31,21 +31,26 @@ from aip.utils.autoload import register, models
 from aip.data.access import get_attacks
 from datetime import date, timedelta
 
-#__models__ = []
+
+def pareto8020(df, column, threshold=80):
+    df = df.sort_values(by=column, ascending=False)
+    cumsum = df[column].cumsum() * 100 / df[column].sum()
+    return df[cumsum < threshold]
 
 @register
-class Alpha(BaseModel):
-    def __init__(self, lookback=1):
+class Pareto(BaseModel):
+    def __init__(self, lookback=60):
         super().__init__()
         self.lookback = lookback
 
     def run(self, for_date=date.today()):
         start = str(for_date - timedelta(days=self.lookback))
         end = str(for_date - timedelta(days=1))
-        # get all the attackers IPs
-        attacks = get_attacks(start, end, usecols=['orig'])
+        column = 'flows'
+        attacks = get_attacks(start, end, usecols=['orig', column])
         attacks = pd.concat(attacks)
-        attacks = attacks.rename(columns={'orig':'ip'})
+        attacks = pareto8020(attacks, column, threshold=80)
+        attacks = pd.DataFrame(attacks.orig.unique(), columns=['ip'])
         self.blocklist = attacks
         self.sanitize()
         return self.blocklist
