@@ -253,7 +253,7 @@ class RandomForest(BaseModel):
             df = target.features[pred.astype(bool)]
             df = df.rename(columns={'orig': 'ip'})
             df = self.sanitize(df)
-            return df['ip']
+            return df[['ip']]
         else:
             df = pd.DataFrame(columns=['ip'])
             return df
