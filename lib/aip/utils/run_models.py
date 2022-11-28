@@ -39,10 +39,11 @@ from aip.utils.metrics import get_metrics, metrics_columns
 
 #project_dir = Path(__file__).resolve().parents[1]
 
-start = '2020-07-06'
+start = '2020-08-01'
 #end = str(date.today())
 end = '2022-07-31'
 
+n_jobs = 16
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -113,14 +114,14 @@ if __name__ == '__main__':
     st_time = time.time()
     print('Running models')
     excluded_models = ['New', 'Consistent', 'RandomForest', 'Alpha', 'Pareto', 'AllIPs']
-    Parallel(n_jobs=16, backend='multiprocessing')(delayed(run_models)(day) for day in dates)
+    Parallel(n_jobs=n_jobs, backend='multiprocessing')(delayed(run_models)(day) for day in dates)
     print()
     print(f'Models run after {(time.time() - st_time)/60} minutes.')
 
     st_time = time.time()
     print('Evaluating models')
     excluded_models = []
-    results = Parallel(n_jobs=16, backend='multiprocessing')(delayed(calculate_metrics)(day) for day in dates)
+    results = Parallel(n_jobs=n_jobs, backend='multiprocessing')(delayed(calculate_metrics)(day) for day in dates)
     print()
     print(f'Metrics taken after {(time.time() - st_time)/60} minutes.')
     results = np.array(results).reshape(-1, 2+len(metrics_columns))
