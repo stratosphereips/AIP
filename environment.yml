@@ -16,5 +16,5 @@ dependencies:
   - pip
   - pip:
     - -r file:/tmp/requirements.txt
-  - python
+  - python=3.10
   #- xeus-python
