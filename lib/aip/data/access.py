@@ -46,7 +46,6 @@ project_dir = Path(__file__).resolve().parents[3]
 data_path = path.join(project_dir,'data')  # Deprecated, do not use
 data_dir = path.join(project_dir,'data')
 
-
 def _process_zeek_file(date):
     '''
     Create a dataset for the date string date in the data/interim folder
@@ -69,7 +68,7 @@ def _process_zeek_file(date):
     for z in zeek_files:
         #df = read_zeek(z, usecols=['id.orig_h', 'id.resp_h'])
         hourly = pd.DataFrame()
-        zeekdata = read_zeek(z)
+        zeekdata = read_zeek(z.path)
         logger.debug(f'Processing hourly file: {z.name}')
         for ip in ips:
             #hourly = hourly.append(zeekdata[zeekdata['id.resp_h'] == ip])
