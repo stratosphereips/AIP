@@ -8,7 +8,7 @@ import zeeklog2pandas as z2p
 
 from dotenv import dotenv_values
 from joblib import Parallel, delayed
-from os import makedirs, path
+from os import makedirs, path, access, W_OK
 from pathlib import Path
 
 _project_dir = Path(__file__).resolve().parents[3]
@@ -30,10 +30,11 @@ def scramble(s):
 
 def getrawdata(date):
     dt.datetime.strptime(date, '%Y-%m-%d')
-    p = path.join(_project_dir,'data','raw', date)
-    makedirs(p, exist_ok=True)
-    commands = [shlex.split(_config['magic'] + f'{date}/conn.{x:02}* ' + p) for x in range(0,24)]
-    Parallel(n_jobs=24, backend='threading')(delayed(subprocess.run)(c) for c in commands)
+    if access('my_folder', W_OK):
+        p = path.join(_project_dir,'data','raw', date)
+        makedirs(p, exist_ok=True)
+        commands = [shlex.split(_config['magic'] + f'{date}/conn.{x:02}* ' + p) for x in range(0,24)]
+        Parallel(n_jobs=24, backend='threading')(delayed(subprocess.run)(c) for c in commands)
 
 def removerawdata(date, force=False):
     dt.datetime.strptime(date, '%Y-%m-%d')
