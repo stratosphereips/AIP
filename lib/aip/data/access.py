@@ -46,41 +46,68 @@ project_dir = Path(__file__).resolve().parents[3]
 data_path = path.join(project_dir,'data')  # Deprecated, do not use
 data_dir = path.join(project_dir,'data')
 
-def _process_zeek_file(date):
+def _get_honeypot_ips(for_date=None):
+    '''
+    Filter those honeypots active due date for_date, if there are operation dates in the honeypot file.
+    '''
+    honeypots = pd.read_csv(path.join(project_dir, 'data', 'external', 'honeypots_public_ips.csv'))
+    if for_date is not None:
+        for_date = pd.to_datetime(for_date)
+        if 'operation_start_date' in honeypots.keys():
+            honeypots['operation_start_date'] = pd.to_datetime(honeypots['operation_start_date'])
+        if 'operation_end_date' in honeypots.keys():
+            honeypots['operation_end_date'] = honeypots['operation_end_date'].fillna(dt.date.today())
+            honeypots['operation_end_date'] = pd.to_datetime(honeypots['operation_end_date'])
+        honeypots = honeypots[(for_date >= honeypots['operation_start_date']) & (for_date <= honeypots['operation_end_date'])]
+    ips = honeypots.public_ip.values
+    return ips
+
+def _process_zeek_files(zeek_files, date):
+    ips = _get_honeypot_ips(date)
+    daily = pd.DataFrame()
+    for z in zeek_files:
+        hourly = pd.DataFrame()
+        zeekdata = read_zeek(z)
+        for ip in ips:
+            hourly = pd.concat([hourly, zeekdata[zeekdata['id.resp_h'] == ip]])
+        daily = pd.concat([daily, hourly])
+    return daily
+
+def _process_argus_files(argus_files, date):
+    ips = _get_honeypot_ips(date)
+    daily = pd.DataFrame()
+    for a in argus_files:
+        hourly = pd.DataFrame()
+        argusdata = read_argus(a)
+        for ip in ips:
+            hourly = pd.concat([hourly, argusdata[argusdata['id.resp_h'] == ip]])
+        daily = pd.concat([daily, hourly])
+    return daily
+
+def _process_raw_files(date):
     '''
     Create a dataset for the date string date in the data/interim folder
     THIS FUNCTION IS DESTRUCTIVE and will overwrite the datasets for the processed date if exists.
     '''
     logger = logging.getLogger(__name__)
-    honeypots = pd.read_csv(path.join(project_dir, 'data', 'external', 'honeypots_public_ips.csv'))
-    ips = honeypots.public_ip.values
     # if data directory does not exist, execute the magic to get it
     if path.isdir(path.join(project_dir,'data','raw', date)) == False:
         logging.debug(f'Downloading data for {date}')
         getrawdata(date)
     # after this point, if directory does not exist, we can skip it.
     try:
-        zeek_files = (x for x in scandir(path.join(project_dir,'data','raw', date)) if x.name.startswith('conn.'))
+        zeek_files = [x for x in scandir(path.join(project_dir,'data','raw', date)) if x.name.startswith('conn.')]
     except FileNotFoundError:
         logger.warning(f'Skipping {path.join(project_dir,"data","raw", date)}. Directory not exist.')
         return
-    daily = pd.DataFrame()
-    for z in zeek_files:
-        #df = read_zeek(z, usecols=['id.orig_h', 'id.resp_h'])
-        hourly = pd.DataFrame()
-        zeekdata = read_zeek(z.path)
-        logger.debug(f'Processing hourly file: {z.name}')
-        for ip in ips:
-            #hourly = hourly.append(zeekdata[zeekdata['id.resp_h'] == ip])
-            hourly = pd.concat([hourly, zeekdata[zeekdata['id.resp_h'] == ip]])
-        #hourly.to_csv(path.join(project_dir,'data','interim', f'hourly.conn.{date}-{z.name[5:10]}.csv.gz'), index=False, compression='gzip')
-        #logger.debug('Writting file: ' + path.join(project_dir,'data','interim', f'hourly.conn.{date}-{z.name[5:10]}.csv'))
-        #daily = daily.append(hourly)
-        daily = pd.concat([daily, hourly])
+    if len(list(zeek_files)) > 0:
+        daily = _process_zeek_files(zeek_files, date)
+    else:
+        daily = pd.DataFrame()
     daily.to_csv(path.join(project_dir,'data','interim', f'daily.conn.{date}.csv.gz'), index=False, compression='gzip')
     logger.debug('Writting file: ' + path.join(project_dir,'data','interim', f'daily.conn.{date}.csv.gz'))
-    #logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
-    #removerawdata(date)
+    logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
+    removerawdata(date)
     return
 
 def _extract_attacks(date):
@@ -126,7 +153,7 @@ def process_zeek_files(dates=None):
                 dates.append(x.name)
             except ValueError:
                 pass
-    Parallel(n_jobs=12, backend='multiprocessing')(delayed(_process_zeek_file)(date) for date in dates)
+    Parallel(n_jobs=12, backend='multiprocessing')(delayed(_process_raw_files)(date) for date in dates)
     return
 
 def extract_attacks(dates=None):
