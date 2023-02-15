@@ -45,8 +45,8 @@ def scramble(s):
 
 def getrawdata(date):
     dt.datetime.strptime(date, '%Y-%m-%d')
-    if access('my_folder', W_OK):
-        p = path.join(_project_dir,'data','raw', date)
+    p = path.join(_project_dir,'data','raw', date)
+    if access(p, W_OK):
         makedirs(p, exist_ok=True)
         commands = [shlex.split(_config['magic'] + f'{date}/conn.{x:02}* ' + p) for x in range(0,24)]
         Parallel(n_jobs=24, backend='threading')(delayed(subprocess.run)(c) for c in commands)
