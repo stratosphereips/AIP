@@ -106,8 +106,8 @@ def _process_raw_files(date):
         daily = pd.DataFrame()
     daily.to_csv(path.join(project_dir,'data','interim', f'daily.conn.{date}.csv.gz'), index=False, compression='gzip')
     logger.debug('Writting file: ' + path.join(project_dir,'data','interim', f'daily.conn.{date}.csv.gz'))
-    logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
-    removerawdata(date)
+    #logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
+    #removerawdata(date)
     return
 
 def _extract_attacks(date):
@@ -126,7 +126,12 @@ def _extract_attacks(date):
         pd.DataFrame(columns=['orig', 'flows', 'duration', 'packets', 'bytes']).to_csv(
                 path.join(project_dir,'data','processed', f'attacks.{date}.csv.gz'), index=False, compression='gzip')
         return
-
+    except pd.errors.EmptyDataError:
+        logger.warning(f'Skipping {path.join(project_dir,"data","interim", f"daily.conn.{date}.csv.gz")}. File is empty.')
+        # Generate an empty attacks file
+        pd.DataFrame(columns=['orig', 'flows', 'duration', 'packets', 'bytes']).to_csv(
+                path.join(project_dir,'data','processed', f'attacks.{date}.csv.gz'), index=False, compression='gzip')
+        return
     # Calculate the total attacks for each origin
     df = daily[['id.orig_h', 'duration', 'orig_pkts', 'orig_ip_bytes']].groupby(['id.orig_h']).sum()
     df.rename(columns={'duration':'duration', 'orig_pkts':'packets', 'orig_ip_bytes':'bytes'}, inplace=True)
@@ -136,7 +141,7 @@ def _extract_attacks(date):
     logger.debug('Writting file: ' + path.join(project_dir,'data','processed', f'attacks.{date}.csv.gz'))
     df.to_csv(path.join(project_dir,'data','processed', f'attacks.{date}.csv.gz'), columns=['orig', 'flows', 'duration', 'packets', 'bytes'], index=False, compression='gzip')
     # logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
-    removerawdata(date)
+    #removerawdata(date)
     return
 
 def process_zeek_files(dates=None):
