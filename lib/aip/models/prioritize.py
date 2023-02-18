@@ -44,6 +44,11 @@ def _add_knowledge(last_knowledge, day):
     attacks = get_attacks(dates=[day])
     df = attacks[0]
     if df.empty is True:
+        last_knowledge.to_csv(path.join(p, f'knowledgebase-{day}-snapshot.gz'),
+            columns=['orig', 'flows', 'duration','bytes', 'packets',
+                'mean_flows', 'mean_duration', 'mean_bytes', 'mean_packets',
+                'days_active', 'first_seen', 'last_seen'],
+            index=False, compression='gzip')
         return last_knowledge
     df = df.rename(columns={"count": "flows"})
     df.loc[:, 'first_seen'] = day

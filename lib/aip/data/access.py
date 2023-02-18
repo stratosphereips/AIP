@@ -97,7 +97,7 @@ def _process_raw_files(date):
         getrawdata(date)
     # after this point, if directory does not exist, we can skip it.
     try:
-        zeek_files = [x for x in scandir(path.join(project_dir,'data','raw', date)) if x.name.startswith('conn.')]
+        zeek_files = [x.path for x in scandir(path.join(project_dir,'data','raw', date)) if x.name.startswith('conn.')]
     except FileNotFoundError:
         logger.warning(f'Skipping {path.join(project_dir,"data","raw", date)}. Directory not exist.')
         return
