@@ -64,6 +64,16 @@ if __name__ == '__main__':
     blocklist = blocklist.rename(columns={'ip':'attacker'})
     pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir,
         f'alpha_{str(date.today())}.csv.gz'), index=False, compression='gzip')
+    
+    #Alpha 7 Model (seven days in the past)
+    output_dir = path.join(project_dir, 'data', 'output', 'alpha7_model')
+    if not path.exists(output_dir):
+        makedirs(output_dir)
+    alpha7 = Alpha(lookback=7)
+    blocklist = alpha7.run()
+    blocklist = blocklist.rename(columns={'ip':'attacker'})
+    pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir,
+        f'alpha7_{str(date.today())}.csv.gz'), index=False, compression='gzip')
 
     # Prioritize New Model
     output_dir = path.join(data_path, 'output', 'prioritize_new')
