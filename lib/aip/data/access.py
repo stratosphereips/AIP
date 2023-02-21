@@ -64,7 +64,7 @@ def _get_honeypot_ips(for_date=None):
     return ips
 
 def _process_zeek_files(zeek_files, date):
-    ips = _get_honeypot_ips(date)
+    ips = _get_honeypot_ips()
     daily = pd.DataFrame()
     for z in zeek_files:
         hourly = pd.DataFrame()
@@ -75,7 +75,7 @@ def _process_zeek_files(zeek_files, date):
     return daily
 
 def _process_argus_files(argus_files, date):
-    ips = _get_honeypot_ips(date)
+    ips = _get_honeypot_ips()
     daily = pd.DataFrame()
     for a in argus_files:
         hourly = pd.DataFrame()
