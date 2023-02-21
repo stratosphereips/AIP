@@ -160,7 +160,7 @@ class BetterKnowledge():
         until = self._check_date_param(until)
         dfs = []
         for delta in scandir(path.join(data_path, 'processed', 'prioritizers')):
-            if delta.name startswith('delta-'):
+            if delta.name.startswith('delta-'):
                 if delta.name[6:16] <= until:
                     print(f'Reading knowledge {delta.name}')
                     dfs.append(pd.read_csv(delta.path))
