@@ -32,7 +32,7 @@ import time
 from aip.data.access import data_path, get_attacks
 from aip.models.base import BaseModel
 from datetime import date, datetime, timedelta
-from os import path, scandir
+from os import path
 from sklearn.ensemble import RandomForestClassifier
 
 
@@ -137,61 +137,6 @@ class Knowledgebase():
                 days_ago -= 1
                 day = str(end - timedelta(days=days_ago))
                 last_knowledge = _add_knowledge(last_knowledge, day)
-
-class BetterKnowledge():
-    '''
-    Statistics about Attacks to our honeypots, saving delta snapshots
-    '''
-    def _check_date_param(self, day_unchk):
-        if day_unchk == 'yesterday':
-            day = str(date.today() - timedelta(days=1))
-        elif type(day_unchk) is str:
-            # force is a date or throw and exception
-            day = str(datetime.strptime(day_unchk, '%Y-%m-%d').date())
-        elif type(day_unchk) is date:
-            day = str(day_unchk)
-        return day
-
-    
-    def _load_knowledge(until):
-        '''
-        Load all the available knowledge until date "until"
-        '''
-        until = self._check_date_param(until)
-        dfs = []
-        for delta in scandir(path.join(data_path, 'processed', 'prioritizers')):
-            if delta.name.startswith('delta-'):
-                if delta.name[6:16] <= until:
-                    print(f'Reading knowledge {delta.name}')
-                    dfs.append(pd.read_csv(delta.path))
-        return pd.concat(dfs)
-
-    def _build_knowledge(until):
-        '''
-        Makes sure there is one delta per day, even if it is empty from starting date to the date "until"
-        '''
-        start = '2020-07-04'
-        end = self._check_date_param(until)
-        dates = [str(x.date()) for x in pd.date_range(start=start, end=end)]
-        dates.sort()
-        dfs = []
-        for day in dates:
-            deltapath = path.join(data_path, 'processed', 'prioritizers', f'delta-{day}-knowledge.cvz.gz')
-            if path.exist(deltapath):
-                dfs.append(pd.read_csv(deltapath))
-            else:
-                print(f'Building missing knowledge starting from day {day}')
-                if len(dfs) == 0:
-                    knowledge = None
-                else:
-                    knowledge = pd.concat(dfs)
-                attacks = get_attacks(start=day, end=day)
-
-    def __init__(self, load_until='yesterday'):
-        day = self._check_date_param(load_until)
-        self.knowledge = self._load_knowledge(until=day)
-
-
 
 
 class Consistent(BaseModel):
