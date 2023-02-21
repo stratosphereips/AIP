@@ -64,7 +64,7 @@ if __name__ == '__main__':
         blocklist = blocklist.rename(columns={'ip':'attacker'})
         pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir, f'alpha_{str(day)}.csv.gz'), index=False, compression='gzip')
     
-    def run_model_alpha(day):
+    def run_model_alpha7(day):
         #Alpha 7 Model
         output_dir = path.join(project_dir, 'data', 'output', 'alpha7_model')
         if not path.exists(output_dir):
@@ -104,6 +104,7 @@ if __name__ == '__main__':
     def run_models(day):
         print(day)
         run_model_alpha(day)
+        run_model_alpha7(day)
         #run_model_pn(day)
         #run_model_pc(day)
         #run_model_rf(day)
