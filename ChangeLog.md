@@ -1,3 +1,6 @@
+2023/02/22
+- AIP Tool major reimplementation (Now Docker ready!)
+
 11/12/2020
 V2.0.5
 - Added complete runtime logging system to main branch
