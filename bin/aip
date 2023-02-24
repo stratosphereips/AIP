@@ -56,32 +56,42 @@ if __name__ == '__main__':
 
 
     #Alpha Model
-    output_dir = path.join(project_dir, 'data', 'output', 'alpha_model')
+    output_dir = path.join(project_dir, 'data', 'output', 'Alpha')
     if not path.exists(output_dir):
         makedirs(output_dir)
     alpha = Alpha()
     blocklist = alpha.run()
     blocklist = blocklist.rename(columns={'ip':'attacker'})
     pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir,
-        f'alpha_{str(date.today())}.csv.gz'), index=False, compression='gzip')
+        f'AIP-Alpha-{str(date.today())}.csv.gz'), index=False, compression='gzip')
+    
+    #Alpha 7 Model (seven days in the past)
+    output_dir = path.join(project_dir, 'data', 'output', 'Alpha7')
+    if not path.exists(output_dir):
+        makedirs(output_dir)
+    alpha7 = Alpha(lookback=7)
+    blocklist = alpha7.run()
+    blocklist = blocklist.rename(columns={'ip':'attacker'})
+    pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir,
+        f'AIP-Alpha7-{str(date.today())}.csv.gz'), index=False, compression='gzip')
 
     # Prioritize New Model
-    output_dir = path.join(data_path, 'output', 'prioritize_new')
+    output_dir = path.join(data_path, 'output', 'Prioritize_New')
     if not path.exists(output_dir):
         makedirs(output_dir)
     pn = New()
     blocklist = pn.run()
     blocklist.to_csv(path.join(output_dir,
-        f'prioritize-new_{str(date.today())}.csv.gz'), index=False, compression='gzip')
+        f'AIP-Prioritize_New-{str(date.today())}.csv.gz'), index=False, compression='gzip')
 
     # Prioritize Consistent Model
-    output_dir = path.join(data_path, 'output', 'prioritize_consistent')
+    output_dir = path.join(data_path, 'output', 'Prioritize_Consistent')
     if not path.exists(output_dir):
         makedirs(output_dir)
     pc = Consistent()
     blocklist = pc.run()
     blocklist.to_csv(path.join(output_dir,
-        f'prioritize-consistent_{str(date.today())}.csv.gz'), index=False, compression='gzip')
+        f'AIP-Prioritize_Consistent-{str(date.today())}.csv.gz'), index=False, compression='gzip')
     
     # Prioritize Random Forest Model
     output_dir = path.join(data_path, 'output', 'random_forest')
@@ -90,4 +100,4 @@ if __name__ == '__main__':
     rf = RandomForest()
     blocklist = rf.run()
     blocklist.to_csv(path.join(output_dir,
-        f'rf_v1_30estimators_{str(date.today())}.csv.gz'), index=False, compression='gzip')
+        f'AIP-Random_Forest-{str(date.today())}.csv.gz'), index=False, compression='gzip')
