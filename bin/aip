@@ -91,7 +91,7 @@ if __name__ == '__main__':
     pc = Consistent()
     blocklist = pc.run()
     blocklist.to_csv(path.join(output_dir,
-        f'AIP-Prioritize_consistent-{str(date.today())}.csv.gz'), index=False, compression='gzip')
+        f'AIP-Prioritize_Consistent-{str(date.today())}.csv.gz'), index=False, compression='gzip')
     
     # Prioritize Random Forest Model
     output_dir = path.join(data_path, 'output', 'random_forest')
