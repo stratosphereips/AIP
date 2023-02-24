@@ -98,7 +98,7 @@ if __name__ == '__main__':
         if not path.exists(output_dir):
             makedirs(output_dir)
         rf = RandomForest()
-        blocklist = rf.run()
+        blocklist = rf.run(for_date=day)
         blocklist.to_csv(path.join(output_dir, f'rf_v1_30estimators_{str(day)}.csv.gz'), index=False, compression='gzip')
     
     def run_models(day):
