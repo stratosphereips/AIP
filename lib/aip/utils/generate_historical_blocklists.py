@@ -42,7 +42,7 @@ from os import makedirs, path, scandir
 #project_dir = Path(__file__).resolve().parents[1]
 
 start = '2020-07-05'
-end = '2022-08-14'
+end = str(date.today())
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -63,7 +63,7 @@ if __name__ == '__main__':
         blocklist = alpha.run(for_date=day)
         blocklist = blocklist.rename(columns={'ip':'attacker'})
         pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir, f'alpha_{str(day)}.csv.gz'), index=False, compression='gzip')
-    
+        
     def run_model_alpha7(day):
         #Alpha 7 Model
         output_dir = path.join(project_dir, 'data', 'output', 'alpha7_model')
@@ -73,7 +73,7 @@ if __name__ == '__main__':
         blocklist = alpha.run(for_date=day)
         blocklist = blocklist.rename(columns={'ip':'attacker'})
         pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir, f'alpha7_{str(day)}.csv.gz'), index=False, compression='gzip')
-    
+
     def run_model_pn(day):
         # Prioritize New Model
         output_dir = path.join(data_path, 'output', 'prioritize_new')
@@ -104,10 +104,9 @@ if __name__ == '__main__':
     def run_models(day):
         print(day)
         run_model_alpha(day)
-        run_model_alpha7(day)
-        #run_model_pn(day)
-        #run_model_pc(day)
-        #run_model_rf(day)
+        run_model_pn(day)
+        run_model_pc(day)
+        run_model_rf(day)
 
     dates = [x.date() for x in (pd.date_range(start=start, end=end))]
     st_time = time.time()
