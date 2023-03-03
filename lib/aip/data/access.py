@@ -36,10 +36,10 @@ import logging
 import pandas as pd
 import numpy as np
 
-from pathlib import Path
-from os import scandir, path
+from aip.data.functions import scramble, read_zeek, getrawdata, removerawdata
 from joblib import Parallel, delayed
-from aip.data.functions import scramble, read_argus, read_zeek, getrawdata, removerawdata
+from os import scandir, path
+from pathlib import Path
 
 project_dir = Path(__file__).resolve().parents[3]
 
@@ -58,13 +58,13 @@ def _get_honeypot_ips(for_date=None):
         if 'operation_end_date' in honeypots.keys():
             honeypots['operation_end_date'] = honeypots['operation_end_date'].fillna(dt.date.today())
             honeypots['operation_end_date'] = pd.to_datetime(honeypots['operation_end_date'])
-        honeypots = honeypots[(for_date >= honeypots['operation_start_date']) & (for_date <= honeypots['operation_end_date'])]
+        if ('operation_start_date' in honeypots.keys()) and 'operation_end_date' in honeypots.keys():
+            honeypots = honeypots[(for_date >= honeypots['operation_start_date']) & (for_date <= honeypots['operation_end_date'])]
     ips = honeypots.public_ip.values
     return ips
 
-
 def _process_zeek_files(zeek_files, date):
-    ips = _get_honeypot_ips(date)
+    ips = _get_honeypot_ips()
     daily = pd.DataFrame()
     for z in zeek_files:
         hourly = pd.DataFrame()
@@ -75,7 +75,7 @@ def _process_zeek_files(zeek_files, date):
     return daily
 
 def _process_argus_files(argus_files, date):
-    ips = _get_honeypot_ips(date)
+    ips = _get_honeypot_ips()
     daily = pd.DataFrame()
     for a in argus_files:
         hourly = pd.DataFrame()
@@ -84,7 +84,6 @@ def _process_argus_files(argus_files, date):
             hourly = pd.concat([hourly, argusdata[argusdata['id.resp_h'] == ip]])
         daily = pd.concat([daily, hourly])
     return daily
-
 
 def _process_raw_files(date):
     '''
@@ -98,21 +97,18 @@ def _process_raw_files(date):
         getrawdata(date)
     # after this point, if directory does not exist, we can skip it.
     try:
-        zeek_files = [x for x in scandir(path.join(project_dir,'data','raw', date)) if x.name.startswith('conn.')]
-        argus_files = [x for x in scandir(path.join(project_dir,'data','raw', date)) if x.name.endswith('.biargus.xz')]
+        zeek_files = [x.path for x in scandir(path.join(project_dir,'data','raw', date)) if x.name.startswith('conn.')]
     except FileNotFoundError:
         logger.warning(f'Skipping {path.join(project_dir,"data","raw", date)}. Directory not exist.')
         return
     if len(list(zeek_files)) > 0:
         daily = _process_zeek_files(zeek_files, date)
-    elif len(list(argus_files)) > 0:
-        daily = _process_argus_files(argus_files, date)
     else:
         daily = pd.DataFrame()
     daily.to_csv(path.join(project_dir,'data','interim', f'daily.conn.{date}.csv.gz'), index=False, compression='gzip')
     logger.debug('Writting file: ' + path.join(project_dir,'data','interim', f'daily.conn.{date}.csv.gz'))
-    logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
-    removerawdata(date)
+    #logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
+    #removerawdata(date)
     return
 
 def _extract_attacks(date):
@@ -131,7 +127,12 @@ def _extract_attacks(date):
         pd.DataFrame(columns=['orig', 'flows', 'duration', 'packets', 'bytes']).to_csv(
                 path.join(project_dir,'data','processed', f'attacks.{date}.csv.gz'), index=False, compression='gzip')
         return
-
+    except pd.errors.EmptyDataError:
+        logger.warning(f'Skipping {path.join(project_dir,"data","interim", f"daily.conn.{date}.csv.gz")}. File is empty.')
+        # Generate an empty attacks file
+        pd.DataFrame(columns=['orig', 'flows', 'duration', 'packets', 'bytes']).to_csv(
+                path.join(project_dir,'data','processed', f'attacks.{date}.csv.gz'), index=False, compression='gzip')
+        return
     # Calculate the total attacks for each origin
     df = daily[['id.orig_h', 'duration', 'orig_pkts', 'orig_ip_bytes']].groupby(['id.orig_h']).sum()
     df.rename(columns={'duration':'duration', 'orig_pkts':'packets', 'orig_ip_bytes':'bytes'}, inplace=True)
@@ -140,7 +141,7 @@ def _extract_attacks(date):
     df.reset_index(drop=True, inplace=True)
     logger.debug('Writting file: ' + path.join(project_dir,'data','processed', f'attacks.{date}.csv.gz'))
     df.to_csv(path.join(project_dir,'data','processed', f'attacks.{date}.csv.gz'), columns=['orig', 'flows', 'duration', 'packets', 'bytes'], index=False, compression='gzip')
-    #logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
+    # logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
     #removerawdata(date)
     return
 
