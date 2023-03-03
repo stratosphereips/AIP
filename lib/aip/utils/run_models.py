@@ -39,9 +39,9 @@ from aip.utils.metrics import get_metrics, metrics_columns
 
 #project_dir = Path(__file__).resolve().parents[1]
 
-start = '2020-08-01'
+start = '2022-01-01'
 #end = str(date.today())
-end = '2022-07-31'
+end = '2022-12-31'
 
 n_jobs = 16
 
@@ -49,7 +49,6 @@ if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     #logging.basicConfig(level=logging.INFO, format=log_fmt)
     logging.basicConfig(level=logging.DEBUG, format=log_fmt)
-
 
     def run_model(day, model):
         output_dir = path.join(data_dir, 'output', str(model.__name__))
