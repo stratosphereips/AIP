@@ -10,7 +10,7 @@ docker build --file etc/docker/Dockerfile --tag aip:aip .
 ### Run the container
 To run the container of that image you can run the following command. This will mount the root folder of the project in $HOME/AIP inside the docker container.
 ```
-docker run --rm -v $(pwd):/home/aip/AIP/:rw -it aip:aip bash
+docker run -v $(pwd):/home/aip/AIP/:rw -it aip:aip bash
 ```
 
 ### Run the tests
