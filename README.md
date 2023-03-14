@@ -7,7 +7,7 @@ Eventually, the project evolved, aiming to test new blocklists generation models
 
 Given a honeypot network in your organization, it should be easy to use AIP to generate your own local blocklists based on the traffic reaching the honeypots.
 
-![Description of the AIP pipeline](AIP_Diagram.png "AIP Tool pipeline")
+![Description of the AIP pipeline](images/AIP_Diagram.png "AIP Tool pipeline")
 
 ## Using the framework
 
