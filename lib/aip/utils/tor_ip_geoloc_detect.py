@@ -53,15 +53,32 @@ def process_file(file_path,output_subdir_path):
 
     with gzip.open(file_path, 'rt') as f_in, \
         gzip.open(os.path.join(output_subdir_path, os.path.basename(file_path)[:-7] + "_advanced.csv.gz"), 'wt', newline='') as f_out:
-        ALPHA_OR_ALPHA_7 = "Alpha" in os.path.basename(file_path)
-        CONSISTEN_OR_NEW = "Consistent" in os.path.basename(file_path) or "New" in os.path.basename(file_path)
-        if ALPHA_OR_ALPHA_7:
+
+        #create duplicate f_in
+        f_in2 = gzip.open(file_path, 'rt')
+        reader = csv.DictReader(f_in2)
+
+        ATTACKER_CSV_FORMAT=False
+        IP_SCORE_CSV_FORMAT=False
+
+        #header is [attacker]
+        for col in reader.fieldnames:
+            if('attacker' in col):
+                ATTACKER_CSV_FORMAT=True
+
+        #header is [Number,IP address,Rating]
+        for col in reader.fieldnames:
+            if("# Top IPs" in col):
+                IP_SCORE_CSV_FORMAT=True
+        
+        if ATTACKER_CSV_FORMAT:
             reader = csv.DictReader(f_in)
             rows = list(reader)
             fieldnames = reader.fieldnames
             fieldnames.insert(1, 'Tor')
-        if CONSISTEN_OR_NEW:
-            next(f_in, None) 
+            
+        if IP_SCORE_CSV_FORMAT:
+            next(f_in, None)
             reader = csv.DictReader(f_in)
             rows= list(reader)
             fieldnames = reader.fieldnames
@@ -71,15 +88,12 @@ def process_file(file_path,output_subdir_path):
         writer = csv.DictWriter(f_out, fieldnames=fieldnames)
         writer.writeheader()
 
-
-        print(fieldnames)
-
         with tqdm(total=len(rows), desc=f"Processing {os.path.basename(file_path)}", unit=" rows") as pbar:
             for row in rows:
-                if ALPHA_OR_ALPHA_7:
+                if ATTACKER_CSV_FORMAT:
                     ip = row['attacker']
                     tor = is_tor(ip,TOR_IPS)
-                if CONSISTEN_OR_NEW:
+                if IP_SCORE_CSV_FORMAT:
                     ip = row['IP address']
                     tor = is_tor(ip,TOR_IPS)
                 row['Tor'] = tor
