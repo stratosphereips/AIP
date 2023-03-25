@@ -3,3 +3,5 @@ maxminddb==2.2.0
 zeeklog2pandas
 ipython
 scikit-learn
+tqdm==4.65.0
+requests==2.28.2

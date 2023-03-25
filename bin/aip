@@ -37,6 +37,7 @@ from aip.models.alpha import Alpha
 from aip.models.prioritize import New
 from aip.models.prioritize import Consistent
 from aip.models.prioritize import RandomForest
+from aip.utils.tor_ip_geoloc_detect import get_advance_csv
 from pathlib import Path
 from os import makedirs, path, scandir
 from datetime import date, timedelta
@@ -101,3 +102,6 @@ if __name__ == '__main__':
     blocklist = rf.run()
     blocklist.to_csv(path.join(output_dir,
         f'AIP-Random_Forest-{str(date.today())}.csv.gz'), index=False, compression='gzip')
+
+    # Tor IP Geolocation Detection
+    get_advance_csv()
