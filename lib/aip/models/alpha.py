@@ -27,10 +27,13 @@ __version__ = "0.0.1"
 import pandas as pd
 
 from aip.models.base import BaseModel
+from aip.utils.autoload import register, models
 from aip.data.access import get_attacks
 from datetime import date, timedelta
 
+#__models__ = []
 
+@register
 class Alpha(BaseModel):
     def __init__(self, lookback=1):
         super().__init__()

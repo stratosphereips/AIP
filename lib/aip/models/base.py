@@ -27,8 +27,10 @@ __version__ = "0.0.1"
 import pandas as pd
 
 from aip.data.access import data_dir
+from aip.utils.autoload import register, models
 from os import path
 
+# @register
 class BaseModel():
     '''
     Template class for AIP models

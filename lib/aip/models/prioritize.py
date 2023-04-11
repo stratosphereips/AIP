@@ -31,6 +31,7 @@ import time
 
 from aip.data.access import data_path, get_attacks
 from aip.models.base import BaseModel
+from aip.utils.autoload import register, models
 from datetime import date, datetime, timedelta
 from os import path
 from sklearn.ensemble import RandomForestClassifier
@@ -139,6 +140,7 @@ class Knowledgebase():
                 last_knowledge = _add_knowledge(last_knowledge, day)
 
 
+@register
 class Consistent(BaseModel):
     '''
     Prioritize Consistent algorithm
@@ -185,6 +187,7 @@ class Consistent(BaseModel):
         return df
 
 
+@register
 class New(Consistent):
     '''
     Prioritize New algorithm

@@ -182,7 +182,7 @@ def extract_attacks(dates=None):
                 dates.append(x.name)
             except ValueError:
                 pass
-    Parallel(n_jobs=12, backend='multiprocessing')(delayed(_extract_attacks)(date) for date in dates)
+    Parallel(n_jobs=16, backend='multiprocessing')(delayed(_extract_attacks)(date) for date in dates)
     return
 
 def get_attacks(start=None, end=None, dates=None, usecols=None):
