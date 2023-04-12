@@ -50,3 +50,8 @@ class Alpha(BaseModel):
         self.sanitize()
         return self.blocklist
 
+@register
+class Alpha7(Alpha):
+    def __init__(self, lookback=7):
+        super().__init__()
+        self.lookback = lookback
