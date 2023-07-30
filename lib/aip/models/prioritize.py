@@ -36,6 +36,7 @@ from datetime import date, datetime, timedelta
 from os import path
 from sklearn.ensemble import RandomForestClassifier
 
+
 def _add_knowledge(last_knowledge, day):
     print(f'DEBUG: PROCESSING DATE {day}')
     st_time = time.time()
@@ -44,6 +45,11 @@ def _add_knowledge(last_knowledge, day):
     attacks = get_attacks(dates=[day])
     df = attacks[0]
     if df.empty is True:
+        last_knowledge.to_csv(path.join(p, f'knowledgebase-{day}-snapshot.gz'),
+            columns=['orig', 'flows', 'duration','bytes', 'packets',
+                'mean_flows', 'mean_duration', 'mean_bytes', 'mean_packets',
+                'days_active', 'first_seen', 'last_seen'],
+            index=False, compression='gzip')
         return last_knowledge
     df = df.rename(columns={"count": "flows"})
     df.loc[:, 'first_seen'] = day
@@ -133,6 +139,7 @@ class Knowledgebase():
                 day = str(end - timedelta(days=days_ago))
                 last_knowledge = _add_knowledge(last_knowledge, day)
 
+
 @register
 class Consistent(BaseModel):
     '''
@@ -179,6 +186,7 @@ class Consistent(BaseModel):
             df = df[df.score > self.score_threshold]
         return df
 
+
 @register
 class New(Consistent):
     '''
@@ -209,7 +217,6 @@ class New(Consistent):
         ipscores *= aging
         return ipscores
 
-@register
 class RandomForest(BaseModel):
     '''
     Prioritize Random Forest from Thomas O'Hara's thesis
@@ -255,5 +262,5 @@ class RandomForest(BaseModel):
             df = self.sanitize(df)
             return df[['ip']]
         else:
-            df = pd.DataFrame(columns=['ip'])
+            df = pd.DataFrame(columns=[['ip']])
             return df
