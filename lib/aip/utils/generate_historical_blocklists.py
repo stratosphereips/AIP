@@ -33,6 +33,7 @@ from aip.models.prioritize import New
 from aip.models.prioritize import Consistent
 from aip.models.prioritize import RandomForest
 from aip.models.prioritize import Knowledgebase
+from aip.models.pareto import Pareto
 from datetime import date, timedelta
 from joblib import Parallel, delayed
 from pathlib import Path
@@ -101,21 +102,32 @@ if __name__ == '__main__':
         blocklist = rf.run(for_date=day)
         blocklist.to_csv(path.join(output_dir, f'rf_v1_30estimators_{str(day)}.csv.gz'), index=False, compression='gzip')
     
+    def run_model_pareto(day):
+        #Pareto Model
+        output_dir = path.join(project_dir, 'data', 'output', 'pareto_model')
+        if not path.exists(output_dir):
+            makedirs(output_dir)
+        pareto = Pareto()
+        blocklist = pareto.run(for_date=day)
+        blocklist = blocklist.rename(columns={'ip':'attacker'})
+        pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir, f'pareto_{str(day)}.csv.gz'), index=False, compression='gzip')
+    
     def run_models(day):
         print(day)
-        run_model_alpha(day)
-        run_model_pn(day)
-        run_model_pc(day)
-        run_model_rf(day)
+        #run_model_alpha(day)
+        #run_model_pn(day)
+        #run_model_pc(day)
+        #run_model_rf(day)
+        run_model_pareto(day)
 
     dates = [x.date() for x in (pd.date_range(start=start, end=end))]
     st_time = time.time()
-    print(f'Creating knowledgebase from {str(dates[0])} to the present')
-    k = Knowledgebase()
+    #print(f'Creating knowledgebase from {str(dates[0])} to the present')
+    #k = Knowledgebase()
     # Need to build the knowledge outside the parallel loop
     # build() is not a reentrant function
-    k.build(start=dates[0], end=dates[-1])
-    print(f'Knowledge created in {(time.time() - st_time)/60} minutes.')
+    #k.build(start=dates[0], end=dates[-1])
+    #print(f'Knowledge created in {(time.time() - st_time)/60} minutes.')
 #    for day in dates:
 #       run_models(day)
     st_time = time.time()
