@@ -44,9 +44,14 @@ class Alpha(BaseModel):
         end = str(for_date - timedelta(days=1))
         # get all the attackers IPs
         attacks = get_attacks(start, end, usecols=['orig'])
-        attacks = pd.concat(attacks)
+        attacks = pd.concat(attacks).drop_duplicates()
         attacks = attacks.rename(columns={'orig':'ip'})
         self.blocklist = attacks
         self.sanitize()
         return self.blocklist
 
+@register
+class Alpha7(Alpha):
+    def __init__(self, lookback=7):
+        super().__init__()
+        self.lookback = lookback
