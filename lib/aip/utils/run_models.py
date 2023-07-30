@@ -39,9 +39,8 @@ from aip.utils.metrics import get_metrics, metrics_columns
 
 #project_dir = Path(__file__).resolve().parents[1]
 
-start = '2022-01-01'
-#end = str(date.today())
-end = '2022-12-31'
+start = '2022-01-03'
+end = '2022-01-31'
 
 n_jobs = 16
 
@@ -112,7 +111,7 @@ if __name__ == '__main__':
     dates = [x.date() for x in (pd.date_range(start=start, end=end))]
     st_time = time.time()
     print('Running models')
-    excluded_models = ['New', 'Consistent', 'RandomForest', 'Alpha', 'Pareto', 'AllIPs']
+    excluded_models = ['RandomForest', 'Pareto', 'AllIPs']
     Parallel(n_jobs=n_jobs, backend='multiprocessing')(delayed(run_models)(day) for day in dates)
     print()
     print(f'Models run after {(time.time() - st_time)/60} minutes.')
@@ -135,8 +134,3 @@ if __name__ == '__main__':
     excluded_models = []
     if make_plots:
         make_metric_plots()
-
-
-
-
-
