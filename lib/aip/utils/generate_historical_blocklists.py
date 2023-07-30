@@ -64,7 +64,17 @@ if __name__ == '__main__':
         blocklist = alpha.run(for_date=day)
         blocklist = blocklist.rename(columns={'ip':'attacker'})
         pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir, f'alpha_{str(day)}.csv.gz'), index=False, compression='gzip')
-    
+        
+    def run_model_alpha7(day):
+        #Alpha 7 Model
+        output_dir = path.join(project_dir, 'data', 'output', 'alpha7_model')
+        if not path.exists(output_dir):
+            makedirs(output_dir)
+        alpha = Alpha(7)
+        blocklist = alpha.run(for_date=day)
+        blocklist = blocklist.rename(columns={'ip':'attacker'})
+        pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir, f'alpha7_{str(day)}.csv.gz'), index=False, compression='gzip')
+
     def run_model_pn(day):
         # Prioritize New Model
         output_dir = path.join(data_path, 'output', 'prioritize_new')
