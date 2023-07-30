@@ -50,7 +50,7 @@ def _get_honeypot_ips(for_date=None):
     '''
     Filter those honeypots active due date for_date, if there are operation dates in the honeypot file.
     '''
-    honeypots = pd.read_csv(path.join(project_dir, 'data', 'external', 'honeypots_public_ips.csv', comment='#'))
+    honeypots = pd.read_csv(path.join(project_dir, 'data', 'external', 'honeypots_public_ips.csv'), comment='#')
     if for_date is not None:
         for_date = pd.to_datetime(for_date)
         if 'operation_start_date' in honeypots.keys():
