@@ -65,7 +65,7 @@ RUN conda env create --file /tmp/environment.yml --force
 RUN conda clean --all --yes
 
 # Include AIP as python package
-# RUN mkdir -p /home/aip/AIP/lib/python3.10/site-packages/
+COPY . $PROJECT_DIR
 RUN ln -s /home/aip/AIP/lib/aip /home/aip/miniconda3/envs/aip/lib/python3.11/site-packages/
 
 RUN echo 'conda activate aip' >> $HOME/.bashrc
