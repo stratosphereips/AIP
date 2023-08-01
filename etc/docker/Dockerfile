@@ -45,13 +45,13 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSI
     ~/miniconda.sh -b -p $CONDA_DIR && \
     rm ~/miniconda.sh
 
-# make non-activate conda commands available
+# Make non-activate conda commands available
 ENV PATH=$CONDA_DIR/bin:$PATH
 
-# make conda activate command available from /bin/bash --login shells
+# Make conda activate command available from /bin/bash --login shells
 RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> ~/.profile
 
-# make conda activate command available from /bin/bash --interative shells
+# Make conda activate command available from /bin/bash --interative shells
 RUN conda init bash
 
 ENV PROJECT_DIR $HOME/AIP
