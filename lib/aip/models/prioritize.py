@@ -59,7 +59,7 @@ def _add_knowledge(last_knowledge, day):
     last_knowledge = pd.concat([last_knowledge, df])
     dates_min = last_knowledge.groupby('orig').first_seen.min()
     dates_max = last_knowledge.groupby('orig').last_seen.max()
-    knowledge = last_knowledge.groupby('orig').sum()
+    knowledge = last_knowledge.groupby('orig').sum(numeric_only=True)
     knowledge.loc[:,'first_seen'] = dates_min
     knowledge.loc[:,'last_seen'] = dates_max
     knowledge.loc[:,'mean_flows'] = knowledge['flows']/knowledge['days_active']
@@ -116,7 +116,7 @@ class Knowledgebase():
         self._load_knowledge_until(day)
     
 
-    def build(self, start=date(2020, 7, 4), end=date.today() - timedelta(days=1), force=False):
+    def build(self, start=date.today() - timedelta(days=2), end=date.today() - timedelta(days=1), force=False):
         if path.exists(self.path) and not force:
             print('Knowledge exists already. Use force=True to rebuild it')
             return
