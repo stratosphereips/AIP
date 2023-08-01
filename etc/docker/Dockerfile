@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM python:3.11-slim
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
