@@ -1,20 +1,7 @@
 name: aip
 
-channels:
-  - conda-forge
-    #- defaults
-
 dependencies:
-  - git
-  - click
-  - pathlib
-  - joblib
-  - python-dotenv
-  - pytest
-  - matplotlib
-  - pandas
+  - python=3.11
   - pip
   - pip:
-    - -r file:/tmp/requirements.txt
-  - python=3.11
-  #- xeus-python
+    - -r requirements.txt
