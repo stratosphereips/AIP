@@ -58,10 +58,11 @@ ENV PROJECT_DIR $HOME/AIP
 RUN mkdir $PROJECT_DIR
 WORKDIR $PROJECT_DIR
 
+COPY environment.yml requirements.txt $PROJECT_DIR/
 
 ENV ENV_PREFIX $HOME/env
 RUN conda update --name base conda
-RUN conda env create --file /tmp/environment.yml --force
+RUN conda env create --file $PROJECT_DIR/environment.yml --force
 RUN conda clean --all --yes
 
 # Include AIP as python package
