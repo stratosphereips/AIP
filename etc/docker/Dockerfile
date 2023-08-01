@@ -10,8 +10,6 @@ LABEL org.opencontainers.image.title="AIP" \
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-LABEL maintainer="Joaquin Bogado <joaquin.bogado@aic.fel.cvut.cz>"
-
 SHELL [ "/bin/bash", "--login", "-c" ]
 
 RUN apt-get update --fix-missing && \
