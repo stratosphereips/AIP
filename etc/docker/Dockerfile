@@ -1,15 +1,16 @@
-FROM ubuntu:focal
+FROM python:3.11-slim
+LABEL org.opencontainers.image.title="AIP" \
+      org.opencontainers.image.description="This image runs the AIP framework for blocklist generation." \
+      org.opencontainers.image.version="0.1.0" \
+      org.opencontainers.image.created="2023-08-01" \
+      org.opencontainers.image.source="https://github.com/stratosphereips/AIP" \
+      org.opencontainers.image.source="Joaquin Bogado <joaquin.bogado@aic.fel.cvut.cz>" \
+      org.opencontainers.image.authors="Veronica Valeros <valerver@fel.cvut.cz>"
+
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-LABEL maintainer="Joaquin Bogado <joaquin.bogado@aic.fel.cvut.cz>"
-
 SHELL [ "/bin/bash", "--login", "-c" ]
-
-RUN apt-get update --fix-missing && \
-    apt-get install -y wget bzip2 curl git vim argus-client&& \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user
 ARG username=aip
@@ -27,12 +28,13 @@ RUN adduser --disabled-password \
     --home $HOME \
     $USER
 
-COPY environment.yml requirements.txt /tmp/
-RUN chown $UID:$GID /tmp/environment.yml /tmp/requirements.txt
+RUN apt-get update && \
+    apt-get install -y bzip2 wget && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY etc/docker/entrypoint.sh /usr/local/bin/
-RUN chown $UID:$GID /usr/local/bin/entrypoint.sh && \
-    chmod u+x /usr/local/bin/entrypoint.sh
+RUN chmod u+x /usr/local/bin/entrypoint.sh
 
 USER $USER
 
@@ -43,30 +45,30 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSI
     ~/miniconda.sh -b -p $CONDA_DIR && \
     rm ~/miniconda.sh
 
-# make non-activate conda commands available
+# Make non-activate conda commands available
 ENV PATH=$CONDA_DIR/bin:$PATH
 
-# make conda activate command available from /bin/bash --login shells
+# Make conda activate command available from /bin/bash --login shells
 RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> ~/.profile
 
-# make conda activate command available from /bin/bash --interative shells
+# Make conda activate command available from /bin/bash --interative shells
 RUN conda init bash
 
 ENV PROJECT_DIR $HOME/AIP
 RUN mkdir $PROJECT_DIR
 WORKDIR $PROJECT_DIR
 
+COPY environment.yml requirements.txt $PROJECT_DIR/
 
 ENV ENV_PREFIX $HOME/env
 RUN conda update --name base conda
-RUN conda env create --file /tmp/environment.yml --force
+RUN conda env create --file $PROJECT_DIR/environment.yml --force
 RUN conda clean --all --yes
 
 # Include AIP as python package
-# RUN mkdir -p /home/aip/AIP/lib/python3.10/site-packages/
+COPY . $PROJECT_DIR
 RUN ln -s /home/aip/AIP/lib/aip /home/aip/miniconda3/envs/aip/lib/python3.11/site-packages/
 
 RUN echo 'conda activate aip' >> $HOME/.bashrc
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
-
