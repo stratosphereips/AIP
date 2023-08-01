@@ -72,4 +72,3 @@ RUN ln -s /home/aip/AIP/lib/aip /home/aip/miniconda3/envs/aip/lib/python3.11/sit
 RUN echo 'conda activate aip' >> $HOME/.bashrc
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
-
