@@ -12,11 +12,6 @@ ENV TZ=Etc/UTC
 
 SHELL [ "/bin/bash", "--login", "-c" ]
 
-RUN apt-get update --fix-missing && \
-    apt-get install -y wget bzip2 curl git vim argus-client&& \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
 # Create a non-root user
 ARG username=aip
 ARG uid=1000
@@ -33,12 +28,13 @@ RUN adduser --disabled-password \
     --home $HOME \
     $USER
 
-COPY environment.yml requirements.txt /tmp/
-RUN chown $UID:$GID /tmp/environment.yml /tmp/requirements.txt
+RUN apt-get update && \
+    apt-get install -y bzip2 wget && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY etc/docker/entrypoint.sh /usr/local/bin/
-RUN chown $UID:$GID /usr/local/bin/entrypoint.sh && \
-    chmod u+x /usr/local/bin/entrypoint.sh
+RUN chmod u+x /usr/local/bin/entrypoint.sh
 
 USER $USER
 
