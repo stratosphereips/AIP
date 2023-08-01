@@ -1,4 +1,12 @@
 FROM python:3.11-slim
+LABEL org.opencontainers.image.title="AIP" \
+      org.opencontainers.image.description="This image runs the AIP framework for blocklist generation." \
+      org.opencontainers.image.version="0.1.0" \
+      org.opencontainers.image.created="2023-08-01" \
+      org.opencontainers.image.source="https://github.com/stratosphereips/AIP" \
+      org.opencontainers.image.source="Joaquin Bogado <joaquin.bogado@aic.fel.cvut.cz>" \
+      org.opencontainers.image.authors="Veronica Valeros <valerver@fel.cvut.cz>"
+
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
