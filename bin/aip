@@ -39,20 +39,30 @@ from aip.models.prioritize import Consistent
 from aip.models.prioritize import RandomForest
 from pathlib import Path
 from os import makedirs, path, scandir
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
+import sys
 
+def validate_and_convert_date(date_str):
+    try:
+        dateobj = datetime.strptime(date_str, '%Y-%m-%d')
+        return dateobj.date()
+    except ValueError as e:
+        print('Invalid date format. It should be YYYY-MM-DD')
+        raise e
 
 #project_dir = Path(__file__).resolve().parents[1]
 
 if __name__ == '__main__':
+    if len(sys.argv) == 2:
+        datestr = sys.argv[1]
+        day = validate_and_convert_date(datestr)
+    else:
+        day = date.today()
+
+
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     #logging.basicConfig(level=logging.INFO, format=log_fmt)
     logging.basicConfig(level=logging.DEBUG, format=log_fmt)
-
-    # not used in this stub but often useful for finding various files
-    
-    # load up the .env entries as environment variables
-    #load_dotenv(find_dotenv())
 
 
     #Alpha Model
@@ -60,44 +70,44 @@ if __name__ == '__main__':
     if not path.exists(output_dir):
         makedirs(output_dir)
     alpha = Alpha()
-    blocklist = alpha.run()
+    blocklist = alpha.run(day)
     blocklist = blocklist.rename(columns={'ip':'attacker'})
     pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir,
-        f'AIP-Alpha-{str(date.today())}.csv.gz'), index=False, compression='gzip')
+        f'AIP-Alpha-{str(day)}.csv.gz'), index=False, compression='gzip')
     
     #Alpha 7 Model (seven days in the past)
     output_dir = path.join(project_dir, 'data', 'output', 'Alpha7')
     if not path.exists(output_dir):
         makedirs(output_dir)
     alpha7 = Alpha(lookback=7)
-    blocklist = alpha7.run()
+    blocklist = alpha7.run(day)
     blocklist = blocklist.rename(columns={'ip':'attacker'})
     pd.DataFrame(blocklist, columns=['attacker']).to_csv(path.join(output_dir,
-        f'AIP-Alpha7-{str(date.today())}.csv.gz'), index=False, compression='gzip')
+        f'AIP-Alpha7-{str(day)}.csv.gz'), index=False, compression='gzip')
 
     # Prioritize New Model
     output_dir = path.join(data_path, 'output', 'Prioritize_New')
     if not path.exists(output_dir):
         makedirs(output_dir)
     pn = New()
-    blocklist = pn.run()
+    blocklist = pn.run(day)
     blocklist.to_csv(path.join(output_dir,
-        f'AIP-Prioritize_New-{str(date.today())}.csv.gz'), index=False, compression='gzip')
+        f'AIP-Prioritize_New-{str(day)}.csv.gz'), index=False, compression='gzip')
 
     # Prioritize Consistent Model
     output_dir = path.join(data_path, 'output', 'Prioritize_Consistent')
     if not path.exists(output_dir):
         makedirs(output_dir)
     pc = Consistent()
-    blocklist = pc.run()
+    blocklist = pc.run(day)
     blocklist.to_csv(path.join(output_dir,
-        f'AIP-Prioritize_Consistent-{str(date.today())}.csv.gz'), index=False, compression='gzip')
+        f'AIP-Prioritize_Consistent-{str(day)}.csv.gz'), index=False, compression='gzip')
     
     # Prioritize Random Forest Model
     output_dir = path.join(data_path, 'output', 'random_forest')
     if not path.exists(output_dir):
         makedirs(output_dir)
     rf = RandomForest()
-    blocklist = rf.run()
+    blocklist = rf.run(day)
     blocklist.to_csv(path.join(output_dir,
-        f'AIP-Random_Forest-{str(date.today())}.csv.gz'), index=False, compression='gzip')
+        f'AIP-Random_Forest-{str(day)}.csv.gz'), index=False, compression='gzip')
