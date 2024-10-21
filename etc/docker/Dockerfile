@@ -40,9 +40,8 @@ RUN python -c "import urllib.request; urllib.request.urlretrieve('https://repo.a
 
 RUN conda init bash
 
-ENV PROJECT_DIR $HOME/AIP
-RUN mkdir $PROJECT_DIR
-WORKDIR $PROJECT_DIR
+# Set the working directory
+WORKDIR $HOME/AIP
 
 COPY environment.yml requirements.txt $PROJECT_DIR/
 
