@@ -50,6 +50,14 @@ def _get_honeypot_ips(for_date=None):
     '''
     Filter those honeypots active due date for_date, if there are operation dates in the honeypot file.
     '''
+    logger = logging.getLogger(__name__)
+    # Check if the file exists before attempting to read it
+    honeypot_public_ips = path.join(project_dir, 'data', 'external', 'honeypots_public_ips.csv')
+
+    if not path.exists(honeypot_public_ips):
+        logger.error(f"File 'honeypot_public_ips.csv' does not exist. Proceeding with an empty array.")
+        return []
+
     honeypots = pd.read_csv(path.join(project_dir, 'data', 'external', 'honeypots_public_ips.csv'), comment='#')
     if for_date is not None:
         for_date = pd.to_datetime(for_date)
