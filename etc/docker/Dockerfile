@@ -29,21 +29,15 @@ COPY etc/docker/entrypoint.sh /usr/local/bin/
 RUN chmod u+x /usr/local/bin/entrypoint.sh
 
 USER $USER
+ENV PATH="$HOME/miniconda3/bin:$PATH"
+ENV ENV_PREFIX=$HOME/env
 
-ENV MINICONDA_VERSION latest
-ENV CONDA_DIR $HOME/miniconda3
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh -O ~/miniconda.sh && \
-    chmod +x ~/miniconda.sh && \
-    ~/miniconda.sh -b -p $CONDA_DIR && \
+
+# Conda installation and setup
+RUN python -c "import urllib.request; urllib.request.urlretrieve('https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh', '$HOME/miniconda.sh')" && \
+    bash ~/miniconda.sh -b -p $HOME/miniconda3 && \
     rm ~/miniconda.sh
 
-# Make non-activate conda commands available
-ENV PATH=$CONDA_DIR/bin:$PATH
-
-# Make conda activate command available from /bin/bash --login shells
-RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> ~/.profile
-
-# Make conda activate command available from /bin/bash --interative shells
 RUN conda init bash
 
 ENV PROJECT_DIR $HOME/AIP
