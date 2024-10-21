@@ -43,12 +43,11 @@ RUN conda init bash
 # Set the working directory
 WORKDIR $HOME/AIP
 
-COPY environment.yml requirements.txt $PROJECT_DIR/
+COPY environment.yml requirements.txt .
 
-ENV ENV_PREFIX $HOME/env
 RUN conda update --name base conda
-RUN conda env create --file $PROJECT_DIR/environment.yml --force
-RUN conda clean --all --yes
+RUN conda env create --file environment.yml && \
+    conda clean --all --yes
 
 # Include AIP as python package
 COPY . $PROJECT_DIR
