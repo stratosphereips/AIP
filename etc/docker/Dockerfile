@@ -21,17 +21,9 @@ ENV UID=$uid
 ENV GID=$gid
 ENV HOME=/home/$USER
 
-RUN adduser --disabled-password \
-    --gecos "Non-root user" \
-    --uid $UID \
-    --gid $GID \
-    --home $HOME \
-    $USER
-
-RUN apt-get update && \
-    apt-get install -y bzip2 wget && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Create a group and user based on the UID and GID
+RUN groupadd -g $GID $USER && \
+    useradd -m -u $UID -g $GID -s /bin/bash $USER
 
 COPY etc/docker/entrypoint.sh /usr/local/bin/
 RUN chmod u+x /usr/local/bin/entrypoint.sh
