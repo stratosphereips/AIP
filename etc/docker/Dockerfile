@@ -7,8 +7,6 @@ LABEL org.opencontainers.image.title="AIP" \
       org.opencontainers.image.source="Joaquin Bogado <joaquin.bogado@aic.fel.cvut.cz>" \
       org.opencontainers.image.authors="Veronica Valeros <valerver@fel.cvut.cz>"
 
-ARG DEBIAN_FRONTEND=noninteractive
-ENV TZ=Etc/UTC
 
 # Define arguments for username, UID, and GID
 ARG username=aip
@@ -28,6 +26,7 @@ RUN groupadd -g $GID $USER && \
 COPY etc/docker/entrypoint.sh /usr/local/bin/
 RUN chmod u+x /usr/local/bin/entrypoint.sh
 
+# Switch to the non-root user
 USER $USER
 ENV PATH="$HOME/miniconda3/bin:$PATH"
 ENV ENV_PREFIX=$HOME/env
@@ -49,9 +48,11 @@ RUN conda update --name base conda
 RUN conda env create --file environment.yml && \
     conda clean --all --yes
 
-# Include AIP as python package
-COPY . $PROJECT_DIR
-RUN ln -s /home/aip/AIP/lib/aip /home/aip/miniconda3/envs/aip/lib/python3.11/site-packages/
+# Copy application 
+COPY . .
+
+# Dynamically link aip to the correct site-packages folder
+RUN ln -s $HOME/AIP/lib/aip $(conda run -n aip python -c "import site; print(site.getsitepackages()[0])")/aip
 
 RUN echo 'conda activate aip' >> $HOME/.bashrc
 
