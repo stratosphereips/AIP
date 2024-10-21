@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 LABEL org.opencontainers.image.title="AIP" \
       org.opencontainers.image.description="This image runs the AIP framework for blocklist generation." \
       org.opencontainers.image.version="0.1.0" \
@@ -7,67 +7,52 @@ LABEL org.opencontainers.image.title="AIP" \
       org.opencontainers.image.source="Joaquin Bogado <joaquin.bogado@aic.fel.cvut.cz>" \
       org.opencontainers.image.authors="Veronica Valeros <valerver@fel.cvut.cz>"
 
-ARG DEBIAN_FRONTEND=noninteractive
-ENV TZ=Etc/UTC
 
-SHELL [ "/bin/bash", "--login", "-c" ]
-
-# Create a non-root user
+# Define arguments for username, UID, and GID
 ARG username=aip
 ARG uid=1000
-ARG gid=100
-ENV USER $username
-ENV UID $uid
-ENV GID $gid
-ENV HOME /home/$USER
+ARG gid=1000
 
-RUN adduser --disabled-password \
-    --gecos "Non-root user" \
-    --uid $UID \
-    --gid $GID \
-    --home $HOME \
-    $USER
+# Set environment variables based on these arguments
+ENV USER=$username
+ENV UID=$uid
+ENV GID=$gid
+ENV HOME=/home/$USER
 
-RUN apt-get update && \
-    apt-get install -y bzip2 wget && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# Create a group and user based on the UID and GID
+RUN groupadd -g $GID $USER && \
+    useradd -m -u $UID -g $GID -s /bin/bash $USER
 
 COPY etc/docker/entrypoint.sh /usr/local/bin/
 RUN chmod u+x /usr/local/bin/entrypoint.sh
 
+# Switch to the non-root user
 USER $USER
+ENV PATH="$HOME/miniconda3/bin:$PATH"
+ENV ENV_PREFIX=$HOME/env
 
-ENV MINICONDA_VERSION latest
-ENV CONDA_DIR $HOME/miniconda3
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh -O ~/miniconda.sh && \
-    chmod +x ~/miniconda.sh && \
-    ~/miniconda.sh -b -p $CONDA_DIR && \
+
+# Conda installation and setup
+RUN python -c "import urllib.request; urllib.request.urlretrieve('https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh', '$HOME/miniconda.sh')" && \
+    bash ~/miniconda.sh -b -p $HOME/miniconda3 && \
     rm ~/miniconda.sh
 
-# Make non-activate conda commands available
-ENV PATH=$CONDA_DIR/bin:$PATH
-
-# Make conda activate command available from /bin/bash --login shells
-RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> ~/.profile
-
-# Make conda activate command available from /bin/bash --interative shells
 RUN conda init bash
 
-ENV PROJECT_DIR $HOME/AIP
-RUN mkdir $PROJECT_DIR
-WORKDIR $PROJECT_DIR
+# Set the working directory
+WORKDIR $HOME/AIP
 
-COPY environment.yml requirements.txt $PROJECT_DIR/
+COPY environment.yml requirements.txt $HOME/AIP/
 
-ENV ENV_PREFIX $HOME/env
 RUN conda update --name base conda
-RUN conda env create --file $PROJECT_DIR/environment.yml --force
-RUN conda clean --all --yes
+RUN conda env create --file environment.yml && \
+    conda clean --all --yes
 
-# Include AIP as python package
-COPY . $PROJECT_DIR
-RUN ln -s /home/aip/AIP/lib/aip /home/aip/miniconda3/envs/aip/lib/python3.11/site-packages/
+# Copy application 
+COPY . .
+
+# Dynamically link aip to the correct site-packages folder
+RUN ln -s $HOME/AIP/lib/aip $(conda run -n aip python -c "import site; print(site.getsitepackages()[0])")/aip
 
 RUN echo 'conda activate aip' >> $HOME/.bashrc
 
