@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.12-slim
 LABEL org.opencontainers.image.title="AIP" \
       org.opencontainers.image.description="This image runs the AIP framework for blocklist generation." \
       org.opencontainers.image.version="0.1.0" \
