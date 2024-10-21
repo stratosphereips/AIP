@@ -42,7 +42,7 @@ RUN conda init bash
 # Set the working directory
 WORKDIR $HOME/AIP
 
-COPY environment.yml requirements.txt .
+COPY environment.yml requirements.txt $HOME/AIP/
 
 RUN conda update --name base conda
 RUN conda env create --file environment.yml && \
