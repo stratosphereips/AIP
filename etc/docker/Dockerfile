@@ -10,16 +10,16 @@ LABEL org.opencontainers.image.title="AIP" \
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-SHELL [ "/bin/bash", "--login", "-c" ]
-
-# Create a non-root user
+# Define arguments for username, UID, and GID
 ARG username=aip
 ARG uid=1000
-ARG gid=100
-ENV USER $username
-ENV UID $uid
-ENV GID $gid
-ENV HOME /home/$USER
+ARG gid=1000
+
+# Set environment variables based on these arguments
+ENV USER=$username
+ENV UID=$uid
+ENV GID=$gid
+ENV HOME=/home/$USER
 
 RUN adduser --disabled-password \
     --gecos "Non-root user" \
