@@ -37,12 +37,15 @@ from aip.models.alpha import Alpha
 from aip.models.prioritize import New
 from aip.models.prioritize import Consistent
 from aip.models.prioritize import RandomForest
-from pathlib import Path
 from os import makedirs, path, scandir
 from datetime import date, timedelta, datetime
 import sys
 
+
 def validate_and_convert_date(date_str):
+    """
+    Validates a date string in 'YYYY-MM-DD' format and converts it to a date object.
+    """
     try:
         dateobj = datetime.strptime(date_str, '%Y-%m-%d')
         return dateobj.date()
@@ -50,7 +53,6 @@ def validate_and_convert_date(date_str):
         print('Invalid date format. It should be YYYY-MM-DD')
         raise e
 
-#project_dir = Path(__file__).resolve().parents[1]
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
@@ -59,11 +61,9 @@ if __name__ == '__main__':
     else:
         day = date.today()
 
-
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     #logging.basicConfig(level=logging.INFO, format=log_fmt)
     logging.basicConfig(level=logging.DEBUG, format=log_fmt)
-
 
     #Alpha Model
     output_dir = path.join(project_dir, 'data', 'output', 'Alpha')
