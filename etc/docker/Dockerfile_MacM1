@@ -1,72 +1,59 @@
-FROM ubuntu:focal
-ARG DEBIAN_FRONTEND=noninteractive
-ENV TZ=Etc/UTC
+FROM python:3.12-slim
+LABEL org.opencontainers.image.title="AIP" \
+      org.opencontainers.image.description="This image runs the AIP framework for blocklist generation." \
+      org.opencontainers.image.version="0.1.0" \
+      org.opencontainers.image.created="2023-08-01" \
+      org.opencontainers.image.source="https://github.com/stratosphereips/AIP" \
+      org.opencontainers.image.source="Joaquin Bogado <joaquin.bogado@aic.fel.cvut.cz>" \
+      org.opencontainers.image.authors="Veronica Valeros <valerver@fel.cvut.cz>"
 
-LABEL maintainer="Joaquin Bogado <joaquin.bogado@aic.fel.cvut.cz>"
 
-SHELL [ "/bin/bash", "--login", "-c" ]
-
-RUN apt-get update --fix-missing && \
-    apt-get install -y wget bzip2 curl git vim argus-client&& \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Create a non-root user
+# Define arguments for username, UID, and GID
 ARG username=aip
 ARG uid=1000
-ARG gid=100
-ENV USER $username
-ENV UID $uid
-ENV GID $gid
-ENV HOME /home/$USER
+ARG gid=1000
 
-RUN adduser --disabled-password \
-    --gecos "Non-root user" \
-    --uid $UID \
-    --gid $GID \
-    --home $HOME \
-    $USER
+# Set environment variables based on these arguments
+ENV USER=$username
+ENV UID=$uid
+ENV GID=$gid
+ENV HOME=/home/$USER
 
-COPY environment.yml requirements.txt /tmp/
-RUN chown $UID:$GID /tmp/environment.yml /tmp/requirements.txt
+# Create a group and user based on the UID and GID
+RUN groupadd -g $GID $USER && \
+    useradd -m -u $UID -g $GID -s /bin/bash $USER
 
 COPY etc/docker/entrypoint.sh /usr/local/bin/
-RUN chown $UID:$GID /usr/local/bin/entrypoint.sh && \
-    chmod u+x /usr/local/bin/entrypoint.sh
+RUN chmod u+x /usr/local/bin/entrypoint.sh
 
+# Switch to the non-root user
 USER $USER
+ENV PATH="$HOME/miniconda3/bin:$PATH"
+ENV ENV_PREFIX=$HOME/env
 
-ENV MINICONDA_VERSION latest
-ENV CONDA_DIR $HOME/miniconda3
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh -O ~/miniconda.sh && \
-    chmod +x ~/miniconda.sh && \
-    ~/miniconda.sh -b -p $CONDA_DIR && \
+
+# Conda installation and setup
+RUN python -c "import urllib.request; urllib.request.urlretrieve('https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-aarch64.sh', '$HOME/miniconda.sh')" && \
+    bash ~/miniconda.sh -b -p $HOME/miniconda3 && \
     rm ~/miniconda.sh
 
-# make non-activate conda commands available
-ENV PATH=$CONDA_DIR/bin:$PATH
-
-# make conda activate command available from /bin/bash --login shells
-RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> ~/.profile
-
-# make conda activate command available from /bin/bash --interative shells
 RUN conda init bash
 
-ENV PROJECT_DIR $HOME/AIP
-RUN mkdir $PROJECT_DIR
-WORKDIR $PROJECT_DIR
+# Set the working directory
+WORKDIR $HOME/AIP
 
+COPY environment.yml requirements.txt $HOME/AIP/
 
-ENV ENV_PREFIX $HOME/env
 RUN conda update --name base conda
-RUN conda env create --file /tmp/environment.yml --force
-RUN conda clean --all --yes
+RUN conda env create --file environment.yml && \
+    conda clean --all --yes
 
-# Include AIP as python package
-# RUN mkdir -p /home/aip/AIP/lib/python3.10/site-packages/
-RUN ln -s /home/aip/AIP/lib/aip /home/aip/miniconda3/envs/aip/lib/python3.10/site-packages/
+# Copy application 
+COPY . .
+
+# Dynamically link aip to the correct site-packages folder
+RUN ln -s $HOME/AIP/lib/aip $(conda run -n aip python -c "import site; print(site.getsitepackages()[0])")/aip
 
 RUN echo 'conda activate aip' >> $HOME/.bashrc
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
-
