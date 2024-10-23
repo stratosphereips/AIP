@@ -53,6 +53,22 @@ def validate_and_convert_date(date_str):
         print('Invalid date format. It should be YYYY-MM-DD')
         raise e
 
+def run_model(aip_model_name, aip_output_dir, aip_model, date_day):
+    """
+    Run a given model with exception handling
+    """
+    blocklist=""
+    # Make sure output directory is created
+    if not path.exists(aip_output_dir):
+        makedirs(aip_output_dir)
+
+    try:
+        blocklist = aip_model.run(day)
+        blocklist.to_csv(path.join(aip_output_dir, f'AIP-{aip_model_name}-{str(date_day)}.csv.gz'), index=False, compression='gzip')
+        logging.info(f"{aip_model_name} model completed successfully.")
+    except Exception as e:
+        logging.error(f"Error running {aip_model_name} model: {e}", exc_info=True)
+
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
