@@ -55,8 +55,8 @@ def _get_honeypot_ips(for_date=None):
     honeypot_public_ips = path.join(project_dir, 'data', 'external', 'honeypots_public_ips.csv')
 
     if not path.exists(honeypot_public_ips):
-        logger.error(f"File 'honeypot_public_ips.csv' does not exist. Proceeding with an empty array.")
-        return []
+        logger.error(f"File 'honeypot_public_ips.csv' does not exist. Raising error.")
+        raise FileNotFoundError("Required file 'honeypots_public_ips.csv' does not exist.")
 
     honeypots = pd.read_csv(path.join(project_dir, 'data', 'external', 'honeypots_public_ips.csv'), comment='#')
     if for_date is not None:
