@@ -9,4 +9,9 @@ Given a honeypot network in your organization, it should be easy to use AIP to g
 
 ![Description of the AIP pipeline](images/AIP_Diagram.png "AIP Tool pipeline")
 
+## Docker
 
+Check the instructions on how to run the AIP using [Docker](etc/docker/README.md).
+
+# About
+This tool was developed at the Stratosphere Laboratory at the Czech Technical University in Prague.
