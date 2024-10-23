@@ -2,7 +2,7 @@
 .env
 *__pycache__*
 src/data/__pycache__/
-edna-run.sh
-automatic_run.sh
+*-run.sh
 venv/
+*.venv/
 *.swp
