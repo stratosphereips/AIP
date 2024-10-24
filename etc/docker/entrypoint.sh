@@ -6,11 +6,10 @@ set -e
 # Force the command prompt to display colors
 export force_color_prompt=yes
 
-# Initialize Conda in the current shell session
-source $HOME/miniconda3/etc/profile.d/conda.sh
+# Activate the virtual environment
+source "$HOME/AIP/venv/bin/activate"
 
-# Activate the conda environment already created in the docker
-conda activate aip
 
 # Execute any command passed to the container when run
-exec "$@"
+PYTHONPATH="$HOME/AIP/lib:$PYTHONPATH" python "$@"
+
