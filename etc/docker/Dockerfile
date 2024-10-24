@@ -1,59 +1,68 @@
-FROM python:3.12-slim
-LABEL org.opencontainers.image.title="AIP" \
-      org.opencontainers.image.description="This image runs the AIP framework for blocklist generation." \
-      org.opencontainers.image.version="0.1.0" \
-      org.opencontainers.image.created="2023-08-01" \
-      org.opencontainers.image.source="https://github.com/stratosphereips/AIP" \
-      org.opencontainers.image.source="Joaquin Bogado <joaquin.bogado@aic.fel.cvut.cz>" \
-      org.opencontainers.image.authors="Veronica Valeros <valerver@fel.cvut.cz>"
+FROM python:3.12-slim AS builder
 
-
-# Define arguments for username, UID, and GID
+# Create a non-root user
 ARG username=aip
 ARG uid=1000
 ARG gid=1000
 
-# Set environment variables based on these arguments
 ENV USER=$username
 ENV UID=$uid
 ENV GID=$gid
 ENV HOME=/home/$USER
 
-# Create a group and user based on the UID and GID
+RUN apt-get update && \
+    apt-get install -y python3-venv && \
+    rm -rf /var/lib/apt/lists/*
+
 RUN groupadd -g $GID $USER && \
     useradd -m -u $UID -g $GID -s /bin/bash $USER
 
+# Switch to the non-root user
+USER $USER
+
+WORKDIR $HOME/AIP
+
+COPY requirements.txt .
+
+RUN python -m venv venv && \
+    ./venv/bin/pip install --no-cache-dir -r requirements.txt
+
+# Remove unnecessary files
+RUN find venv/ -type d -name '__pycache__' -exec rm -rf {} +
+RUN find venv/ -type d -name 'tests' -exec rm -rf {} + && \
+    find venv/ -type d -name '*.dist-info' -exec rm -rf {} +
+
+# Stage 2: Final stage
+FROM python:3.12-slim
+
+# Create a non-root user
+ARG username=aip
+ARG uid=1000
+ARG gid=1000
+
+ENV USER=$username
+ENV UID=$uid
+ENV GID=$gid
+ENV HOME=/home/$USER
+
+RUN groupadd -g $GID $USER && \
+    useradd -m -u $UID -g $GID -s /bin/bash $USER
+
+# Copy the entrypoint script
 COPY etc/docker/entrypoint.sh /usr/local/bin/
 RUN chmod u+x /usr/local/bin/entrypoint.sh
 
 # Switch to the non-root user
 USER $USER
-ENV PATH="$HOME/miniconda3/bin:$PATH"
-ENV ENV_PREFIX=$HOME/env
 
-
-# Conda installation and setup
-RUN python -c "import urllib.request; urllib.request.urlretrieve('https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh', '$HOME/miniconda.sh')" && \
-    bash ~/miniconda.sh -b -p $HOME/miniconda3 && \
-    rm ~/miniconda.sh
-
-RUN conda init bash
-
-# Set the working directory
 WORKDIR $HOME/AIP
 
-COPY environment.yml requirements.txt $HOME/AIP/
+# Copy venv from the builder stage
+COPY --from=builder $HOME/AIP/venv $HOME/AIP/venv
 
-RUN conda update --name base conda
-RUN conda env create --file environment.yml && \
-    conda clean --all --yes
+# Copy aip files 
+COPY --chown=$USER:$USER . .
 
-# Copy application 
-COPY . .
-
-# Dynamically link aip to the correct site-packages folder
-RUN ln -s $HOME/AIP/lib/aip $(conda run -n aip python -c "import site; print(site.getsitepackages()[0])")/aip
-
-RUN echo 'conda activate aip' >> $HOME/.bashrc
+ENV PATH="$HOME/AIP/venv/bin:$PATH"
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]
