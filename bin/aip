@@ -29,17 +29,21 @@ __license__ = "GPLv3"
 __maintainer__ = "Joaquin Bogado"
 __version__ = "1.0.0"
 
+import argparse
 import logging
-import pandas as pd
-
-from aip.data.access import data_path, project_dir
+import sys
+from datetime import date
+from datetime import datetime
+from datetime import timedelta
+from os import makedirs
+from os import path
+from os import scandir
+from aip.data.access import data_path
+from aip.data.access import project_dir
 from aip.models.alpha import Alpha
 from aip.models.prioritize import New
 from aip.models.prioritize import Consistent
 from aip.models.prioritize import RandomForest
-from os import makedirs, path, scandir
-from datetime import date, timedelta, datetime
-import sys
 
 
 def validate_and_convert_date(date_str):
@@ -52,6 +56,7 @@ def validate_and_convert_date(date_str):
     except ValueError as e:
         print('Invalid date format. It should be YYYY-MM-DD')
         raise e
+
 
 def run_model(aip_model_name, aip_output_dir, aip_model, date_day):
     """
