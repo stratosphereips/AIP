@@ -1,10 +1,6 @@
 netaddr==0.8.0
-maxminddb==2.2.0
 zeeklog2pandas
-ipython
 scikit-learn
-pathlib
 joblib
 python-dotenv
-matplotlib
 pandas
