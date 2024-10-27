@@ -75,12 +75,13 @@ def run_model(aip_model_name, aip_output_dir, aip_model, date_day):
         logging.error(f"Error running {aip_model_name} model: {e}", exc_info=True)
 
 
-if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        datestr = sys.argv[1]
-        day = validate_and_convert_date(datestr)
-    else:
-        day = date.today()
+def main():
+    parser = argparse.ArgumentParser(description='Attacker IP Prioritization (AIP) Tool')
+    parser.add_argument('--date', type=str, help='The date for running the models in YYYY-MM-DD format. Defaults to today.', default=str(date.today()))
+    parser.add_argument('--model', type=str, choices=['Alpha', 'Alpha7', 'Prioritize_New', 'Prioritize_Consistent', 'Random_Forest', 'all'], default='all',
+                        help='Select AIP model to run. Defaults to all.')
+
+    args = parser.parse_args()
 
     # Set up logging
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
