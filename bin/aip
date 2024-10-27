@@ -87,17 +87,28 @@ def main():
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.DEBUG, format=log_fmt)
 
+    # Validate input date
+    run_date_day = validate_and_convert_date(args.date)
+
     # Run Alpha Model
-    run_model('Alpha', path.join(data_path, 'output', 'Alpha'), Alpha(), day)
+    if args.model in ['Alpha', 'all']:
+        run_model('Alpha', path.join(data_path, 'output', 'Alpha'), Alpha(), run_date_day)
 
     # Alpha 7 Model
-    run_model('Alpha7', path.join(data_path, 'output', 'Alpha7'), Alpha(lookback=7), day)
+    if args.model in ['Alpha7', 'all']:
+        run_model('Alpha7', path.join(data_path, 'output', 'Alpha7'), Alpha(lookback=7), run_date_day)
 
     # Prioritize New Model
-    run_model('Prioritize_New', path.join(data_path, 'output', 'Prioritize_New'), New(), day)
+    if args.model in ['Prioritize_New', 'all']:
+        run_model('Prioritize_New', path.join(data_path, 'output', 'Prioritize_New'), New(), run_date_day)
 
     # Prioritize Consistent Model
-    run_model('Prioritize_Consistent', path.join(data_path, 'output', 'Prioritize_Consistent'), Consistent(), day)
+    if args.model in ['Prioritize_Consistent', 'all']:
+        run_model('Prioritize_Consistent', path.join(data_path, 'output', 'Prioritize_Consistent'), Consistent(), run_date_day)
 
     # Prioritize Random Forest Model
-    run_model('Random_Forest', path.join(data_path, 'output', 'random_forest'), RandomForest(), day)
+    if args.model in ['Random_Forest', 'all']:
+        run_model('Random_Forest', path.join(data_path, 'output', 'random_forest'), RandomForest(), run_date_day)
+
+if __name__ == '__main__':
+    main()
