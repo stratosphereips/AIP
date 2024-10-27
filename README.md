@@ -51,3 +51,5 @@ The Stratosphere AIP tool is licensed under [GNU General Public License v3.0](ht
 
 ## About
 This tool was developed at the Stratosphere Laboratory at the Czech Technical University in Prague. This is part of the [Stratosphere blocklist generation project](https://mcfp.felk.cvut.cz/publicDatasets/CTU-AIPP-BlackList/).
+
+This tool was originally born from the bachelor thesis of Thomas O'Hara, [The Attacker IP Prioritizer: An IoT Optimized Blacklisting Algorithm (2021)](https://dspace.cvut.cz/handle/10467/96722).
