@@ -68,7 +68,7 @@ def run_model(aip_model_name, aip_output_dir, aip_model, date_day):
         makedirs(aip_output_dir)
 
     try:
-        blocklist = aip_model.run(day)
+        blocklist = aip_model.run(date_day)
         blocklist.to_csv(path.join(aip_output_dir, f'AIP-{aip_model_name}-{str(date_day)}.csv.gz'), index=False, compression='gzip')
         logging.info(f"{aip_model_name} model completed successfully.")
     except Exception as e:
