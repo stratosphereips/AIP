@@ -63,14 +63,15 @@ def run_model(aip_model_name, aip_model, date_day):
 def main():
     parser = argparse.ArgumentParser(description='Attacker IP Prioritization (AIP) Tool')
     parser.add_argument('--date', type=str, help='The date for running the models in YYYY-MM-DD format. Defaults to today.', default=str(date.today()))
-    parser.add_argument('--model', type=str, choices=['Alpha', 'Alpha7', 'Prioritize_New', 'Prioritize_Consistent', 'Random_Forest', 'all'], default='all',
-                        help='Select AIP model to run. Defaults to all.')
+    parser.add_argument('--model', type=str, choices=['Alpha', 'Alpha7', 'Prioritize_New', 'Prioritize_Consistent', 'Random_Forest', 'all'], default='all', help='Select AIP model to run. Defaults to all.')
+    parser.add_argument('-d', '--debug', required=False, help="Debugging mode.", action="store_const", dest="log_level", const=logging.DEBUG, default=logging.ERROR,)
+    parser.add_argument('-v', '--verbose', required=False, help="Verbose mode", action="store_const", dest="log_level", const=logging.INFO,)
 
     args = parser.parse_args()
 
     # Set up logging
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.DEBUG, format=log_fmt)
+    logging.basicConfig(level=args.log_level, format=log_fmt)
 
     # Validate input date
     run_date_day = validate_and_convert_date(args.date)
