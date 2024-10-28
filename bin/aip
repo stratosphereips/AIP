@@ -42,18 +42,19 @@ from aip.models.prioritize import RandomForest
 from aip.utils.date_utils import validate_and_convert_date
 
 
-def run_model(aip_model_name, aip_output_dir, aip_model, date_day):
+def run_model(aip_model_name, aip_model, date_day):
     """
     Run a given model with exception handling
     """
     blocklist=""
+    model_output_dir = path.join(data_path,'output',aip_model_name)
     # Make sure output directory is created
-    if not path.exists(aip_output_dir):
-        makedirs(aip_output_dir)
+    if not path.exists(model_output_dir):
+        makedirs(model_output_dir)
 
     try:
         blocklist = aip_model.run(date_day)
-        blocklist.to_csv(path.join(aip_output_dir, f'AIP-{aip_model_name}-{str(date_day)}.csv.gz'), index=False, compression='gzip')
+        blocklist.to_csv(path.join(model_output_dir, f'AIP-{aip_model_name}-{str(date_day)}.csv.gz'), index=False, compression='gzip')
         logging.info(f"{aip_model_name} model completed successfully.")
     except Exception as e:
         logging.error(f"Error running {aip_model_name} model: {e}", exc_info=True)
@@ -76,23 +77,23 @@ def main():
 
     # Run Alpha Model
     if args.model in ['Alpha', 'all']:
-        run_model('Alpha', path.join(data_path, 'output', 'Alpha'), Alpha(), run_date_day)
+        run_model('Alpha', Alpha(), run_date_day)
 
     # Alpha 7 Model
     if args.model in ['Alpha7', 'all']:
-        run_model('Alpha7', path.join(data_path, 'output', 'Alpha7'), Alpha(lookback=7), run_date_day)
+        run_model('Alpha7', Alpha(lookback=7), run_date_day)
 
     # Prioritize New Model
     if args.model in ['Prioritize_New', 'all']:
-        run_model('Prioritize_New', path.join(data_path, 'output', 'Prioritize_New'), New(), run_date_day)
+        run_model('Prioritize_New', New(), run_date_day)
 
     # Prioritize Consistent Model
     if args.model in ['Prioritize_Consistent', 'all']:
-        run_model('Prioritize_Consistent', path.join(data_path, 'output', 'Prioritize_Consistent'), Consistent(), run_date_day)
+        run_model('Prioritize_Consistent', Consistent(), run_date_day)
 
     # Prioritize Random Forest Model
     if args.model in ['Random_Forest', 'all']:
-        run_model('Random_Forest', path.join(data_path, 'output', 'random_forest'), RandomForest(), run_date_day)
+        run_model('Random_Forest', RandomForest(), run_date_day)
 
 if __name__ == '__main__':
     main()
