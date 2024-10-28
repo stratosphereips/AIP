@@ -31,31 +31,15 @@ __version__ = "1.0.0"
 
 import argparse
 import logging
-import sys
 from datetime import date
-from datetime import datetime
-from datetime import timedelta
 from os import makedirs
 from os import path
-from os import scandir
 from aip.data.access import data_path
-from aip.data.access import project_dir
 from aip.models.alpha import Alpha
 from aip.models.prioritize import New
 from aip.models.prioritize import Consistent
 from aip.models.prioritize import RandomForest
-
-
-def validate_and_convert_date(date_str):
-    """
-    Validates a date string in 'YYYY-MM-DD' format and converts it to a date object.
-    """
-    try:
-        dateobj = datetime.strptime(date_str, '%Y-%m-%d')
-        return dateobj.date()
-    except ValueError as e:
-        print('Invalid date format. It should be YYYY-MM-DD')
-        raise e
+from aip.utils.date_utils import validate_and_convert_date
 
 
 def run_model(aip_model_name, aip_output_dir, aip_model, date_day):
