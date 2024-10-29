@@ -20,6 +20,10 @@ to follow when contributing:
 - refactor-<>:      pull request branch, contains code refactoring,
 
 
+## Tests
+
+Our project uses `unittest` for testing. To ensure code quality and maintainability, please run all tests before opening a pull request.
+
 ## Creating a pull request
 
 Commits:
