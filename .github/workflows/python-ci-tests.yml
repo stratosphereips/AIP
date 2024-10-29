@@ -2,9 +2,7 @@ name: Python CI Tests
 
 on:
   pull_request:
-    branches:
-      - main
-      - development
+    branches: [main, development]
 
 jobs:
   test:
