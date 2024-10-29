@@ -1,8 +1,8 @@
 .idea/
 .env
-*__pycache__*
-src/data/__pycache__/
+__pycache__/
 *-run.sh
 venv/
 *.venv/
 *.swp
+
