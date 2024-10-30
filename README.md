@@ -1,4 +1,16 @@
 # Attacker IP Prioritization (AIP) Tool
+[![Python CI Tests](https://github.com/stratosphereips/AIP/actions/workflows/python-ci-tests.yml/badge.svg?branch=development)](https://github.com/stratosphereips/AIP/actions/workflows/python-ci-tests.yml)
+[![CodeQL](https://github.com/stratosphereips/AIP/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/stratosphereips/AIP/actions/workflows/github-code-scanning/codeql)
+[![Docker Hub CI](https://github.com/stratosphereips/AIP/actions/workflows/docker-hub.yml/badge.svg?branch=main)](https://github.com/stratosphereips/AIP/actions/workflows/docker-hub.yml)
+[![Docker GHCR CI](https://github.com/stratosphereips/AIP/actions/workflows/docker-publish.yml/badge.svg?branch=main)](https://github.com/stratosphereips/AIP/actions/workflows/docker-publish.yml)
+
+[![Docker Pulls](https://img.shields.io/docker/pulls/stratosphereips/aip?color=green)](https://hub.docker.com/r/stratosphereips/aip)
+[![GitHub issues](https://img.shields.io/github/issues/stratosphereips/AIP.svg?color=green)](https://github.com/stratosphereips/AIP/issues/)
+[![GitHub issues-closed](https://img.shields.io/github/issues-closed/stratosphereips/AIP.svg?color=green)](https://github.com/stratosphereips/AIP/issues?q=is%3Aissue+is%3Aclosed)
+[![GitHub open-pull-requests](https://img.shields.io/github/issues-pr-raw/stratosphereips/AIP?color=green&label=open%20PRs)](https://github.com/stratosphereips/AIP/pulls?q=is%3Aopen)
+[![GitHub pull-requests closed](https://img.shields.io/github/issues-pr-closed-raw/stratosphereips/AIP?color=green&label=closed%20PRs)](https://github.com/stratosphereips/AIP/pulls?q=is%3Aclosed)
+
+
 The Attacker IP Prioritization (AIP) is a tool to generate efficient and economic IP blocklists based on network traffic captured from honeypot networks. 
 
 With the advent of 5G, IoT devices are directly connected often without firewall protection. Therefore we need blocklists that are small, efficient and economic. The AIP structure is shown below.
