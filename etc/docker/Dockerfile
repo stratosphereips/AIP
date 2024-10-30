@@ -1,74 +1,68 @@
-FROM python:3.11-slim
-LABEL org.opencontainers.image.title="AIP" \
-      org.opencontainers.image.description="This image runs the AIP framework for blocklist generation." \
-      org.opencontainers.image.version="0.1.0" \
-      org.opencontainers.image.created="2023-08-01" \
-      org.opencontainers.image.source="https://github.com/stratosphereips/AIP" \
-      org.opencontainers.image.source="Joaquin Bogado <joaquin.bogado@aic.fel.cvut.cz>" \
-      org.opencontainers.image.authors="Veronica Valeros <valerver@fel.cvut.cz>"
-
-ARG DEBIAN_FRONTEND=noninteractive
-ENV TZ=Etc/UTC
-
-SHELL [ "/bin/bash", "--login", "-c" ]
+FROM python:3.12-slim AS builder
 
 # Create a non-root user
 ARG username=aip
 ARG uid=1000
-ARG gid=100
-ENV USER $username
-ENV UID $uid
-ENV GID $gid
-ENV HOME /home/$USER
+ARG gid=1000
 
-RUN adduser --disabled-password \
-    --gecos "Non-root user" \
-    --uid $UID \
-    --gid $GID \
-    --home $HOME \
-    $USER
+ENV USER=$username
+ENV UID=$uid
+ENV GID=$gid
+ENV HOME=/home/$USER
 
 RUN apt-get update && \
-    apt-get install -y bzip2 wget && \
-    apt-get clean && \
+    apt-get install -y python3-venv && \
     rm -rf /var/lib/apt/lists/*
 
+RUN groupadd -g $GID $USER && \
+    useradd -m -u $UID -g $GID -s /bin/bash $USER
+
+# Switch to the non-root user
+USER $USER
+
+WORKDIR $HOME/AIP
+
+COPY requirements.txt .
+
+RUN python -m venv venv && \
+    ./venv/bin/pip install --no-cache-dir -r requirements.txt
+
+# Remove unnecessary files
+RUN find venv/ -type d -name '__pycache__' -exec rm -rf {} +
+RUN find venv/ -type d -name 'tests' -exec rm -rf {} + && \
+    find venv/ -type d -name '*.dist-info' -exec rm -rf {} +
+
+# Stage 2: Final stage
+FROM python:3.12-slim
+
+# Create a non-root user
+ARG username=aip
+ARG uid=1000
+ARG gid=1000
+
+ENV USER=$username
+ENV UID=$uid
+ENV GID=$gid
+ENV HOME=/home/$USER
+
+RUN groupadd -g $GID $USER && \
+    useradd -m -u $UID -g $GID -s /bin/bash $USER
+
+# Copy the entrypoint script
 COPY etc/docker/entrypoint.sh /usr/local/bin/
 RUN chmod u+x /usr/local/bin/entrypoint.sh
 
+# Switch to the non-root user
 USER $USER
 
-ENV MINICONDA_VERSION latest
-ENV CONDA_DIR $HOME/miniconda3
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-$MINICONDA_VERSION-Linux-x86_64.sh -O ~/miniconda.sh && \
-    chmod +x ~/miniconda.sh && \
-    ~/miniconda.sh -b -p $CONDA_DIR && \
-    rm ~/miniconda.sh
+WORKDIR $HOME/AIP
 
-# Make non-activate conda commands available
-ENV PATH=$CONDA_DIR/bin:$PATH
+# Copy venv from the builder stage
+COPY --from=builder $HOME/AIP/venv $HOME/AIP/venv
 
-# Make conda activate command available from /bin/bash --login shells
-RUN echo ". $CONDA_DIR/etc/profile.d/conda.sh" >> ~/.profile
+# Copy aip files 
+COPY --chown=$USER:$USER . .
 
-# Make conda activate command available from /bin/bash --interative shells
-RUN conda init bash
-
-ENV PROJECT_DIR $HOME/AIP
-RUN mkdir $PROJECT_DIR
-WORKDIR $PROJECT_DIR
-
-COPY environment.yml requirements.txt $PROJECT_DIR/
-
-ENV ENV_PREFIX $HOME/env
-RUN conda update --name base conda
-RUN conda env create --file $PROJECT_DIR/environment.yml --force
-RUN conda clean --all --yes
-
-# Include AIP as python package
-COPY . $PROJECT_DIR
-RUN ln -s /home/aip/AIP/lib/aip /home/aip/miniconda3/envs/aip/lib/python3.11/site-packages/
-
-RUN echo 'conda activate aip' >> $HOME/.bashrc
+ENV PATH="$HOME/AIP/venv/bin:$PATH"
 
 ENTRYPOINT [ "/usr/local/bin/entrypoint.sh" ]

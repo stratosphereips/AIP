@@ -25,6 +25,7 @@ __maintainer__ = "Joaquin Bogado"
 __version__ = "0.0.1"
 
 import pandas as pd
+import logging
 
 from aip.data.access import data_dir
 from aip.utils.autoload import register, models
@@ -36,9 +37,19 @@ class BaseModel():
     Template class for AIP models
     '''
     def __init__(self):
+        # Set up the logger for the class
+        self.logger = logging.getLogger(self.__class__.__name__)
+
         # Model initialization and configuration
         self.blocklist = pd.DataFrame()
-        self.donotblocklist = pd.read_csv(path.join(data_dir, 'external', 'do_not_block_these_ips.csv'))
+        exclude_ips = path.join(data_dir, 'external', 'do_not_block_these_ips.csv')
+
+        if path.exists(exclude_ips):
+            self.donotblocklist = pd.read_csv(exclude_ips)
+        else:
+            # Warning: File 'do_not_block_these_ips.csv' does not exist. Initializing with empty DataFrame.
+            self.logger.warning("File 'do_not_block_these_ips.csv' does not exist. Initializing with empty DataFrame.")
+            self.donotblocklist = pd.DataFrame(columns=['ip'])
 
     def sanitize(self, blocklist=None):
         if blocklist is None:
