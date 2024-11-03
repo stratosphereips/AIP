@@ -45,7 +45,7 @@ from aip.utils.date_utils import validate_and_convert_date
 from aip.utils.knowledge_base import _rebuild
 
 
-def run_model(aip_model_name, aip_model, date_day):
+def run_model(aip_model_name, aip_model, date_day, log_level=logging.ERROR):
     """
     Run a given model with exception handling
     """
@@ -95,25 +95,26 @@ def main():
         logger.error(err)
         sys.exit()
 
+    logging.info(f"Running {args.model} model(s) for date {run_date_day}.")
     # Run Alpha Model
     if args.model in ['Alpha', 'all']:
-        run_model('Alpha', Alpha(), run_date_day)
+        run_model('Alpha', Alpha(), run_date_day, args.log_level)
 
     # Alpha 7 Model
     if args.model in ['Alpha7', 'all']:
-        run_model('Alpha7', Alpha(lookback=7), run_date_day)
+        run_model('Alpha7', Alpha(lookback=7), run_date_day, args.log_level)
 
     # Prioritize New Model
     if args.model in ['Prioritize_New', 'all']:
-        run_model('Prioritize_New', New(), run_date_day)
+        run_model('Prioritize_New', New(), run_date_day, args.log_level)
 
     # Prioritize Consistent Model
     if args.model in ['Prioritize_Consistent', 'all']:
-        run_model('Prioritize_Consistent', Consistent(), run_date_day)
+        run_model('Prioritize_Consistent', Consistent(), run_date_day, args.log_level)
 
     # Prioritize Random Forest Model
     if args.model in ['Random_Forest', 'all']:
-        run_model('Random_Forest', RandomForest(), run_date_day)
+        run_model('Random_Forest', RandomForest(), run_date_day, args.log_level)
 
 if __name__ == '__main__':
     main()
