@@ -37,6 +37,7 @@ from os import makedirs
 from os import path
 from aip.data.access import data_path
 from aip.models.alpha import Alpha
+from aip.models.alpha7 import Alpha7
 from aip.models.prioritize_new import New
 from aip.models.prioritize_consistent import Consistent
 from aip.models.random_forest import RandomForest
