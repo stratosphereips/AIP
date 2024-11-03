@@ -31,7 +31,8 @@ import pandas as pd
 from aip.models.base import BaseModel
 from aip.utils.autoload import register
 from aip.utils.knowledge_base import Knowledgebase
-from datetime import date, timedelta
+from datetime import date
+from datetime import timedelta
 
 
 @register
