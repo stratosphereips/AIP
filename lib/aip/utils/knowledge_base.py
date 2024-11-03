@@ -119,19 +119,24 @@ class Knowledgebase():
         self.timeframe = (self.knowledge.last_seen.min(), self.knowledge.last_seen.max())
     
     def __init__(self, load_until='yesterday'):
+        # Set up the logger for the class
+        self.logger = logging.getLogger(self.__class__.__name__)
+
         day = self._check_date_param(load_until)
-        self.path = path.join(data_path,
-                'processed', 'prioritizers', f'knowledgebase-{day}-snapshot.gz')
+
+        self.path = path.join(data_path, 'processed', 'prioritizers', f'knowledgebase-{day}-snapshot.gz')
         self._load_knowledge_until(day)
     
 
     def build(self, start=date.today() - timedelta(days=2), end=date.today() - timedelta(days=1), force=False):
         if path.exists(self.path) and not force:
-            print('Knowledge exists already. Use force=True to rebuild it')
+            self.logger.error('The knowledge already exists. Use force=True to force its rebuild')
             return
+
         # check if the snapshot for the start date exists
         # if not, all the snapshots must be created again
         p = path.join(data_path, 'processed', 'prioritizers')
+
         if not path.exists(path.join(p, f'knowledgebase-{str(start)}-snapshot.gz')):
             last_knowledge = _build_knowledge(start=start, end=end)
         else:
