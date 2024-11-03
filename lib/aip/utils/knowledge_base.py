@@ -14,12 +14,19 @@ from aip.data.access import data_path
 from aip.data.access import get_attacks
 
 
-def _add_knowledge(last_knowledge, day):
-    print(f'DEBUG: PROCESSING DATE {day}')
+def _add_knowledge(last_knowledge, day, log_level=logging.ERROR):
+    # Configure logger
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=log_level)
+
+    logger.debug(f'_add_knowledge - Processing date {day}')
     st_time = time.time()
     day = datetime.strptime(day, '%Y-%m-%d').date()
+
     p = path.join(data_path, 'processed', 'prioritizers')
+
     attacks = get_attacks(dates=[day])
+
     df = attacks[0]
     if df.empty is True:
         last_knowledge.to_csv(path.join(p, f'knowledgebase-{day}-snapshot.gz'),
@@ -33,6 +40,7 @@ def _add_knowledge(last_knowledge, day):
     df.loc[:, 'last_seen'] = day
     df.loc[:, 'days_active'] = 1
     df.loc[df['flows'] == 0, 'flows'] = 1
+
     last_knowledge = pd.concat([last_knowledge, df])
     dates_min = last_knowledge.groupby('orig').first_seen.min()
     dates_max = last_knowledge.groupby('orig').last_seen.max()
@@ -49,7 +57,8 @@ def _add_knowledge(last_knowledge, day):
                 'mean_flows', 'mean_duration', 'mean_bytes', 'mean_packets',
                 'days_active', 'first_seen', 'last_seen'],
             index=False, compression='gzip')
-    print(f'DEBUG: PROCESSED IN {(time.time() - st_time)/60} MINUTES.')
+
+    logger.debug(f'_add_knowledge - Processed in {(time.time() - st_time)/60} minutes')
     return knowledge
 
 
