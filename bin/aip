@@ -59,8 +59,8 @@ def run_model(aip_model_name, aip_model, date_day):
         blocklist = aip_model.run(date_day)
         blocklist.to_csv(path.join(model_output_dir, f'AIP-{aip_model_name}-{str(date_day)}.csv.gz'), index=False, compression='gzip')
         logging.info(f"{aip_model_name} model completed successfully.")
-    except Exception as e:
-        logging.error(f"Error running {aip_model_name} model: {e}", exc_info=True)
+    except Exception as err:
+        logging.error(f"Error running {aip_model_name} model: {err}")
 
 
 def main():

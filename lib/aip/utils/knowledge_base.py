@@ -141,14 +141,17 @@ class Knowledgebase():
             last_knowledge = _build_knowledge(start=start, end=end)
         else:
             days_ago = 1
-            day = str(end - timedelta(days=days_ago))
-            while not path.exists(path.join(p, f'knowledgebase-{day}-snapshot.gz')):
-                days_ago += 1
+            try:
                 day = str(end - timedelta(days=days_ago))
-            last_knowledge = pd.read_csv(path.join(p, f'knowledgebase-{day}-snapshot.gz'))
-            last_knowledge.loc[:, 'first_seen'] = pd.to_datetime(last_knowledge.first_seen).dt.date
-            last_knowledge.loc[:, 'last_seen'] = pd.to_datetime(last_knowledge.last_seen).dt.date
-            while days_ago >= 1:
-                days_ago -= 1
-                day = str(end - timedelta(days=days_ago))
-                last_knowledge = _add_knowledge(last_knowledge, day)
+                while not path.exists(path.join(p, f'knowledgebase-{day}-snapshot.gz')):
+                    days_ago += 1
+                    day = str(end - timedelta(days=days_ago))
+                last_knowledge = pd.read_csv(path.join(p, f'knowledgebase-{day}-snapshot.gz'))
+                last_knowledge.loc[:, 'first_seen'] = pd.to_datetime(last_knowledge.first_seen).dt.date
+                last_knowledge.loc[:, 'last_seen'] = pd.to_datetime(last_knowledge.last_seen).dt.date
+                while days_ago >= 1:
+                    days_ago -= 1
+                    day = str(end - timedelta(days=days_ago))
+                    last_knowledge = _add_knowledge(last_knowledge, day)
+            except OverflowError as err:
+                raise Exception(f"There is not Knowledge Base for the model to run (Required: {end})")
