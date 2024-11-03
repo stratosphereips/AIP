@@ -37,9 +37,9 @@ from os import makedirs
 from os import path
 from aip.data.access import data_path
 from aip.models.alpha import Alpha
-from aip.models.prioritize import New
-from aip.models.prioritize import Consistent
-from aip.models.prioritize import RandomForest
+from aip.models.prioritize_new import New
+from aip.models.prioritize_consistent import Consistent
+from aip.models.random_forest import RandomForest
 from aip.utils.date_utils import validate_and_convert_date
 
 
