@@ -60,6 +60,23 @@ def _build_knowledge(start, end):
     return last_knowledge
 
 
+def _rebuild(start_date, log_level=logging.ERROR):
+    """
+    Wrapper to rebuild the knowledge base from the specified start date to today.
+    """
+    # Configure logger
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=log_level)
+
+    st_time = time.time()
+    current_date = date.today()
+    logger.info(f"_rebuild - Rebuilding knowledge base from {start_date} to {current_date}")
+
+    _build_knowledge(start=start_date, end=current_date, log_level=log_level)
+
+    logger.info(f'_rebuild - Rebuilding knowledge base finished in {(time.time() - st_time)/60} minutes')
+
+
 class Knowledgebase():
     '''
     Object that represents the IP features database
