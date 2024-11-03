@@ -31,6 +31,7 @@ __version__ = "1.0.0"
 
 import argparse
 import logging
+import sys
 from datetime import date
 from os import makedirs
 from os import path
@@ -74,7 +75,11 @@ def main():
     logging.basicConfig(level=args.log_level, format=log_fmt)
 
     # Validate input date
-    run_date_day = validate_and_convert_date(args.date)
+    try:
+        run_date_day = validate_and_convert_date(args.date)
+    except ValueError as err:
+        logging.error(err)
+        sys.exit()
 
     # Run Alpha Model
     if args.model in ['Alpha', 'all']:
