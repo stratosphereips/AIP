@@ -1,6 +1,7 @@
 import unittest
 import logging
 from datetime import date
+from datetime import timedelta
 from lib.aip.utils.date_utils import validate_and_convert_date
 
 
@@ -47,6 +48,14 @@ class TestValidateAndConvertDate(unittest.TestCase):
     def test_edge_case(self):
         # Test leap years
         self.assertEqual(validate_and_convert_date("2024-02-29"), date(2024, 2, 29))
+
+    def test_future_date(self):
+        # Test future date raises exception
+        future_date = (date.today() + timedelta(days=1)).isoformat()
+
+        with self.assertRaises(ValueError):
+            validate_and_convert_date(future_date)
+
 
 if __name__ == '__main__':
     unittest.main()
