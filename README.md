@@ -38,11 +38,13 @@ Each AIP model generates its own blocklist based on a specific criteria. The mai
     - A more experimental approach to increase blocklist efficiency.
 
 
-## AIP Docker
+## Installation
+
+AIP can be run through Docker (recommended) or natively. In any case, make sure the data is correctly accessible in the `data/raw/` folder and that the files `data/external/` are correctly configured.
+
+### AIP Docker
 
 The best way to run AIP right now is using [Docker](etc/docker/README.md).
-
-## Usage
 
 AIP will automatically attempt to run all the models using the available data. Assuming the Zeek data is located in its usual location:
 
@@ -56,6 +58,25 @@ To run AIP for a specific day:
 :~$ cd AIP
 :~$ docker run --rm -v /opt/zeek/logs/:/home/aip/AIP/data/raw:ro -v ${PWD}/data/:/home/aip/AIP/data/:rw --name aip stratosphereips/aip:latest bin/aip YYYY-MM-DD
 ```
+
+### Local Installation
+
+To run AIP locally, follow the next steps:
+
+* Clone the AIP repository:
+    * `git clone https://github.com/stratosphereips/AIP.git ~/AIP`
+* Access the AIP folder:
+    * `cd ~/AIP`
+* Create a Python Virtual Environment to install the requirements
+    * `python3 -m venv aip-venv`
+* Activate the virtual environment
+    * `source aip-venv/bin/activate`
+* Install the Python requirements:
+    * `pip install -r requirements.txt`
+* Set the PYTHONPATH environment variable so Python knows where to find all AIP components:
+    * `export PYTHONPATH=$(pwd)/lib`
+* Let's test that AIP works with a simple test:
+    * `python3 bin/aip --help`
 
 ## License
 
