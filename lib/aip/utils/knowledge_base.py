@@ -3,6 +3,7 @@ This module provides functionality for managing the
 knowledge base used by AIP models.
 """
 
+import logging
 import time
 import pandas as pd
 from datetime import date
@@ -52,11 +53,16 @@ def _add_knowledge(last_knowledge, day):
     return knowledge
 
 
-def _build_knowledge(start, end):
+def _build_knowledge(start, end, log_level=logging.ERROR):
+    # Configure logger
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=log_level)
+
     dates = pd.date_range(start=start, end=end)
     last_knowledge = pd.DataFrame()
     for day in dates:
-        last_knowledge = _add_knowledge(last_knowledge, str(day.date()))
+        logger.debug(f'_build_knowledge - Building knowledge base for {day}')
+        last_knowledge = _add_knowledge(last_knowledge, str(day.date()), log_level=log_level)
     return last_knowledge
 
 
