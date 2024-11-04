@@ -84,7 +84,7 @@ def _rebuild(start_date, end_date=date.today(), log_level=logging.ERROR):
     logging.basicConfig(level=log_level)
 
     start_time = time.time()
-    logger.info(f"_rebuild - Rebuilding knowledge base from {start_date} to {end_date}")
+    logger.debug(f"_rebuild - Rebuilding knowledge base from {start_date} to {end_date}")
 
     _build_knowledge(start=start_date, end=end_date, log_level=log_level)
 
