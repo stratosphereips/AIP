@@ -75,7 +75,7 @@ def _build_knowledge(start, end, log_level=logging.ERROR):
     return last_knowledge
 
 
-def _rebuild(start_date, log_level=logging.ERROR):
+def _rebuild(start_date, end_date=date.today(), log_level=logging.ERROR):
     """
     Wrapper to rebuild the knowledge base from the specified start date to today.
     """
@@ -83,13 +83,12 @@ def _rebuild(start_date, log_level=logging.ERROR):
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=log_level)
 
-    st_time = time.time()
-    current_date = date.today()
-    logger.info(f"_rebuild - Rebuilding knowledge base from {start_date} to {current_date}")
+    start_time = time.time()
+    logger.debug(f"_rebuild - Rebuilding knowledge base from {start_date} to {end_date}")
 
-    _build_knowledge(start=start_date, end=current_date, log_level=log_level)
+    _build_knowledge(start=start_date, end=end_date, log_level=log_level)
 
-    logger.info(f'_rebuild - Rebuilding knowledge base finished in {(time.time() - st_time)/60} minutes')
+    logger.debug(f'_rebuild - Rebuilding knowledge base finished in {(time.time() - start_time)/60} minutes')
 
 
 class Knowledgebase():
