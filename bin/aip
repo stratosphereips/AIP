@@ -102,7 +102,7 @@ def main():
 
     # Alpha 7 Model
     if args.model in ['Alpha7', 'all']:
-        run_model('Alpha7', Alpha(lookback=7), run_date_day, args.log_level)
+        run_model('Alpha7', Alpha7(), run_date_day, args.log_level)
 
     # Prioritize New Model
     if args.model in ['Prioritize_New', 'all']:
