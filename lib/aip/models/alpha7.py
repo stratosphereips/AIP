@@ -24,33 +24,11 @@ __license__ = "GPLv3"
 __maintainer__ = "Joaquin Bogado"
 __version__ = "0.0.1"
 
-import pandas as pd
-
-from aip.models.base import BaseModel
+from aip.models.alpha import Alpha
 from aip.utils.autoload import register
-from aip.data.access import get_attacks
-from datetime import date
-from datetime import timedelta
-
 
 @register
-class Alpha(BaseModel):
-    def __init__(self, lookback=1):
+class Alpha7(Alpha):
+    def __init__(self, lookback=7):
         super().__init__()
         self.lookback = lookback
-
-    def run(self, for_date=date.today()):
-        start = str(for_date - timedelta(days=self.lookback))
-        end = str(for_date - timedelta(days=1))
-
-        # Get all the attackers IPs
-        attacks = get_attacks(start, end, usecols=['orig'])
-        attacks = pd.concat(attacks).drop_duplicates()
-        attacks = attacks.rename(columns={'orig':'ip'})
-
-        self.blocklist = attacks
-
-        # Remove IPs from do_not_block_these_ips.csv
-        self.sanitize()
-
-        return self.blocklist

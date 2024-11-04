@@ -26,10 +26,11 @@ __version__ = "0.0.1"
 
 import pandas as pd
 import logging
+from os import path
 
 from aip.data.access import data_dir
-from aip.utils.autoload import register, models
-from os import path
+from aip.utils.autoload import models
+from aip.utils.autoload import register
 
 # @register
 class BaseModel():
