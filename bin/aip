@@ -67,9 +67,9 @@ def main():
     parser = argparse.ArgumentParser(description='Attacker IP Prioritization (AIP) Tool')
     parser.add_argument('-d', '--debug', required=False, help="Debugging mode.", action="store_const", dest="log_level", const=logging.DEBUG, default=logging.ERROR,)
     parser.add_argument('-v', '--verbose', required=False, help="Verbose mode", action="store_const", dest="log_level", const=logging.INFO,)
-    parser.add_argument('--date', type=str, help='The date for running the models in YYYY-MM-DD format. Defaults to today.', default=str(date.today()))
-    parser.add_argument('--model', type=str, choices=['Alpha', 'Alpha7', 'Prioritize_New', 'Prioritize_Consistent', 'Random_Forest', 'all'], default='all', help='Select AIP model to run. Defaults to all.')
-    parser.add_argument('--rebuild-kb', type=str, help='Rebuild knowledge base from a specific date (YYYY-MM-DD).')
+
+    subparsers = parser.add_subparsers(dest="command", help="commands")
+
 
     args = parser.parse_args()
 
