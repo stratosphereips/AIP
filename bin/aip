@@ -99,36 +99,32 @@ def main():
             args.model = 'all'
 
         # Rebuild knowledge base
-        if args.rebuild_kb:
-            rebuild_date = validate_and_convert_date(args.rebuild_kb)
-            logger.info(f"Rebuilding knowledge base from {rebuild_date} onwards")
-            _rebuild(start_date=rebuild_date, log_level=args.log_level)
+        if args.command == "rebuild-kb":
+            logger.info(f"Rebuilding knowledge base from {aip_start_date} onwards")
+            _rebuild(start_date=aip_start_date, log_level=args.log_level)
             sys.exit()
 
-        # Validate input date
-        if args.date: 
-            run_date_day = validate_and_convert_date(args.date)
-
-        logging.info(f"Running {args.model} model(s) for date {run_date_day}.")
+        logging.info(f"Running {args.model} model(s) for date {aip_start_date}.")
         # Run Alpha Model
         if args.model in ['Alpha', 'all']:
-            run_model('Alpha', Alpha(), run_date_day, args.log_level)
+            run_model('Alpha', Alpha(), aip_start_date, args.log_level)
 
         # Alpha 7 Model
         if args.model in ['Alpha7', 'all']:
-            run_model('Alpha7', Alpha7(), run_date_day, args.log_level)
+            run_model('Alpha7', Alpha7(), aip_start_date, args.log_level)
 
         # Prioritize New Model
         if args.model in ['Prioritize_New', 'all']:
-            run_model('Prioritize_New', New(), run_date_day, args.log_level)
+            run_model('Prioritize_New', New(), aip_start_date, args.log_level)
 
         # Prioritize Consistent Model
         if args.model in ['Prioritize_Consistent', 'all']:
-            run_model('Prioritize_Consistent', Consistent(), run_date_day, args.log_level)
+            run_model('Prioritize_Consistent', Consistent(), aip_start_date, args.log_level)
 
         # Prioritize Random Forest Model
         if args.model in ['Random_Forest', 'all']:
-            run_model('Random_Forest', RandomForest(), run_date_day, args.log_level)
+            run_model('Random_Forest', RandomForest(), aip_start_date, args.log_level)
+
     except ValueError as err:
         logger.error(err)
         sys.exit()
