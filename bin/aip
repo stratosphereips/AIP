@@ -93,6 +93,11 @@ def main():
         else:
             # If not set, default to today()
             aip_start_date = date.today()
+
+        # If model is not set, default to today
+        if not hasattr(args,'model'):
+            args.model = 'all'
+
         # Rebuild knowledge base
         if args.rebuild_kb:
             rebuild_date = validate_and_convert_date(args.rebuild_kb)
