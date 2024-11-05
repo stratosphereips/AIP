@@ -76,6 +76,8 @@ def main():
     run_models_parser.add_argument('--model', type=str, choices=['Alpha', 'Alpha7', 'Prioritize_New', 'Prioritize_Consistent', 'Random_Forest', 'all'], default='all', help='Select AIP model to run. Default is all models.')
 
     # Rebuild KB command
+    rebuild_kb_parser = subparsers.add_parser("rebuild-kb", help="Rebuild the knowledge base from a specific date.")
+    rebuild_kb_parser.add_argument("--start-date", required=True, type=str, help="The date from which to rebuild the knowledge base in YYYY-MM-DD format.")
 
     args = parser.parse_args()
 
