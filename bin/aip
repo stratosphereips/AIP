@@ -70,6 +70,12 @@ def main():
 
     subparsers = parser.add_subparsers(dest="command", help="commands")
 
+    # Run Models command 
+    run_models_parser = subparsers.add_parser("run-models", help="Run models with optional date range.")
+    run_models_parser.add_argument('--start-date', type=str, help='The start date for running the models (YYYY-MM-DD). Default is today.', default=str(date.today()))
+    run_models_parser.add_argument('--model', type=str, choices=['Alpha', 'Alpha7', 'Prioritize_New', 'Prioritize_Consistent', 'Random_Forest', 'all'], default='all', help='Select AIP model to run. Default is all models.')
+
+    # Rebuild KB command
 
     args = parser.parse_args()
 
