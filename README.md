@@ -53,12 +53,6 @@ AIP will automatically attempt to run all the models using the available data. A
 :~$ docker run --rm -v /opt/zeek/logs/:/home/aip/AIP/data/raw:ro -v ${PWD}/data/:/home/aip/AIP/data/:rw --name aip stratosphereips/aip:latest bin/aip
 ```
 
-To run AIP for a specific day:
-```bash
-:~$ cd AIP
-:~$ docker run --rm -v /opt/zeek/logs/:/home/aip/AIP/data/raw:ro -v ${PWD}/data/:/home/aip/AIP/data/:rw --name aip stratosphereips/aip:latest bin/aip YYYY-MM-DD
-```
-
 ### Local Installation
 
 To run AIP locally, follow the next steps:
@@ -77,6 +71,17 @@ To run AIP locally, follow the next steps:
     * `export PYTHONPATH=$(pwd)/lib`
 * Let's test that AIP works with a simple test:
     * `python3 bin/aip --help`
+
+### AIP Commands
+
+Get all the full list of options with `bin/aip --help`:
+
+- Run AIP for a specific day:
+    - `bin/aip -v run-models --start-date YYYY-MM-DD`
+- Run AIP for a specific day and model:
+    - `bin/aip -v run-models --start-date YYYY-MM-DD --model Alpha`
+- Rebuild AIP knowledge base from a specific date:
+    - `bin/aip -d rebuild-kb --start-date YYYY-MM-DD`
 
 ## License
 
