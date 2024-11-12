@@ -94,12 +94,10 @@ def main():
         args.end_date = date.today().strftime('%Y-%m-%d')
 
     try: 
-        # Validate start_date once not on every command
-        if hasattr(args,'start_date'):
-            aip_start_date = validate_and_convert_date(args.start_date)
-        else:
-            # If not set, default to today()
-            aip_start_date = date.today()
+        # Validate once not on every command
+        aip_start_date = validate_and_convert_date(args.start_date)
+        aip_end_date = validate_and_convert_date(args.end_date)
+        logger.debug(f"AIP will run models from start date {aip_start_date} to end date {aip_end_date}")
 
         # If model is not set, default to today
         if not hasattr(args,'model'):
