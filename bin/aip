@@ -33,6 +33,7 @@ import argparse
 import logging
 import sys
 from datetime import date
+from datetime import timedelta
 from os import makedirs
 from os import path
 from aip.data.access import data_path
@@ -109,46 +110,49 @@ def main():
             _rebuild(start_date=aip_start_date, log_level=args.log_level)
             sys.exit()
 
-        logging.info(f"Running {args.model} model(s) for date {aip_start_date}.")
-        # Run Alpha Model
-        if args.model in ['Alpha', 'all']:
-            run_model(aip_model_name='Alpha',
-                      aip_model=Alpha(),
-                      start_date=aip_start_date,
-                      log_level=args.log_level
-                    )
 
-        # Alpha 7 Model
-        if args.model in ['Alpha7', 'all']:
-            run_model(aip_model_name='Alpha7',
-                      aip_model=Alpha7(),
-                      start_date=aip_start_date,
-                      log_level=args.log_level
-                    )
+        while aip_start_date <= aip_end_date:
+            logging.info(f"Running {args.model} model(s) for date {aip_start_date}.")
+            # Run Alpha Model
+            if args.model in ['Alpha', 'all']:
+                run_model(aip_model_name='Alpha',
+                        aip_model=Alpha(),
+                        start_date=aip_start_date,
+                        log_level=args.log_level
+                        )
 
-        # Prioritize New Model
-        if args.model in ['Prioritize_New', 'all']:
-            run_model(aip_model_name='Prioritize_New',
-                      aip_model=New(),
-                      start_date=aip_start_date,
-                      log_level=args.log_level
-                    )
+            # Alpha 7 Model
+            if args.model in ['Alpha7', 'all']:
+                run_model(aip_model_name='Alpha7',
+                        aip_model=Alpha7(),
+                        start_date=aip_start_date,
+                        log_level=args.log_level
+                        )
 
-        # Prioritize Consistent Model
-        if args.model in ['Prioritize_Consistent', 'all']:
-            run_model(aip_model_name='Prioritize_Consistent',
-                      aip_model=Consistent(),
-                      start_date=aip_start_date,
-                      log_level=args.log_level
-                    )
+            # Prioritize New Model
+            if args.model in ['Prioritize_New', 'all']:
+                run_model(aip_model_name='Prioritize_New',
+                        aip_model=New(),
+                        start_date=aip_start_date,
+                        log_level=args.log_level
+                        )
 
-        # Prioritize Random Forest Model
-        if args.model in ['Random_Forest', 'all']:
-            run_model(aip_model_name='Random_Forest',
-                      aip_model=RandomForest(),
-                      start_date=aip_start_date,
-                      log_level=args.log_level
-                    )
+            # Prioritize Consistent Model
+            if args.model in ['Prioritize_Consistent', 'all']:
+                run_model(aip_model_name='Prioritize_Consistent',
+                        aip_model=Consistent(),
+                        start_date=aip_start_date,
+                        log_level=args.log_level
+                        )
+
+            # Prioritize Random Forest Model
+            if args.model in ['Random_Forest', 'all']:
+                run_model(aip_model_name='Random_Forest',
+                        aip_model=RandomForest(),
+                        start_date=aip_start_date,
+                        log_level=args.log_level
+                        )
+            aip_start_date += timedelta(days=1)
 
     except ValueError as err:
         logger.error(err)
