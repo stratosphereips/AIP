@@ -17,13 +17,22 @@ _config = {
 }
 
 def read_zeek(path, **kwargs):
+    """
+    Reads a Zeek file to a DataFrame
+    """
     try:
+        # Load Zeek path to DataFrame
         df = z2p.read_zeek(path, **kwargs)
+
+        # Convert to readable time format
         if 'ts' in df.keys():
             df['ts'] = pd.to_datetime(df.ts, unit='s')
+
+        # Returns data frame
         return df
     except:
         raise z2p.NotAZeekFile(path)
+
 
 def read_argus(path, **kwargs):
     from os import path as ospath
