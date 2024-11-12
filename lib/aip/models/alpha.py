@@ -46,11 +46,14 @@ class Alpha(BaseModel):
         # Get all the attackers IPs
         attacks = get_attacks(start, end, usecols=['orig'])
         attacks = pd.concat(attacks).drop_duplicates()
-        attacks = attacks.rename(columns={'orig':'ip'})
+        if not attacks.empty:
+            attacks = attacks.rename(columns={'orig':'ip'})
 
-        self.blocklist = attacks
+            self.blocklist = attacks
 
-        # Remove IPs from do_not_block_these_ips.csv
-        self.sanitize()
+            # Remove IPs from do_not_block_these_ips.csv
+            self.sanitize()
 
-        return self.blocklist
+            return self.blocklist
+        else:
+            raise ValueError("Please check data availability and try again.")
