@@ -3,12 +3,17 @@ import gzip
 import hashlib
 import pandas as pd
 import shutil
-import subprocess, shlex
+import shlex
+import subprocess
 import zeeklog2pandas as z2p
 
 from dotenv import dotenv_values
-from joblib import Parallel, delayed
-from os import makedirs, path, access, W_OK
+from joblib import Parallel
+from joblib import delayed
+from os import makedirs
+from os import path
+from os import access
+from os import W_OK
 from pathlib import Path
 
 _project_dir = Path(__file__).resolve().parents[3]

@@ -36,10 +36,15 @@ import logging
 import pandas as pd
 import numpy as np
 
-from aip.data.functions import scramble, read_zeek, getrawdata, removerawdata
-from joblib import Parallel, delayed
-from os import scandir, path
+from joblib import Parallel
+from joblib import delayed
+from os import scandir
+from os import path
 from pathlib import Path
+from aip.data.functions import scramble
+from aip.data.functions import read_zeek
+from aip.data.functions import getrawdata
+from aip.data.functions import removerawdata
 
 project_dir = Path(__file__).resolve().parents[3]
 
