@@ -45,7 +45,7 @@ from aip.utils.date_utils import validate_and_convert_date
 from aip.utils.knowledge_base import _rebuild
 
 
-def run_model(aip_model_name, aip_model, date_day, log_level=logging.ERROR):
+def run_model(aip_model_name, aip_model, start_date, log_level=logging.ERROR):
     """
     Run a given model with exception handling
     """
@@ -56,8 +56,8 @@ def run_model(aip_model_name, aip_model, date_day, log_level=logging.ERROR):
         makedirs(model_output_dir)
 
     try:
-        blocklist = aip_model.run(date_day)
-        blocklist.to_csv(path.join(model_output_dir, f'AIP-{aip_model_name}-{str(date_day)}.csv.gz'), index=False, compression='gzip')
+        blocklist = aip_model.run(start_date)
+        blocklist.to_csv(path.join(model_output_dir, f'AIP-{aip_model_name}-{str(start_date)}.csv.gz'), index=False, compression='gzip')
         logging.info(f"{aip_model_name} model completed successfully.")
     except Exception as err:
         logging.error(f"Error running {aip_model_name} model: {err}")
