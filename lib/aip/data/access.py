@@ -92,15 +92,35 @@ def _get_honeypot_ips(for_date=None):
     return ips
 
 
-def _process_zeek_files(zeek_files, date):
+def _process_zeek_files(list_of_zeek_files, date):
+    """
+    Process a list of Zeek log files to extract all connections
+    from honeypot IPs for a given date.
+    """
+    # Retrieve the list of honeypot IPs
     ips = _get_honeypot_ips()
+
+    # Initialises daily, a dataframe that will contain
+    # all the connections from the honeypots IPs found
+    # on the input zeek files
     daily = pd.DataFrame()
-    for z in zeek_files:
+
+    # Process each zeek file in the input list
+    for zeek_file in list_of_zeek_files:
         hourly = pd.DataFrame()
-        zeekdata = read_zeek(z)
+
+        # Read the zeek file into a dataframe
+        zeekdata = read_zeek(zeek_file)
+
+        # Find all traffic from IPs on the zeek traffic 
         for ip in ips:
             hourly = pd.concat([hourly, zeekdata[zeekdata['id.resp_h'] == ip]])
+
+        # Store the hourly traffic on the daily dataframe
         daily = pd.concat([daily, hourly])
+
+    # Return a DF with all the traffic seen from the honeypot IPs
+    # on the input Zeek files
     return daily
 
 
