@@ -62,7 +62,7 @@ def scramble(s):
     return hashlib.sha1(_config['salt'].encode() + s.encode()).hexdigest()
 
 
-def getrawdata(date):
+def get_raw_data(date):
     """
     Retrieves Zeek data from a remote? location and stores it
     on a directory for AIP to process it. The copy is done in
@@ -90,7 +90,7 @@ def getrawdata(date):
         Parallel(n_jobs=24, backend='threading')(delayed(subprocess.run)(cmd) for cmd in commands)
 
 
-def removerawdata(date, force=False):
+def remove_raw_data(date, force=False):
     """
     Remove (delete) the content of the raw data directory 
     for a given date.
