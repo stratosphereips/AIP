@@ -43,8 +43,8 @@ from os import path
 from pathlib import Path
 from aip.data.functions import scramble
 from aip.data.functions import read_zeek
-from aip.data.functions import getrawdata
-from aip.data.functions import removerawdata
+from aip.data.functions import get_raw_data
+from aip.data.functions import remove_raw_data
 
 project_dir = Path(__file__).resolve().parents[3]
 
@@ -107,7 +107,7 @@ def _process_raw_files(date):
     # if data directory does not exist, execute the magic to get it
     if path.isdir(path.join(project_dir,'data','raw', date)) == False:
         logging.debug(f'Downloading data for {date}')
-        getrawdata(date)
+        get_raw_data(date)
     # after this point, if directory does not exist, we can skip it.
     try:
         zeek_files = [x.path for x in scandir(path.join(project_dir,'data','raw', date)) if x.name.startswith('conn.')]
