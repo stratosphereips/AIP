@@ -91,8 +91,16 @@ def getrawdata(date):
 
 
 def removerawdata(date, force=False):
+    """
+    Remove (delete) the content of the raw data directory 
+    for a given date.
+    """
+    # Validate date is well formatted
     dt.datetime.strptime(date, '%Y-%m-%d')
-    p = path.join(_project_dir,'data','raw', date)
+
+    raw_data_dir = path.join(_project_dir,'data','raw', date)
+
     # Only delete raw data if explicitly allowed in the configuration file
     if (_config['remove_raw_data'].lower() == 'true') or force:
-        shutil.rmtree(p)
+        shutil.rmtree(raw_data_dir)
+
