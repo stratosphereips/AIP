@@ -83,6 +83,7 @@ def _get_honeypot_ips(for_date=None):
             honeypots['operation_end_date'] = honeypots['operation_end_date'].fillna(dt.date.today())
             honeypots['operation_end_date'] = pd.to_datetime(honeypots['operation_end_date'])
 
+        # Keep honeypots active on the specified date
         if ('operation_start_date' in honeypots.keys()) and 'operation_end_date' in honeypots.keys():
             honeypots = honeypots[(for_date >= honeypots['operation_start_date']) & (for_date <= honeypots['operation_end_date'])]
 
