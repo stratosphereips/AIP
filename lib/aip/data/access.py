@@ -53,26 +53,39 @@ data_dir = path.join(project_dir,'data')
 
 def _get_honeypot_ips(for_date=None):
     '''
-    Filter those honeypots active due date for_date, if there are operation dates in the honeypot file.
+    Filter active honeypots IPs due date for_date, if there are operation dates in the honeypot file.
+    The honeypots_public_ips.csv has the following format:
+        # List of IPs to look for to generate the attack files.
+        public_ip,operation_start_date,operation_end_date
     '''
     logger = logging.getLogger(__name__)
+
     # Check if the file exists before attempting to read it
     honeypot_public_ips = path.join(project_dir, 'data', 'external', 'honeypots_public_ips.csv')
 
+    # If the file does not exist raise an exception
     if not path.exists(honeypot_public_ips):
-        logger.error(f"File 'honeypot_public_ips.csv' does not exist. Raising error.")
-        raise FileNotFoundError("Required file 'honeypots_public_ips.csv' does not exist.")
+        raise FileNotFoundError("_get_honeypot_ips() required file 'honeypots_public_ips.csv' does not exist.")
 
+    # Read CSV located in data/external/honeypots_public_ips.csv
     honeypots = pd.read_csv(path.join(project_dir, 'data', 'external', 'honeypots_public_ips.csv'), comment='#')
+
     if for_date is not None:
+        # Convert to datetime object
         for_date = pd.to_datetime(for_date)
+
+        # Parsing start date
         if 'operation_start_date' in honeypots.keys():
             honeypots['operation_start_date'] = pd.to_datetime(honeypots['operation_start_date'])
+
+        # Parsing end date, filling emtpy values with date of 'today'
         if 'operation_end_date' in honeypots.keys():
             honeypots['operation_end_date'] = honeypots['operation_end_date'].fillna(dt.date.today())
             honeypots['operation_end_date'] = pd.to_datetime(honeypots['operation_end_date'])
+
         if ('operation_start_date' in honeypots.keys()) and 'operation_end_date' in honeypots.keys():
             honeypots = honeypots[(for_date >= honeypots['operation_start_date']) & (for_date <= honeypots['operation_end_date'])]
+
     ips = honeypots.public_ip.values
     return ips
 
