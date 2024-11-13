@@ -50,6 +50,7 @@ project_dir = Path(__file__).resolve().parents[3]
 
 data_dir = path.join(project_dir,'data')
 
+
 def _get_honeypot_ips(for_date=None):
     '''
     Filter active honeypots IPs due date for_date, if there are operation dates in the honeypot file.
@@ -89,6 +90,7 @@ def _get_honeypot_ips(for_date=None):
     ips = honeypots.public_ip.values
     return ips
 
+
 def _process_zeek_files(zeek_files, date):
     ips = _get_honeypot_ips()
     daily = pd.DataFrame()
@@ -100,6 +102,7 @@ def _process_zeek_files(zeek_files, date):
         daily = pd.concat([daily, hourly])
     return daily
 
+
 def _process_argus_files(argus_files, date):
     ips = _get_honeypot_ips()
     daily = pd.DataFrame()
@@ -110,6 +113,7 @@ def _process_argus_files(argus_files, date):
             hourly = pd.concat([hourly, argusdata[argusdata['id.resp_h'] == ip]])
         daily = pd.concat([daily, hourly])
     return daily
+
 
 def _process_raw_files(date):
     '''
@@ -136,6 +140,7 @@ def _process_raw_files(date):
     #logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
     #removerawdata(date)
     return
+
 
 def _extract_attacks(date):
     '''
@@ -171,6 +176,7 @@ def _extract_attacks(date):
     #removerawdata(date)
     return
 
+
 def process_zeek_files(dates=None):
     """ 
     Creates the dataset or part of it
@@ -187,6 +193,7 @@ def process_zeek_files(dates=None):
                 pass
     Parallel(n_jobs=12, backend='multiprocessing')(delayed(_process_raw_files)(date) for date in dates)
     return
+
 
 def extract_attacks(dates=None):
     """
@@ -211,6 +218,7 @@ def extract_attacks(dates=None):
     Parallel(n_jobs=12, backend='multiprocessing')(delayed(_extract_attacks)(date) for date in dates)
     return
 
+
 def get_attacks(start=None, end=None, dates=None, usecols=None):
     '''
     Returns a DataFrame with the attacks between the dates start and end or the
@@ -229,6 +237,7 @@ def get_attacks(start=None, end=None, dates=None, usecols=None):
     dfs = [pd.read_csv(path.join(project_dir, 'data', 'processed',f'attacks.{date}.csv.gz'), usecols=usecols, comment='#')
             for date in dates]
     return dfs
+
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
