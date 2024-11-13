@@ -3,12 +3,17 @@ import gzip
 import hashlib
 import pandas as pd
 import shutil
-import subprocess, shlex
+import shlex
+import subprocess
 import zeeklog2pandas as z2p
 
 from dotenv import dotenv_values
-from joblib import Parallel, delayed
-from os import makedirs, path, access, W_OK
+from joblib import Parallel
+from joblib import delayed
+from os import makedirs
+from os import path
+from os import access
+from os import W_OK
 from pathlib import Path
 
 _project_dir = Path(__file__).resolve().parents[3]
@@ -16,15 +21,26 @@ _config = {
     **dotenv_values(path.join(_project_dir, ".env")),  # load sensitive variables
 }
 
+
 def read_zeek(path, **kwargs):
+    """
+    Reads a Zeek file to a DataFrame
+    """
     try:
+        # Load Zeek path to DataFrame
         df = z2p.read_zeek(path, **kwargs)
+
+        # Convert to readable time format
         if 'ts' in df.keys():
             df['ts'] = pd.to_datetime(df.ts, unit='s')
+
+        # Returns data frame
         return df
     except:
         raise z2p.NotAZeekFile(path)
 
+
+# Currently deprecated, AIP is using now strictly Zeek logs
 def read_argus(path, **kwargs):
     from os import path as ospath
     if ospath.exists(path.path + '.csv'):
@@ -40,21 +56,51 @@ def read_argus(path, **kwargs):
     df.rename(columns={'StartTime':'ts', 'SrcAddr':'id.orig_h', 'DstAddr':'id.resp_h', 'Dur': 'duration', 'SrcBytes': 'orig_ip_bytes', 'SrcPkts': 'orig_pkts'}, inplace=True)
     return df
 
+
+# This function is unused right now
 def scramble(s):
     return hashlib.sha1(_config['salt'].encode() + s.encode()).hexdigest()
 
-def getrawdata(date):
-    dt.datetime.strptime(date, '%Y-%m-%d')
-    p = path.join(_project_dir,'data','raw', date)
-    if access(p, W_OK):
-        makedirs(p, exist_ok=True)
-        commands = [shlex.split(_config['magic'] + f'{date}/conn.{x:02}* ' + p) for x in range(0,24)]
-        Parallel(n_jobs=24, backend='threading')(delayed(subprocess.run)(c) for c in commands)
 
-def removerawdata(date, force=False):
+def get_raw_data(date):
+    """
+    Retrieves Zeek data from a remote? location and stores it
+    on a directory for AIP to process it. The copy is done in
+    parallel.
+    """
+
+    # Validate date is well formatted
     dt.datetime.strptime(date, '%Y-%m-%d')
-    p = path.join(_project_dir,'data','raw', date)
+
+    raw_data_dir = path.join(_project_dir,'data','raw', date)
+
+    # Ensure directory exists and is writable
+    if access(raw_data_dir, W_OK):
+        # Create directory, ignore if it exists
+        makedirs(raw_data_dir, exist_ok=True)
+
+        # The next part seems to be prepared to retrieve data from a location
+        # and store it in the data/raw/YYYY-MM-DD directory for processing.
+        commands = [
+            shlex.split(_config['magic'] + f'{date}/conn.{x:02}* ' + raw_data_dir) 
+            for x in range(0,24)
+        ]
+
+        # Attempting to run the previous commands in parallel
+        Parallel(n_jobs=24, backend='threading')(delayed(subprocess.run)(cmd) for cmd in commands)
+
+
+def remove_raw_data(date, force=False):
+    """
+    Remove (delete) the content of the raw data directory 
+    for a given date.
+    """
+    # Validate date is well formatted
+    dt.datetime.strptime(date, '%Y-%m-%d')
+
+    raw_data_dir = path.join(_project_dir,'data','raw', date)
+
     # Only delete raw data if explicitly allowed in the configuration file
     if (_config['remove_raw_data'].lower() == 'true') or force:
-        shutil.rmtree(p)
+        shutil.rmtree(raw_data_dir)
 

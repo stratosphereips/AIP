@@ -36,51 +36,93 @@ import logging
 import pandas as pd
 import numpy as np
 
-from aip.data.functions import scramble, read_zeek, getrawdata, removerawdata
-from joblib import Parallel, delayed
-from os import scandir, path
+from joblib import Parallel
+from joblib import delayed
+from os import scandir
+from os import path
 from pathlib import Path
+from aip.data.functions import scramble
+from aip.data.functions import read_zeek
+from aip.data.functions import get_raw_data
+from aip.data.functions import remove_raw_data
 
 project_dir = Path(__file__).resolve().parents[3]
 
 data_path = path.join(project_dir,'data')  # Deprecated, do not use
 data_dir = path.join(project_dir,'data')
 
+
 def _get_honeypot_ips(for_date=None):
     '''
-    Filter those honeypots active due date for_date, if there are operation dates in the honeypot file.
+    Filter active honeypots IPs due date for_date, if there are operation dates in the honeypot file.
+    The honeypots_public_ips.csv has the following format:
+        # List of IPs to look for to generate the attack files.
+        public_ip,operation_start_date,operation_end_date
     '''
     logger = logging.getLogger(__name__)
+
     # Check if the file exists before attempting to read it
     honeypot_public_ips = path.join(project_dir, 'data', 'external', 'honeypots_public_ips.csv')
 
+    # If the file does not exist raise an exception
     if not path.exists(honeypot_public_ips):
-        logger.error(f"File 'honeypot_public_ips.csv' does not exist. Raising error.")
-        raise FileNotFoundError("Required file 'honeypots_public_ips.csv' does not exist.")
+        raise FileNotFoundError("_get_honeypot_ips() required file 'honeypots_public_ips.csv' does not exist.")
 
+    # Read CSV located in data/external/honeypots_public_ips.csv
     honeypots = pd.read_csv(path.join(project_dir, 'data', 'external', 'honeypots_public_ips.csv'), comment='#')
+
     if for_date is not None:
+        # Convert to datetime object
         for_date = pd.to_datetime(for_date)
+
+        # Parsing start date
         if 'operation_start_date' in honeypots.keys():
             honeypots['operation_start_date'] = pd.to_datetime(honeypots['operation_start_date'])
+
+        # Parsing end date, filling emtpy values with date of 'today'
         if 'operation_end_date' in honeypots.keys():
             honeypots['operation_end_date'] = honeypots['operation_end_date'].fillna(dt.date.today())
             honeypots['operation_end_date'] = pd.to_datetime(honeypots['operation_end_date'])
+
+        # Keep honeypots active on the specified date
         if ('operation_start_date' in honeypots.keys()) and 'operation_end_date' in honeypots.keys():
             honeypots = honeypots[(for_date >= honeypots['operation_start_date']) & (for_date <= honeypots['operation_end_date'])]
+
     ips = honeypots.public_ip.values
     return ips
 
-def _process_zeek_files(zeek_files, date):
+
+def _process_zeek_files(list_of_zeek_files, date):
+    """
+    Process a list of Zeek log files to extract all connections
+    from honeypot IPs for a given date.
+    """
+    # Retrieve the list of honeypot IPs
     ips = _get_honeypot_ips()
+
+    # Initialises daily, a dataframe that will contain
+    # all the connections from the honeypots IPs found
+    # on the input zeek files
     daily = pd.DataFrame()
-    for z in zeek_files:
+
+    # Process each zeek file in the input list
+    for zeek_file in list_of_zeek_files:
         hourly = pd.DataFrame()
-        zeekdata = read_zeek(z)
+
+        # Read the zeek file into a dataframe
+        zeekdata = read_zeek(zeek_file)
+
+        # Find all traffic from IPs on the zeek traffic 
         for ip in ips:
             hourly = pd.concat([hourly, zeekdata[zeekdata['id.resp_h'] == ip]])
+
+        # Store the hourly traffic on the daily dataframe
         daily = pd.concat([daily, hourly])
+
+    # Return a DF with all the traffic seen from the honeypot IPs
+    # on the input Zeek files
     return daily
+
 
 def _process_argus_files(argus_files, date):
     ips = _get_honeypot_ips()
@@ -93,6 +135,7 @@ def _process_argus_files(argus_files, date):
         daily = pd.concat([daily, hourly])
     return daily
 
+
 def _process_raw_files(date):
     '''
     Create a dataset for the date string date in the data/interim folder
@@ -102,7 +145,7 @@ def _process_raw_files(date):
     # if data directory does not exist, execute the magic to get it
     if path.isdir(path.join(project_dir,'data','raw', date)) == False:
         logging.debug(f'Downloading data for {date}')
-        getrawdata(date)
+        get_raw_data(date)
     # after this point, if directory does not exist, we can skip it.
     try:
         zeek_files = [x.path for x in scandir(path.join(project_dir,'data','raw', date)) if x.name.startswith('conn.')]
@@ -118,6 +161,7 @@ def _process_raw_files(date):
     #logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
     #removerawdata(date)
     return
+
 
 def _extract_attacks(date):
     '''
@@ -153,6 +197,7 @@ def _extract_attacks(date):
     #removerawdata(date)
     return
 
+
 def process_zeek_files(dates=None):
     """ 
     Creates the dataset or part of it
@@ -169,6 +214,7 @@ def process_zeek_files(dates=None):
                 pass
     Parallel(n_jobs=12, backend='multiprocessing')(delayed(_process_raw_files)(date) for date in dates)
     return
+
 
 def extract_attacks(dates=None):
     """
@@ -193,6 +239,7 @@ def extract_attacks(dates=None):
     Parallel(n_jobs=12, backend='multiprocessing')(delayed(_extract_attacks)(date) for date in dates)
     return
 
+
 def get_attacks(start=None, end=None, dates=None, usecols=None):
     '''
     Returns a DataFrame with the attacks between the dates start and end or the
@@ -211,6 +258,7 @@ def get_attacks(start=None, end=None, dates=None, usecols=None):
     dfs = [pd.read_csv(path.join(project_dir, 'data', 'processed',f'attacks.{date}.csv.gz'), usecols=usecols, comment='#')
             for date in dates]
     return dfs
+
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
