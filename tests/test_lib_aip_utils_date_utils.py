@@ -53,7 +53,7 @@ class TestValidateAndConvertDate(unittest.TestCase):
         # Test future date raises exception
         future_date = (date.today() + timedelta(days=1)).isoformat()
 
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, "cannot be in the future"):
             validate_and_convert_date(future_date)
 
 
