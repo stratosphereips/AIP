@@ -54,13 +54,12 @@ data_dir = path.join(project_dir,'data')
 
 def _get_honeypot_ips(for_date=None):
     '''
-    Filter active honeypots IPs due date for_date, if there are operation dates in the honeypot file.
-    The honeypots_public_ips.csv has the following format:
+    Return the public IPs of the honeypots. If for_date is given and the
+    honeypot file has operation dates, only return the honeypots active on
+    that date. The honeypots_public_ips.csv has the following format:
         # List of IPs to look for to generate the attack files.
         public_ip,operation_start_date,operation_end_date
     '''
-    logger = logging.getLogger(__name__)
-
     # Check if the file exists before attempting to read it
     honeypot_public_ips = path.join(project_dir, 'data', 'external', 'honeypots_public_ips.csv')
 
@@ -79,7 +78,7 @@ def _get_honeypot_ips(for_date=None):
         if 'operation_start_date' in honeypots.keys():
             honeypots['operation_start_date'] = pd.to_datetime(honeypots['operation_start_date'])
 
-        # Parsing end date, filling emtpy values with date of 'today'
+        # Parsing end date, filling empty values with date of 'today'
         if 'operation_end_date' in honeypots.keys():
             honeypots['operation_end_date'] = honeypots['operation_end_date'].fillna(dt.date.today())
             honeypots['operation_end_date'] = pd.to_datetime(honeypots['operation_end_date'])
@@ -95,13 +94,13 @@ def _get_honeypot_ips(for_date=None):
 def _process_zeek_files(list_of_zeek_files, date):
     """
     Process a list of Zeek log files to extract all connections
-    from honeypot IPs for a given date.
+    sent to the honeypot IPs (the attacks) for a given date.
     """
     # Retrieve the list of honeypot IPs
     ips = _get_honeypot_ips()
 
     # Initialises daily, a dataframe that will contain
-    # all the connections from the honeypots IPs found
+    # all the connections to the honeypot IPs found
     # on the input zeek files
     daily = pd.DataFrame()
 
@@ -112,14 +111,15 @@ def _process_zeek_files(list_of_zeek_files, date):
         # Read the zeek file into a dataframe
         zeekdata = read_zeek(zeek_file)
 
-        # Find all traffic from IPs on the zeek traffic 
+        # Keep the connections where the honeypot is the responder,
+        # that is, traffic sent to the honeypot
         for ip in ips:
             hourly = pd.concat([hourly, zeekdata[zeekdata['id.resp_h'] == ip]])
 
         # Store the hourly traffic on the daily dataframe
         daily = pd.concat([daily, hourly])
 
-    # Return a DF with all the traffic seen from the honeypot IPs
+    # Return a DF with all the traffic sent to the honeypot IPs
     # on the input Zeek files
     return daily
 
@@ -159,7 +159,7 @@ def _process_raw_files(date):
     daily.to_csv(path.join(project_dir,'data','interim', f'daily.conn.{date}.csv.gz'), index=False, compression='gzip')
     logger.debug('Writting file: ' + path.join(project_dir,'data','interim', f'daily.conn.{date}.csv.gz'))
     #logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
-    #removerawdata(date)
+    #remove_raw_data(date)
     return
 
 
@@ -194,7 +194,7 @@ def _extract_attacks(date):
     logger.debug('Writting file: ' + path.join(project_dir,'data','processed', f'attacks.{date}.csv.gz'))
     df.to_csv(path.join(project_dir,'data','processed', f'attacks.{date}.csv.gz'), columns=['orig', 'flows', 'duration', 'packets', 'bytes'], index=False, compression='gzip')
     # logger.debug('Removing raw data (not needed anymore): ' + path.join(project_dir,'data','raw', f'{date}'))
-    #removerawdata(date)
+    #remove_raw_data(date)
     return
 
 
