@@ -75,13 +75,18 @@ def _build_knowledge(start, end, log_level=logging.ERROR):
     return last_knowledge
 
 
-def _rebuild(start_date, end_date=date.today(), log_level=logging.ERROR):
+def _rebuild(start_date, end_date=None, log_level=logging.ERROR):
     """
-    Wrapper to rebuild the knowledge base from the specified start date to today.
+    Wrapper to rebuild the knowledge base from the specified start date to
+    yesterday, the last complete day.
     """
     # Configure logger
     logger = logging.getLogger(__name__)
     logging.basicConfig(level=log_level)
+
+    # Today's data is incomplete, do not add it to the knowledge base
+    if end_date is None:
+        end_date = date.today() - timedelta(days=1)
 
     start_time = time.time()
     logger.debug(f"_rebuild - Rebuilding knowledge base from {start_date} to {end_date}")
