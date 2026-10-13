@@ -70,7 +70,7 @@ This runs all models for today. To use any of the [commands](#commands) below, w
 docker run --rm \
   -v /opt/zeek/logs/:/home/aip/AIP/data/raw:ro \
   -v ${PWD}/data/:/home/aip/AIP/data/:rw \
-  --name aip stratosphereips/aip:latest bin/aip run-models --start-date 2026-10-12 --end-date 2026-10-13
+  --name aip stratosphereips/aip:latest bin/aip run-models --start-date 2026-10-12 --end-date 2026-10-12
 ```
 
 To build the image yourself, see the [Docker guide](etc/docker/README.md).
