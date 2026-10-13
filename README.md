@@ -97,7 +97,7 @@ Run `source aip-venv/bin/activate` and the `export PYTHONPATH` line again each t
 | Run all models for one day | `bin/aip run-models --start-date 2026-10-02 --end-date 2026-10-02` |
 | Run all models for several days | `bin/aip run-models --start-date 2026-10-01 --end-date 2026-10-12` |
 | Run only one model | Add `--model` with `Alpha`, `Alpha7`, `Prioritize_New`, `Prioritize_Consistent` or `Random_Forest` |
-| Rebuild the attacker history from a date until today | `bin/aip rebuild-kb --start-date 2026-10-01` |
+| Rebuild the attacker history from a date until yesterday | `bin/aip rebuild-kb --start-date 2026-10-01` |
 
 Things to know:
 
