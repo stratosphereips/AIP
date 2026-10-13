@@ -38,24 +38,75 @@ Each AIP model generates its own blocklist based on a specific criteria. The mai
     - A more experimental approach to increase blocklist efficiency.
 
 
-## AIP Docker
+## Setup
 
-The best way to run AIP right now is using [Docker](etc/docker/README.md).
+AIP can run with Docker (recommended) or directly with Python. Either way, it needs two things:
 
-## Usage
+1. **Zeek logs** in `data/raw/`, one folder per day (for example `data/raw/2024-10-22/conn.*`). With Docker you can point AIP to your Zeek logs folder instead of copying them.
+2. **Your honeypot IPs** in `data/external/`. Copy the example files and edit them:
 
-AIP will automatically attempt to run all the models using the available data. Assuming the Zeek data is located in its usual location:
+    ```bash
+    cp data/external/honeypots_public_ips_example.csv data/external/honeypots_public_ips.csv
+    cp data/external/do_not_block_these_ips_example.csv data/external/do_not_block_these_ips.csv
+    ```
+
+    - `honeypots_public_ips.csv` (required): the public IPs of your honeypots. AIP only looks at traffic sent to these IPs.
+    - `do_not_block_these_ips.csv` (optional): IPs that must never appear in a blocklist.
+
+### Run with Docker
+
+From the AIP folder, assuming your Zeek logs are in `/opt/zeek/logs/`:
 
 ```bash
-:~$ cd AIP
-:~$ docker run --rm -v /opt/zeek/logs/:/home/aip/AIP/data/raw:ro -v ${PWD}/data/:/home/aip/AIP/data/:rw --name aip stratosphereips/aip:latest bin/aip
+docker run --rm \
+  -v /opt/zeek/logs/:/home/aip/AIP/data/raw:ro \
+  -v ${PWD}/data/:/home/aip/AIP/data/:rw \
+  --name aip stratosphereips/aip:latest bin/aip
 ```
 
-To run AIP for a specific day:
+This runs all models for today. To use any of the [commands](#commands) below, write them after `bin/aip`. For example, to run all models for one day:
+
 ```bash
-:~$ cd AIP
-:~$ docker run --rm -v /opt/zeek/logs/:/home/aip/AIP/data/raw:ro -v ${PWD}/data/:/home/aip/AIP/data/:rw --name aip stratosphereips/aip:latest bin/aip YYYY-MM-DD
+docker run --rm \
+  -v /opt/zeek/logs/:/home/aip/AIP/data/raw:ro \
+  -v ${PWD}/data/:/home/aip/AIP/data/:rw \
+  --name aip stratosphereips/aip:latest bin/aip run-models --start-date 2026-10-12 --end-date 2026-10-12
 ```
+
+To build the image yourself, see the [Docker guide](etc/docker/README.md).
+
+### Run with Python
+
+```bash
+git clone https://github.com/stratosphereips/AIP.git ~/AIP
+cd ~/AIP
+python3 -m venv aip-venv
+source aip-venv/bin/activate
+pip install -r requirements.txt
+export PYTHONPATH=$(pwd)/lib
+bin/aip --help
+```
+
+Run `source aip-venv/bin/activate` and the `export PYTHONPATH` line again each time you open a new terminal.
+
+## Commands
+
+| What you want | Command |
+|---|---|
+| Run all models for today | `bin/aip` |
+| Run all models for one day | `bin/aip run-models --start-date 2026-10-02 --end-date 2026-10-02` |
+| Run all models for several days | `bin/aip run-models --start-date 2026-10-01 --end-date 2026-10-12` |
+| Run only one model | Add `--model` with `Alpha`, `Alpha7`, `Prioritize_New`, `Prioritize_Consistent` or `Random_Forest` |
+| Rebuild the attacker history from a date until yesterday | `bin/aip rebuild-kb --start-date 2026-10-01` |
+
+Things to know:
+
+- If you leave out `--end-date`, it is today. So `--start-date` alone runs every day from that date until today.
+- The blocklist for a day is built from the attacks seen on the days before it.
+- Blocklists are saved in `data/output/<model name>/`.
+- The attacker history is what the Prioritize and Random Forest models learn from. AIP builds it on its own as it runs.
+- To see what AIP is doing, add `-v` (progress) or `-d` (full detail) right after `bin/aip`, for example `bin/aip -v run-models`.
+- See all options with `bin/aip --help`.
 
 ## License
 
