@@ -40,7 +40,7 @@ def read_zeek(path, **kwargs):
         raise z2p.NotAZeekFile(path)
 
 
-# Currently deprecated, AIP is using now strictly Zeek logs
+# Deprecated, AIP only reads Zeek logs
 def read_argus(path, **kwargs):
     from os import path as ospath
     if ospath.exists(path.path + '.csv'):
@@ -64,9 +64,13 @@ def scramble(s):
 
 def get_raw_data(date):
     """
-    Retrieves Zeek data from a remote? location and stores it
-    on a directory for AIP to process it. The copy is done in
-    parallel.
+    Copies the Zeek conn logs of a given date into data/raw/YYYY-MM-DD,
+    using the copy command set in 'magic' in the .env file (for example
+    'cp' or 'scp'). The 24 hourly files are copied in parallel.
+
+    Known issue: this function never copies anything. It is only called
+    when data/raw/YYYY-MM-DD does not exist, and access() returns False
+    for a directory that does not exist, so the copy is always skipped.
     """
 
     # Validate date is well formatted
@@ -74,26 +78,26 @@ def get_raw_data(date):
 
     raw_data_dir = path.join(_project_dir,'data','raw', date)
 
-    # Ensure directory exists and is writable
+    # Only copy if the directory exists and is writable (see known issue above)
     if access(raw_data_dir, W_OK):
         # Create directory, ignore if it exists
         makedirs(raw_data_dir, exist_ok=True)
 
-        # The next part seems to be prepared to retrieve data from a location
-        # and store it in the data/raw/YYYY-MM-DD directory for processing.
+        # Build one copy command per hour of the day:
+        # <magic><date>/conn.<hour>* data/raw/YYYY-MM-DD
         commands = [
-            shlex.split(_config['magic'] + f'{date}/conn.{x:02}* ' + raw_data_dir) 
+            shlex.split(_config['magic'] + f'{date}/conn.{x:02}* ' + raw_data_dir)
             for x in range(0,24)
         ]
 
-        # Attempting to run the previous commands in parallel
+        # Run the copy commands in parallel
         Parallel(n_jobs=24, backend='threading')(delayed(subprocess.run)(cmd) for cmd in commands)
 
 
 def remove_raw_data(date, force=False):
     """
-    Remove (delete) the content of the raw data directory 
-    for a given date.
+    Delete the raw data directory of a given date. Only runs if
+    remove_raw_data is set to true in the .env file, or if force=True.
     """
     # Validate date is well formatted
     dt.datetime.strptime(date, '%Y-%m-%d')
