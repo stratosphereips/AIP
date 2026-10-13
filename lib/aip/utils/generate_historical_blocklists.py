@@ -30,9 +30,9 @@ import time
 from aip.data.access import data_path, project_dir
 from aip.models.alpha import Alpha
 from aip.models.alpha7 import Alpha7
-from lib.aip.models.prioritize_new import New
-from lib.aip.models.prioritize_consistent import Consistent
-from lib.aip.models.random_forest import RandomForest
+from aip.models.prioritize_new import New
+from aip.models.prioritize_consistent import Consistent
+from aip.models.random_forest import RandomForest
 from aip.models.pareto import Pareto
 from datetime import date, timedelta
 from joblib import Parallel, delayed
